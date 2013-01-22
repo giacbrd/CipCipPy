@@ -1,0 +1,54 @@
+
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+
+class TrainingSet():
+
+    def __init__(self, rawTweets, tweetsToPop):
+        """rawTweets is the initial training set, the first tweetsToPop tweets can be successively removed to refine
+        the training set, for example after a new sample is added to it"""
+        self.tweetId=[]
+        self.tweetTarget=[]
+        self.features=[]
+        self.tweetsToPop = tweetsToPop
+        for triple in rawTweets:
+            self.tweetId.append(triple[0])
+            self.tweetTarget.append(1 if triple[1] else 0)
+            self.features.append(' '.join(triple[2]))
+        self.vectorcounts = None
+        self.count_vect = CountVectorizer()
+
+    def countVectorize(self):
+        self.vectorcounts = self.count_vect.fit_transform(self.features)
+
+
+    def vectorizeTest(self, testTweet):
+        return self.count_vect.transform((' '.join(testTweet[2]),))
+
+    def addExample(self, rawTweet):
+        self.tweetId.append(rawTweet[0])
+        self.tweetTarget.append(1 if rawTweet[1] else 0)
+        self.features.append(' '.join(rawTweet[2]))
+
+    def popOldExample(self):
+        if self.tweetsToPop > 0:
+            self.tweetId.pop(0)
+            self.tweetTarget.pop(0)
+            self.features.pop(0)
+            self.tweetsToPop -= 1
+
+
+class NBClassifier():
+    def __init__(self, vectorFeature,vectorTarget):
+        self.NB=MultinomialNB()
+        self.NB.fit(vectorFeature, vectorTarget)
+
+    def retrain(self, vectorFeature, vectorTarget):
+        self.NB.fit(vectorFeature, vectorTarget)
+
+    def classify(self, vectorizedTest):
+        return self.NB.predict(vectorizedTest)
+
+    def getProb(self, vectorizedTest):
+        return self.NB.predict_proba(vectorizedTest)

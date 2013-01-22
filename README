@@ -1,0 +1,59 @@
+CipCipPy
+Twitter IR system for the TREC Microblog track.
+
+Authors: Giacomo Berardi <giacomo.berardi@isti.cnr.it>
+         Andrea Esuli <andrea.esuli@isti.cnr.it>
+         Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>
+URL: <http://tag.isti.cnr.it/cipcippy/>
+For license information, see LICENSE
+
+
+#############################################################################
+
+
+Installation:
+In config.py define the constant ROOT_PATH with the library path (eg: /home/giacomo/projects/CipCipPy/)
+Eventually add the sources path (eg: /home/giacomo/projects/CipCipPy/src) to the PYTHONPATH environment variable.
+
+
+Dependencies:
+    numpy
+    whoosh
+    sklearn
+    nltk
+    httplib2 (only for corpus downloading)
+
+
+Packages and files:
+
+config.py
+    Global constants to configure the environment
+
+corpus
+    New corpus can be generated with the function corpus.builder, passing a list of instances of the classes in
+    corpus.filters
+
+external
+    Interfaces for accessing to external resources
+
+indexing
+    Each module in this package contains a function *index* to generate an index from a plain text corpus, with documents
+    until a specific date, and assigning it a name
+
+retrieval
+    Classes for searching, use the indexes by index names.
+
+classification
+    Supervised learning utilities
+
+realtimeFilering
+    Classes for real-time filtering (a TREC microblog task)
+
+utils
+    Generic classes and functions used in the library
+
+test (not a package)
+    Scripts to execute applications using the library (building indexes, searching from TREC topics, ...)
+
+data (not a package)
+    Data path contains all the data used by the library (cached data, indexes, ...)
