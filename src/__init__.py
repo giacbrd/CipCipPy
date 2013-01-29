@@ -14,6 +14,6 @@ Twitter IR system for the TREC Microblog track.
 """
 
 __version__ = "0.1"
-__authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>", 
-               "Andrea Esuli <andrea.esuli@isti.cnr.it>", 
+__authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
+               "Andrea Esuli <andrea.esuli@isti.cnr.it>",
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]

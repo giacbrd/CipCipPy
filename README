@@ -13,7 +13,7 @@ For license information, see LICENSE
 
 Installation:
 In config.py define the constant ROOT_PATH with the library path (eg: /home/giacomo/projects/CipCipPy/)
-Eventually add the sources path (eg: /home/giacomo/projects/CipCipPy/src) to the PYTHONPATH environment variable.
+Install the package executing as root: python setup.py install
 
 
 Dependencies:

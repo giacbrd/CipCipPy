@@ -1,3 +1,15 @@
+"""
+Index all corpus and store their content in separated inndexes
+arguments:
+    topics file
+    path of the tweet statuses corpus
+    path of the corpus from which extract hashtags (usually is the statuses corpus)
+    path of the link titles corpus
+    path of the tweet named entities corpus
+"""
+
+#FIXME usa argparse ovunque
+
 from CipCipPy.utils.fileManager import readQueries
 from CipCipPy.indexing import hashtag, linkTitle, status, namedEntity
 import sys

@@ -38,7 +38,7 @@ def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResul
 
 def readQueries(filePath):
     """Returns tuples of query string and date from a topics file:
-    (number, query topic, query date, query date as tweet id [, query date as tweet id of the newest tweet])"""
+    (number, query topic, query date, query date as tweet id [, query date as tweet id of the most recent tweet])"""
     queries = []
     f = open(filePath)
     topics = f.read().split('\n</top>\n\n<top>\n')

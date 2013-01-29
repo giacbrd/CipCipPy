@@ -14,5 +14,5 @@ RESOURCE_PATH = os.path.join(DATA_PATH, 'resources')
 #topicsFile = os.path.join(ROOT_PATH, 'data/topics.txt') # TREC topics file path
 
 #TODO these constants should be parameters
-PROC_NUM = 6 # number of processors for indexing computing
-MEM_SIZE = 1024 # memory size for each processor in indexing computing, in MB
+PROC_NUM = 6  # number of processors for indexing computing
+MEM_SIZE = 1024  # memory size for each processor in indexing computing, in MB

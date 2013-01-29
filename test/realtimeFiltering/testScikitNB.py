@@ -1,11 +1,11 @@
 """
 arguments:
-    number of positive samples to find before starting classification
+    number of positive samples to find before starting classification (bootstrap phase)
     number of positive samples
     number of negative samples
     topics file
     relevance judgements
-    path of ids and content per query (test set) for realtime filtering
+    path of ids and content per query for realtime filtering (test set)
     training set dir
     results dir
     "external" for using external information, otherwise "internal"
