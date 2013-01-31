@@ -10,7 +10,7 @@ from . import getIndexPath
 
 segmenter = Segmenter()
 
-def index(corpusPath, name, tweetTime = None, stored = False):
+def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
     """Indexing of segmented hashtags."""
     
     dirList = os.listdir(corpusPath)
@@ -24,6 +24,8 @@ def index(corpusPath, name, tweetTime = None, stored = False):
     if not os.path.exists(indexPath):
         os.makedirs(indexPath)
     else:
+        if not overwrite:
+            return
         shutil.rmtree(indexPath)
         os.makedirs(indexPath)
     ix = whoosh.index.create_in(indexPath, schema)

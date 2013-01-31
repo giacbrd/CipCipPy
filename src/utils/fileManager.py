@@ -1,6 +1,4 @@
-import operator
 import datetime
-import re
 from . import replyRE, hashtagRE, months
 import os.path
 from ..retrieval import getStoredValue
@@ -98,7 +96,7 @@ def iterTweets(filePath, skipNull = True):
     """Iterator over tweets in the plain text file filePath."""
     for line in open(filePath):
         try:
-            line = unicode(line, errors = 'replace')
+            line = unicode(line, errors = 'replace', encoding = 'utf8')
         except UnicodeDecodeError:
             print 'unicode error: ' + line
             continue
@@ -125,6 +123,14 @@ def tweetParser(line):
     return tuple(l)
 
 def dateFromFileName(fileName):
-    """Return the datetime of a collection file name"""
+    """Return the datetime of a collection file name."""
     y, m, d = fileName[:4], fileName[4:6], fileName[6:8]
     return datetime.datetime(int(y), int(m), int(d))
+
+def topicsFileName(filePath):
+    """Returns the unique name of the set of topics (queries) defined in the filePath."""
+    fileName = os.path.split(filePath)[1]
+    if fileName[-3:].lower() == "txt":
+        return fileName[:-4]
+    else:
+        return fileName

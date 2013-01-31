@@ -1,7 +1,7 @@
 import os
 
 # DEFINE THE LIBRARY PATH!
-ROOT_PATH = '/home/giacomo/projects/CipCipPy/'
+ROOT_PATH = '/home/giacomo/Dropbox/projects/CipCipPy/'
 
 DATA_PATH = os.path.join(ROOT_PATH, 'data')
 CACHE_PATH = os.path.join(DATA_PATH, 'cache')

@@ -8,7 +8,7 @@ import whoosh.index
 from . import getIndexPath
 
 
-def index(corpusPath, name, tweetTime = None, stored = False):#, featureExtractor):
+def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):#, featureExtractor):
     """Indexing of the status of tweets."""
     
     dirList = os.listdir(corpusPath)
@@ -32,6 +32,8 @@ def index(corpusPath, name, tweetTime = None, stored = False):#, featureExtracto
     if not os.path.exists(indexPath):
         os.makedirs(indexPath)
     else:
+        if not overwrite:
+            return
         shutil.rmtree(indexPath)
         os.makedirs(indexPath)
     ix = whoosh.index.create_in(indexPath, schema)

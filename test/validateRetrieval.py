@@ -40,6 +40,7 @@ best = (0.5,)
 for r in resultsQueryExp:
     for v in scoreWeights:
         results = s.get(queries, scorer, numOfResults, scoreWeights = v, resultsExpans = r)
+        #FIXME usa script ufficiali di TREC
         curves = ROC(results, qrels)
         areas = 0.
         for curve in curves:
