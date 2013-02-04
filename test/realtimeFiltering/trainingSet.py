@@ -22,6 +22,9 @@ queries = readQueries(sys.argv[3])
 nameSuffix = "." + topicsFileName(sys.argv[3])
 outPath = os.path.join(sys.argv[4], str(n) + '-' + str(m))
 
+if len(sys.argv) > 5:
+    queries = [q for q in queries if q[0] in set(sys.argv[5].split(':'))]
+
 if not os.path.exists(outPath):
     os.makedirs(outPath)
 
@@ -50,11 +53,11 @@ for qNum in queries:
     for i in (0, 1):
         for tweetId in (positives if i == 0 else negatives):
             samples[i].append((tweetId, featureExtractId(tweetId, queries[qNum][0])))
-    print '__________________________________________________'
-    print qNum, len(posResult), len(negResult)
+    printOut = '__________________________________________________' + '\n'
+    printOut += str((qNum, len(posResult), len(negResult))) + '\n'
     for i in (0, 1):
-        for p in samples[i]:
-            print p
-        print '-----------------------'
+        printOut += '\n'.join(samples[i])
+        printOut +=  '-----------------------' + '\n'
+    print printOut
 
     cPickle.dump(samples, open(os.path.join(outPath, qNum), 'w'))

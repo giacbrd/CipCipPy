@@ -42,13 +42,14 @@ def getStoredValue(searcher, tweetId, valueKey):
 
 class Searcher:
     
-    def __init__(self, statusIndexName, hashtagIndexName, linkTitlesIndexName, storedValuesIndexName, overwrite = True):
+    def __init__(self, statusIndexName, hashtagIndexName, linkTitlesIndexName, storedValuesIndexName, overwrite = False):
         self.statusIndexName = statusIndexName
         self.hashtagIndexName = hashtagIndexName
         self.linkTitlesIndexName = linkTitlesIndexName
         self.storedValues = index.open_dir(getIndexPath(storedValuesIndexName)).searcher()
         self.segmenter = hashtag.Segmenter()
         self.results = None
+        # FIXME non va bene! non puoi cancellare tutto, e se ci sono cose in parallelo?
         if overwrite:
             try:
                 cleanCache('retrieval.Searcher')
