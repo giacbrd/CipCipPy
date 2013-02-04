@@ -3,32 +3,33 @@ usage: <topics file> <corpus directory> <output directory> [query numbers divide
 
 import os
 import sys
-from CipCipPy.utils.fileManager import readQueries, iterTweets
+from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
 from CipCipPy.indexing import getIndexPath
 from CipCipPy.retrieval import getStoredValue
 import whoosh.index
 
 queries = readQueries(sys.argv[1])
+nameSuffix = "." + topicsFileName(sys.argv[1])
 
-_storedStatus = whoosh.index.open_dir(getIndexPath('storedStatus')).searcher()
-_storedHashtag = whoosh.index.open_dir(getIndexPath('storedHashtag')).searcher()
-_storedLinkTitle = whoosh.index.open_dir(getIndexPath('storedLinkTitle')).searcher()
-_storedNamedEntity = whoosh.index.open_dir(getIndexPath('storedNamedEntity')).searcher()
+_storedStatus = whoosh.index.open_dir(getIndexPath('storedStatus' + nameSuffix)).searcher()
+_storedHashtag = whoosh.index.open_dir(getIndexPath('storedHashtag' + nameSuffix)).searcher()
+_storedLinkTitle = whoosh.index.open_dir(getIndexPath('storedLinkTitle' + nameSuffix)).searcher()
+_storedNamedEntity = whoosh.index.open_dir(getIndexPath('storedNamedEntity' + nameSuffix)).searcher()
 
 def getStatus(indexId):
-    return getStoredValue(_storedStatus, indexId, 'status')
+    return getStoredValue(_storedStatus, indexId, 'status' + nameSuffix)
 def getTitle(indexId):
-    return getStoredValue(_storedLinkTitle, indexId, 'title')
+    return getStoredValue(_storedLinkTitle, indexId, 'title' + nameSuffix)
 def getHashtag(indexId):
-    return getStoredValue(_storedHashtag, indexId, 'hashtags')
+    return getStoredValue(_storedHashtag, indexId, 'hashtags' + nameSuffix)
 def getNE(indexId):
-    return getStoredValue(_storedNamedEntity, indexId, 'namedEntities')
+    return getStoredValue(_storedNamedEntity, indexId, 'namedEntities' + nameSuffix)
 
 if len(sys.argv) > 4:
     queries = [q for q in queries if q[0] in set(sys.argv[4].split(':'))]
 
 def clean(text):
-    return text.encode('ascii', 'ignore') if text != None else ''
+    return text.encode('ascii', 'replace') if text != None else ''
 
 for q in queries:
     dirList = os.listdir(sys.argv[2])

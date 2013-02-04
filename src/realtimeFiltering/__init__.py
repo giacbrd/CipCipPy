@@ -31,7 +31,7 @@ class Filterer:
         """Remove badly encoded terms."""
         cleanedFeatures = []
         for feat in features:
-            feat = feat.encode('ascii', 'ignore')
+            feat = feat.encode('ascii', 'replace')
             if feat:
                 cleanedFeatures.append(feat)
         return cleanedFeatures

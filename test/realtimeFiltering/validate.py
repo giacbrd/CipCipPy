@@ -15,6 +15,7 @@ from CipCipPy.classification.feature import terms
 from realtimeFiltering import Filterer
 
 queries = readQueries(sys.argv[1])
+
 qrels = readQrels(sys.argv[2], set(q[0] for q in queries))
 filteringIdsPath = sys.argv[3]
 trainingSetPath = sys.argv[4]
@@ -26,8 +27,7 @@ parameters = set(tuple(c.split('-')) for c in sys.argv[6].split(':'))
 def cleanUtf(features):
     cleanedFeatures = []
     for feat in features:
-        # FIXME è corretto usare 'ignore'?
-        feat = feat.encode('ascii', 'ignore')
+        feat = feat.encode('ascii', 'replace')
         if feat:
             cleanedFeatures.append(feat)
     return cleanedFeatures

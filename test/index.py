@@ -31,16 +31,16 @@ def index(q):
     except Empty:
         print "empty index, skipping!"
     print "hashtags indexing"
-    # try:
-    #     hashtag.index(sys.argv[3], 'hashtag' + nameSuffix, tweetTime = q[3])
-    # except Empty:
-    #     print "empty index, skipping!"
+    try:
+        hashtag.index(sys.argv[3], 'hashtag' + nameSuffix, tweetTime = q[3])
+    except Empty:
+        print "empty index, skipping!"
 
 print "collection data indexing"
-status.index(sys.argv[2], 'storedStatus' + nameSuffix, stored = True, overwrite = False)
-linkTitle.index(sys.argv[4], 'storedLinkTitle' + nameSuffix, stored = True, overwrite = False)
-hashtag.index(sys.argv[3], 'storedHashtag' + nameSuffix, stored = True, overwrite = False)
-#namedEntity.index(sys.argv[5], 'storedNamedEntity' + nameSuffix, stored = True, overwrite = False)
+status.index(sys.argv[2], 'storedStatus' + nameSuffix, stored = True)
+linkTitle.index(sys.argv[4], 'storedLinkTitle' + nameSuffix, stored = True)
+hashtag.index(sys.argv[3], 'storedHashtag' + nameSuffix, stored = True)
+namedEntity.index(sys.argv[5], 'storedNamedEntity' + nameSuffix, stored = True, overwrite = False)
 
 try:
     for q in queries:

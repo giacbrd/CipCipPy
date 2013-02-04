@@ -175,7 +175,7 @@ class Searcher:
                 result = [(i, result[i]) for i in sorted(result.keys(), reverse=True)]
                 alreadySeen = set()
                 for i in reversed(xrange(len(result))):
-                    tweetHash = int(hashlib.md5(self.getStoredValue(result[i][0], 'status').encode('ascii', 'replace')).hexdigest()[:12], 16)
+                    tweetHash = int(hashlib.md5(self.getStoredValue(result[i][0], 'status').encode('ascii', 'ignore')).hexdigest()[:12], 16)
                     if result[i][1] < threshold or tweetHash in alreadySeen:
                         del result[i]
                     alreadySeen.add(tweetHash)
