@@ -55,6 +55,12 @@ class NBClassifier():
         return self.NB.predict_proba(vectorizedTest)
 
 class SVMClassifier():
-	def __init__(self, vectorFeature, vectorTarget):
-		self.SVM=svm.SVC()
-		self.SVM.fit(vectorFeature, vectorTarget)
+    def __init__(self, vectorFeature, vectorTarget):
+        self.SVM=svm.SVC()
+        self.SVM.fit(vectorFeature, vectorTarget)
+
+    def retrain(self, vectorFeature, vectorTarget):
+        self.SVM.fit(vectorFeature, vectorTarget)
+
+    def classify(self, vectorizedTest):
+        return self.SVM.predict(vectorizedTest)
