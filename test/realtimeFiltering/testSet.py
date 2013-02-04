@@ -11,10 +11,10 @@ import whoosh.index
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
 
-_storedStatus = whoosh.index.open_dir(getIndexPath('storedStatus' + nameSuffix)).searcher()
-_storedHashtag = whoosh.index.open_dir(getIndexPath('storedHashtag' + nameSuffix)).searcher()
-_storedLinkTitle = whoosh.index.open_dir(getIndexPath('storedLinkTitle' + nameSuffix)).searcher()
-_storedNamedEntity = whoosh.index.open_dir(getIndexPath('storedNamedEntity' + nameSuffix)).searcher()
+_storedStatus = whoosh.index.open_dir(getIndexPath('storedStatus')).searcher()
+_storedHashtag = whoosh.index.open_dir(getIndexPath('storedHashtag')).searcher()
+_storedLinkTitle = whoosh.index.open_dir(getIndexPath('storedLinkTitle')).searcher()
+_storedNamedEntity = whoosh.index.open_dir(getIndexPath('storedNamedEntity')).searcher()
 
 def getStatus(indexId):
     return getStoredValue(_storedStatus, indexId, 'status' + nameSuffix)

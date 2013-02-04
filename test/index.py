@@ -37,10 +37,10 @@ def index(q):
         print "empty index, skipping!"
 
 print "collection data indexing"
-status.index(sys.argv[2], 'storedStatus' + nameSuffix, stored = True)
-linkTitle.index(sys.argv[4], 'storedLinkTitle' + nameSuffix, stored = True)
-hashtag.index(sys.argv[3], 'storedHashtag' + nameSuffix, stored = True)
-namedEntity.index(sys.argv[5], 'storedNamedEntity' + nameSuffix, stored = True, overwrite = False)
+status.index(sys.argv[2], 'storedStatus', stored = True)
+linkTitle.index(sys.argv[4], 'storedLinkTitle', stored = True)
+hashtag.index(sys.argv[3], 'storedHashtag' , stored = True)
+namedEntity.index(sys.argv[5], 'storedNamedEntity', stored = True, overwrite = False)
 
 try:
     for q in queries:
