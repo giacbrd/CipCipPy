@@ -2,6 +2,7 @@
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
+from sklearn import svm
 
 class TrainingSet():
 
@@ -20,7 +21,7 @@ class TrainingSet():
         self.count_vect = CountVectorizer()
 
     def countVectorize(self):
-        self.vectorcounts = self.count_vect.fit_transform(self.features)
+        self.vectorcounts = self.count_vect.fit_transform(self.features, min_df=1)
 
 
     def vectorizeTest(self, testTweet):
@@ -52,3 +53,8 @@ class NBClassifier():
 
     def getProb(self, vectorizedTest):
         return self.NB.predict_proba(vectorizedTest)
+
+class SVMClassifier():
+	def __init__(self, vectorFeature, vectorTarget):
+		self.SVM=svm.SVC()
+		self.SVM.fit(vectorFeature, vectorTarget)
