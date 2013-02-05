@@ -38,11 +38,11 @@ if not os.path.exists(outPath):
 scorer = scoring.BM25F(K1 = 0)
 
 if n:
-    s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus' + nameSuffix)
+    s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus')
     # Retrieval without external information
     posResults = s.get(queries, scorer, n, scoreWeights = (1., .0, .0, .0), resultsExpans = 0)
 if m:
-    s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus' + nameSuffix)
+    s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus')
     # Retrieval without external information
     negResults = s.get(queries, scorer, m, scoreWeights = (1., .0, .0, .0), resultsExpans = 0, complementary=True)
 
@@ -52,13 +52,17 @@ _storedLinkTitle = index.open_dir(getIndexPath('storedLinkTitle')).searcher()
 _storedNamedEntity = index.open_dir(getIndexPath('storedNamedEntity')).searcher()
 
 def getStatus(indexId):
-    return getStoredValue(_storedStatus, indexId, 'status' + nameSuffix)
+    store = getStoredValue(_storedStatus, indexId, 'status')
+    return store if store else ""
 def getTitle(indexId):
-    return getStoredValue(_storedLinkTitle, indexId, 'title' + nameSuffix)
+    store = getStoredValue(_storedLinkTitle, indexId, 'title')
+    return store if store else ""
 def getHashtag(indexId):
-    return getStoredValue(_storedHashtag, indexId, 'hashtags' + nameSuffix)
+    store = getStoredValue(_storedHashtag, indexId, 'hashtags')
+    return store if store else ""
 def getNE(indexId):
-    return getStoredValue(_storedNamedEntity, indexId, 'namedEntities' + nameSuffix)
+    store = getStoredValue(_storedNamedEntity, indexId, 'namedEntities')
+    return store if store else ""
 
 queries = dict((q[0], q[1:]) for q in queries)
 
@@ -79,8 +83,8 @@ for qNum in queries:
     printOut = '__________________________________________________' + '\n'
     printOut += str((qNum, len(posResult), len(negResult))) + '\n'
     for i in (0, 1):
-        printOut += '\n'.join(samples[i])
-        printOut +=  '-----------------------' + '\n'
+        printOut += '\n'.join(str(p) for p in samples[i][:10])
+        printOut +=  '\n-----------------------\n'
     print printOut
 
     cPickle.dump(samples, open(os.path.join(outPath, qNum), 'w'))

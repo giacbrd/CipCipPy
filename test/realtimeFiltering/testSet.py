@@ -17,13 +17,13 @@ _storedLinkTitle = whoosh.index.open_dir(getIndexPath('storedLinkTitle')).search
 _storedNamedEntity = whoosh.index.open_dir(getIndexPath('storedNamedEntity')).searcher()
 
 def getStatus(indexId):
-    return getStoredValue(_storedStatus, indexId, 'status' + nameSuffix)
+    return getStoredValue(_storedStatus, indexId, 'status')
 def getTitle(indexId):
-    return getStoredValue(_storedLinkTitle, indexId, 'title' + nameSuffix)
+    return getStoredValue(_storedLinkTitle, indexId, 'title')
 def getHashtag(indexId):
-    return getStoredValue(_storedHashtag, indexId, 'hashtags' + nameSuffix)
+    return getStoredValue(_storedHashtag, indexId, 'hashtags')
 def getNE(indexId):
-    return getStoredValue(_storedNamedEntity, indexId, 'namedEntities' + nameSuffix)
+    return getStoredValue(_storedNamedEntity, indexId, 'namedEntities')
 
 if len(sys.argv) > 4:
     queries = [q for q in queries if q[0] in set(sys.argv[4].split(':'))]

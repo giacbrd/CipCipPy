@@ -12,7 +12,6 @@ CipCipPy
 
 Real-time filtering package.
 """
-import sys
 
 __version__ = "0.1"
 __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
@@ -65,9 +64,11 @@ class Filterer:
                 rawTweets.append((tweetId, True, self.cleanUtf(features)))
             for tweetId, features in training[1][:m]:
                 rawTweets.append((tweetId, False, self.cleanUtf(features)))
+            classifier = None
             training = TrainingSet(rawTweets, n)
-            training.countVectorize()
-            classifier=NBClassifier(training.vectorcounts, training.tweetTarget)
+            if rawTweets:
+                training.countVectorize()
+                classifier=NBClassifier(training.vectorcounts, training.tweetTarget)
             # do not train the first tweet
             firstTweet = True
             for line in open(os.path.join(filteringIdsPath, q[0])):
@@ -87,7 +88,10 @@ class Filterer:
                     continue
                 elif currRulesCount == 0:
                     training.countVectorize()
-                    classifier.retrain(training.vectorcounts, training.tweetTarget)
+                    if classifier:
+                        classifier.retrain(training.vectorcounts, training.tweetTarget)
+                    else:
+                        classifier=NBClassifier(training.vectorcounts, training.tweetTarget)
                     currRulesCount = -1
                 features = self.cleanUtf(featureExtractText(text[:-1], q[1], external))
                 if not features:
