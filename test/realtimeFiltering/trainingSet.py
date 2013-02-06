@@ -75,6 +75,7 @@ for qNum in queries:
     if m:
         negResult = sorted(negResults[qNum], key=itemgetter(1), reverse=True)
         negatives = [r[0] for r in negResult[:m]]
+    # FIXME la query andrebbe aggiunta nel Filterer non qua
     # add the query as positive example
     samples = ([(qNum, queryFeatureExtractor.get(queries[qNum][0]))], [])
     for i in (0, 1):

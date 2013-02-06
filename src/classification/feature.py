@@ -39,7 +39,7 @@ def bigrams(text):
         for subSent in sent.split(';'):
             bigrams.extend(nltk.bigrams(nltk.word_tokenize(subSent)))
     bigrams = [' '.join(b) for b in bigrams if u'\ufffd' not in b]
-    return [b.lower() for b in bigrams if not len(set(b) & punctuations2)]
+    return [b.lower().replace(' ', '_') for b in bigrams if not len(set(b) & punctuations2)]
 
 def hashtags(text):
     return [h.lower() for h in hashtagRE.findall(text)]

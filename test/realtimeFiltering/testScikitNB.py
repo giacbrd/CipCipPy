@@ -16,7 +16,7 @@ arguments:
 import os
 import sys
 from CipCipPy.utils.fileManager import readQueries, readQrels
-from realtimeFiltering import Filterer
+from CipCipPy.realtimeFiltering import Filterer
 
 rulesCount = int(sys.argv[1])
 n = int(sys.argv[2])

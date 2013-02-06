@@ -25,7 +25,7 @@ class TrainingSet():
 
 
     def vectorizeTest(self, testTweet):
-        return self.count_vect.transform((' '.join(testTweet[2]),))
+        return self.count_vect.transform([' '.join(testTweet[2])])
 
     def addExample(self, rawTweet):
         self.tweetId.append(rawTweet[0])

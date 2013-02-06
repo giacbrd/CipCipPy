@@ -53,13 +53,15 @@ class Filterer:
         """
         results = {}
         for q in queries:
-            currRulesCount = rulesCount
+            currRulesCount = rulesCount if rulesCount > 0 else 0
             print currRulesCount, n, m, q
             results[q[0]] = []
             training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             # (positives, negatives) ordered by relevance
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
             rawTweets=[]
+            # FIXME perché reversed???
+            # FIXME la query dovrebbe essere sempre come esempio positivo nel training!
             for tweetId, features in reversed(training[0][:n]):
                 rawTweets.append((tweetId, True, self.cleanUtf(features)))
             for tweetId, features in training[1][:m]:
@@ -87,6 +89,8 @@ class Filterer:
                             training.addExample((tweetId, False, features))
                     continue
                 elif currRulesCount == 0:
+                    if not training.features:
+                        raise Exception("No training set for classification")
                     training.countVectorize()
                     if classifier:
                         classifier.retrain(training.vectorcounts, training.tweetTarget)
