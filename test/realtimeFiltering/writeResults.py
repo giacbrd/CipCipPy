@@ -1,4 +1,4 @@
-"""wrote results from result dumps
+"""Write results from result dumps
 usage: <dumps dir> <out path> <run name> [printTweets]"""
 
 import sys

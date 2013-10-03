@@ -18,4 +18,5 @@ class InteractiveProcess:
 
     def communicate(self, input):
         self.proc.stdin.write(input + '\n')
+        # FIXME sleep?
         return self.proc.stdout.readline().strip()

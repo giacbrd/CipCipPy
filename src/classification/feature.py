@@ -20,8 +20,14 @@ filterSet = stopwords | punctuations
 punctuations2 = set(('\'', '"', '`'))
 
 segmenter = None
+def getSegmenter(dictionary):
+    global segmenter
+    if not segmenter:
+        segmenter = Segmenter(dictionary)
+    return segmenter
 
 def terms(text):
+    """Returns the unique, filtered, terms of a text"""
     terms = []
     text = hashReplRE.sub(" ", text)
     text = urlRE.sub(" ", text)
@@ -32,6 +38,7 @@ def terms(text):
     return [t for t in terms if t not in filterSet and not len(set(t) & punctuations2)]
 
 def bigrams(text):
+    """Returns term pairs of a text"""
     bigrams = []
     text = hashReplRE.sub(";", text)
     text = urlRE.sub(";", text)
@@ -42,24 +49,24 @@ def bigrams(text):
     return [b.lower().replace(' ', '_') for b in bigrams if not len(set(b) & punctuations2)]
 
 def hashtags(text):
+    """Returns hashtags of a text"""
     return [h.lower() for h in hashtagRE.findall(text)]
 
-def segmHashtags(text):
-    global segmenter
-    if not segmenter:
-        segmenter = Segmenter()
+def segmHashtags(text, dictionary):
+    """Returns terms of the segmented hashtags of a text"""
+    segmenter = getSegmenter(dictionary)
     return terms(' '.join(' '.join(segmenter.get(ht)[0]) for ht in hashtags(text)))
 
-def segmHashtagsBigrams(text):
-    global segmenter
-    if not segmenter:
-        segmenter = Segmenter()
+def segmHashtagsBigrams(text, dictionary):
+    """Returns term pairs of the segmented hashtags of a text"""
+    segmenter = getSegmenter(dictionary)
     hashBigr = []
     for ht in hashtags(text):
         hashBigr.extend(bigrams(' '.join(segmenter.get(ht)[0])))
     return hashBigr
 
 def countAggregateAllEntities(nerTweet):
+    """Returns a feature representing the count of the named entities"""
     result=[]
     count=nerTweet.count('/B-')
     for i in range(count):
@@ -67,6 +74,7 @@ def countAggregateAllEntities(nerTweet):
     return result
 
 def countAggregateMostCommonEntities(nerTweet):
+    """Returns a feature representing the count of the most common named entities"""
     entitiesName=['person','geo-loc','company']
     result=[]
     for ent in entitiesName:
@@ -76,6 +84,7 @@ def countAggregateMostCommonEntities(nerTweet):
     return result
 
 def countSpecificAllEntities(nerTweet):
+    """Returns a feature representing the count of each type of named entity"""
     entitiesName=['person','geo-loc','company','facility','product','band','sportsteam','movie','tv-show','other','NONE']
     result=[]
     for ent in entitiesName:
@@ -85,6 +94,7 @@ def countSpecificAllEntities(nerTweet):
     return result
 
 def countSpecificMostCommonEntities(nerTweet):
+    """Returns a feature representing the count of each type of the most common named entities"""
     entitiesName=['person','geo-loc','company']
     result=[]
     for ent in entitiesName:
@@ -94,6 +104,7 @@ def countSpecificMostCommonEntities(nerTweet):
     return result
 
 def countIntersectingTerms(text, query):
+    """Returns a feature representing the number of terms in common between two texts"""
     result=[]
     termsQuery=terms(query)
     termsText=terms(text)

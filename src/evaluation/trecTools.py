@@ -2,4 +2,4 @@
 
 def evaluate(toolPath, qrelsPath, resultPath):
     """Use trec_eval to return an object with all the evaluations on the result."""
-    pass
+    raise NotImplementedError()

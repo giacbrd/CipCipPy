@@ -1,4 +1,6 @@
-from CipCipPy.classification.feature import *
+"""Functions for features extraction from text"""
+
+from ..classification.feature import *
 #from CipCipPy.indexing import getIndexPath
 #from CipCipPy.retrieval import getStoredValue
 #import whoosh.index
@@ -28,6 +30,7 @@ queryFeatureExtractor = FeatureExtractor((terms, bigrams))
 #    return features
 
 def featureExtractText(text, query, external = True):
+    """Extracts all the features from an sample of text + query"""
     features = []
     text = text.split('\t\t')
     if text[0]: # status

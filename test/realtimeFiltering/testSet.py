@@ -1,20 +1,19 @@
-"""For each query serialize tweet ids and corpus content in the time range. Last content is external, like link titles.
+"""For each query serialize tweet ids and corpus content in the time range. Last content is external, e.g. link titles.
 usage: <topics file> <corpus directory> <output directory> [query numbers divided by :]"""
 
 import os
 import sys
 from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
-from CipCipPy.indexing import getIndexPath
+from CipCipPy.indexing import getIndexPath, getIndex
 from CipCipPy.retrieval import getStoredValue
-import whoosh.index
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
 
-_storedStatus = whoosh.index.open_dir(getIndexPath('storedStatus')).searcher()
-_storedHashtag = whoosh.index.open_dir(getIndexPath('storedHashtag')).searcher()
-_storedLinkTitle = whoosh.index.open_dir(getIndexPath('storedLinkTitle')).searcher()
-_storedNamedEntity = whoosh.index.open_dir(getIndexPath('storedNamedEntity')).searcher()
+_storedStatus = getIndex('storedStatus')
+_storedHashtag = getIndex('storedHashtag')
+_storedLinkTitle = getIndex('storedLinkTitle')
+_storedNamedEntity = getIndex('storedNamedEntity')
 
 def getStatus(indexId):
     return getStoredValue(_storedStatus, indexId, 'status')

@@ -1,4 +1,4 @@
-
+"""Classification with scikit-learn"""
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
@@ -21,18 +21,21 @@ class TrainingSet():
         self.count_vect = CountVectorizer(min_df=1)
 
     def countVectorize(self):
+        """Compute vectors of features frequency"""
         self.vectorcounts = self.count_vect.fit_transform(self.features)
 
-
     def vectorizeTest(self, testTweet):
+        """Vectorize a tweet"""
         return self.count_vect.transform([' '.join(testTweet[2])])
 
     def addExample(self, rawTweet):
+        """Add a new example for retraining"""
         self.tweetId.append(rawTweet[0])
         self.tweetTarget.append(1 if rawTweet[1] else 0)
         self.features.append(' '.join(rawTweet[2]))
 
     def popOldExample(self):
+        """Pop out the first example inserted"""
         if self.tweetsToPop > 0:
             self.tweetId.pop(0)
             self.tweetTarget.pop(0)

@@ -8,7 +8,7 @@ arguments:
     parameters: rulesCount-posTrainCut-negTrainCut. e.g. 10-1-100:10-2-200:10-5-100:10-5-1000
 """
 
-import sys
+import sys, collections, re
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.evaluation import T11SU, F1
 from CipCipPy.classification.feature import terms
@@ -25,14 +25,6 @@ external = False
 if sys.argv[5] == 'external':
     external = True
 parameters = set(tuple(c.split('-')) for c in sys.argv[6].split(':'))
-
-def cleanUtf(features):
-    cleanedFeatures = []
-    for feat in features:
-        feat = feat.encode('ascii', 'replace')
-        if feat:
-            cleanedFeatures.append(feat)
-    return cleanedFeatures
 
 def intersect(query, text):
     return len(set(terms(query)) & set(terms(text)))
@@ -100,6 +92,7 @@ for param in parameters:
     jig.comp_means()
     jig.print_means()
 
+    # Using CipCipPy evaluation tools
     # T11SUs = T11SU(results, qrels)
     # F1s = F1(results, qrels)
     # print 'parameters:', param

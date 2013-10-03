@@ -1,11 +1,18 @@
-# CipCipPy
-# Twitter IR system for the TREC Microblog track.
+#    CipCipPy - Twitter IR system for the TREC Microblog track.
+#    Copyright (C) <2011-2013>  Giacomo Berardi, Andrea Esuli, Diego Marcheggiani
 #
-# Authors: Giacomo Berardi <giacomo.berardi@isti.cnr.it>
-#          Andrea Esuli <andrea.esuli@isti.cnr.it>
-#          Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>
-# URL: <http://tag.isti.cnr.it/cipcippy/>
-# For license information, see LICENSE
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 CipCipPy
@@ -36,6 +43,7 @@ class News:
     """Manage content retrieved from Reuters for given topics."""
     
     def __init__(self, queries, numOfPages):
+        """queries are used to retrieve the first numOfPages articles, for each, from Reuters"""
         
         self.queries = queries
         self.schema = ('mobile.reuters.com', '<p>', '<div class="lnk">')
@@ -62,7 +70,6 @@ class News:
         return self.contents
 
     def retrieveContents(self):
-        contents = []
         for query in self.queries:
             alreadySeen = set()
             n = 0

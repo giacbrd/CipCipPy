@@ -1,5 +1,5 @@
 """
-Index all corpus and store their content in separated inndexes
+Index all corpus and store their content in separated indexes
 arguments:
     topics file
     path of the tweet statuses corpus
@@ -8,12 +8,14 @@ arguments:
     path of the tweet named entities corpus
 """
 
-#FIXME usa argparse ovunque
+#FIXME use argparse
 
 from CipCipPy.utils.fileManager import readQueries, topicsFileName
 from CipCipPy.indexing import hashtag, linkTitle, status, namedEntity
 import sys
 from Queue import Empty
+from CipCipPy.config import RESOURCE_PATH
+import os
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
@@ -32,14 +34,14 @@ def index(q):
         print "empty index, skipping!"
     print "hashtags indexing"
     try:
-        hashtag.index(sys.argv[3], 'hashtag' + nameSuffix, tweetTime = q[3])
+        hashtag.index(sys.argv[3], 'hashtag' + nameSuffix, tweetTime = q[3], dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
     except Empty:
         print "empty index, skipping!"
 
 print "collection data indexing"
 status.index(sys.argv[2], 'storedStatus', stored = True)
 linkTitle.index(sys.argv[4], 'storedLinkTitle', stored = True)
-hashtag.index(sys.argv[3], 'storedHashtag' , stored = True)
+hashtag.index(sys.argv[3], 'storedHashtag' , stored = True, dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
 namedEntity.index(sys.argv[5], 'storedNamedEntity', stored = True, overwrite = False)
 
 try:

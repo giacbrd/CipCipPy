@@ -1,4 +1,5 @@
 """
+Test filtering.
 arguments:
     number of positive samples to find before starting classification (bootstrap phase)
     number of positive samples
@@ -18,6 +19,8 @@ import sys
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.realtimeFiltering import Filterer
 
+#FIXME use argparse
+
 rulesCount = int(sys.argv[1])
 n = int(sys.argv[2])
 m = int(sys.argv[3])
@@ -33,7 +36,7 @@ if sys.argv[9] == 'external':
     external = True
 
 
-runName = 'runNeMIS_' + str(rulesCount) + '-' + str(n) + '-' + str(m) + ('_external' if external else '_internal')
+runName = 'run1_' + str(rulesCount) + '-' + str(n) + '-' + str(m) + ('_external' if external else '_internal')
 
 dumpsPath = os.path.join(resultsPath, 'dumps_' + runName)
 if not os.path.exists(dumpsPath):

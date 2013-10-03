@@ -1,11 +1,18 @@
-# CipCipPy
-# Twitter IR system for the TREC Microblog track.
+#    CipCipPy - Twitter IR system for the TREC Microblog track.
+#    Copyright (C) <2011-2013>  Giacomo Berardi, Andrea Esuli, Diego Marcheggiani
 #
-# Authors: Giacomo Berardi <giacomo.berardi@isti.cnr.it>
-#          Andrea Esuli <andrea.esuli@isti.cnr.it>
-#          Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>
-# URL: <http://tag.isti.cnr.it/cipcippy/>
-# For license information, see LICENSE
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 CipCipPy
@@ -56,12 +63,12 @@ class Filterer:
             currRulesCount = rulesCount if rulesCount > 0 else 0
             print currRulesCount, n, m, q
             results[q[0]] = []
-            training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             # (positives, negatives) ordered by relevance
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
+            training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             rawTweets=[]
-            # FIXME perché reversed???
-            # FIXME la query dovrebbe essere sempre come esempio positivo nel training!
+            # FIXME justify using reversed
+            # FIXME the query should be a positive sample in the training
             for tweetId, features in reversed(training[0][:n]):
                 rawTweets.append((tweetId, True, self.cleanUtf(features)))
             for tweetId, features in training[1][:m]:

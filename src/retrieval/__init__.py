@@ -1,11 +1,18 @@
-# CipCipPy
-# Twitter IR system for the TREC Microblog track.
+#    CipCipPy - Twitter IR system for the TREC Microblog track.
+#    Copyright (C) <2011-2013>  Giacomo Berardi, Andrea Esuli, Diego Marcheggiani
 #
-# Authors: Giacomo Berardi <giacomo.berardi@isti.cnr.it>
-#          Andrea Esuli <andrea.esuli@isti.cnr.it>
-#          Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>
-# URL: <http://tag.isti.cnr.it/cipcippy/>
-# For license information, see LICENSE
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 CipCipPy
@@ -42,14 +49,15 @@ def getStoredValue(searcher, tweetId, valueKey):
 
 class Searcher:
     
-    def __init__(self, statusIndexName, hashtagIndexName, linkTitlesIndexName, storedValuesIndexName, overwrite = False):
+    def __init__(self, statusIndexName, hashtagIndexName, linkTitlesIndexName, storedValuesIndexName, dictionary, overwrite = False):
+        """Generate a searcher given the name of the indexes stored by CipCipPy"""
         self.statusIndexName = statusIndexName
         self.hashtagIndexName = hashtagIndexName
         self.linkTitlesIndexName = linkTitlesIndexName
         self.storedValues = index.open_dir(getIndexPath(storedValuesIndexName)).searcher()
-        self.segmenter = hashtag.Segmenter()
+        self.segmenter = hashtag.Segmenter(dictionary)
         self.results = None
-        # FIXME non va bene! non puoi cancellare tutto, e se ci sono cose in parallelo?
+        # FIXME can not delete everything: another process may be working on the cache
         if overwrite:
             try:
                 cleanCache('retrieval.Searcher')
@@ -57,6 +65,7 @@ class Searcher:
                 pass
 
     def getExpansedQuery(self, query, resultsExpans, complementary = False):
+        """Expand a query using some first retrieved results"""
         qp = QueryParser("status", schema = self.statusIndex.schema)
         qp.add_plugin(BoostPlugin())
         q = qp.parse('* NOT (' + ' OR '.join(t for t in query[1].split(' ') if t.strip()) + ')' if complementary else query[1])
@@ -81,8 +90,11 @@ class Searcher:
     def get(self, queries, scoringObj, numOfResults, scoreWeights = (0.2, 0.2, 0.2, 0.2), resultsExpans = 20, threshold = 0., complementary = False):
         """Search a list of text queries and iterates on the results.
         queries - list of tuples of text queries and dates
+        scoringObj - a whoosh object of a scoring class (for weighting results)
+                scoreWeights - weights for each type of score
         resultsExpans - number of results to use for hashtag query expansion
-        scoreWeights - weights for each type of score
+        threshold - if the score value is lower than threshold, filter out the result
+        complementary - retrieve results for the complementary query (documents not relevant to the query)
         """
         self.results = {}
         statusW, hashtagW, linkTitleW, dateW = scoreWeights
@@ -116,7 +128,7 @@ class Searcher:
                         if complementary:
                             queryStatus = '* NOT (' + ' OR '.join(t for t in query[1].split(' ') if t.strip()) + ')'
                         else:
-                        # disjunction of the cunjunctions of all the pairs of the query
+                            # disjunction of the cunjunctions of all the pairs of the query
                             queryStatus = [t for t in query[1].split(' ') if t.strip()]
                             queryStatus = frozenset(frozenset((t1, t2)) for t1 in queryStatus for t2 in queryStatus)
                             queryStatus = ' OR '.join(['(' + ' AND '.join(tuple(t)) + ')' for t in queryStatus])

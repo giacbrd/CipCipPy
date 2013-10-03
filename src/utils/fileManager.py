@@ -1,3 +1,5 @@
+"""Functions for several IO uses"""
+
 import datetime
 from . import replyRE, hashtagRE, months
 import os.path

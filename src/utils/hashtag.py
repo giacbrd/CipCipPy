@@ -1,8 +1,8 @@
-import os
+"""Hashtag management tools"""
+
 import re
 import pickle
-from itertools import groupby
-from ..config import RESOURCE_PATH
+import sys
 
 class Segmenter:
     
@@ -12,16 +12,17 @@ class Segmenter:
     def __wordProb(self, word):
         return self.dictionary.get(word, 0) / self.total
     
-    def __init__(self, resource = None):
-        """resource is the text from which the dictionary from segmentation is generated"""
-        dictionary=open(os.path.join(RESOURCE_PATH, '1gramsGoogle'),'r')
-        self.dictionary = pickle.load(dictionary)
-        dictionary.close()
+    def __init__(self, dictionary):
+        """dictionary is a map of terms and frequency values (a dict file, serialized with pickle).
+        It can be generated from a generic text, and it is used for segmentation."""
+        #dictionary=open(os.path.join(RESOURCE_PATH, '1gramsGoogle'),'r')
+        self.dictionary = pickle.load(open(dictionary))
         self.maxWordLength = max(map(len, self.dictionary))
         self.total = float(sum(self.dictionary.values()))
 
 
     def get(self, text):
+        """Segment the hashtag text"""
         text=text.lower()
         probs, lasts = [1.0], [0]
         for i in range(1, len(text) + 1):
@@ -39,9 +40,8 @@ class Segmenter:
 
 
 if __name__ == '__main__':
-    se = Segmenter()
+    se = Segmenter(sys.argv[1])
     print se.get('skypeisnotworkingagain')
     print se.get('mamamiahereicomeagain')
     print se.get('blacksabbathrocks')
-    print se.get('fuckyoubarackobama')
     print se.get('facebookisnotworking')

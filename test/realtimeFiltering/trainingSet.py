@@ -12,11 +12,13 @@ import sys
 import os
 from CipCipPy.utils.fileManager import readQueries, topicsFileName
 from CipCipPy.retrieval import Searcher, getStoredValue
-from CipCipPy.indexing import getIndexPath
+from CipCipPy.indexing import getIndexPath, getIndex
 from whoosh import scoring, index
 import cPickle
 from operator import itemgetter
 from CipCipPy.realtimeFiltering.feature import featureExtractText, queryFeatureExtractor
+from CipCipPy.config import RESOURCE_PATH
+
 
 n = int(sys.argv[1])
 m = int(sys.argv[2])
@@ -37,19 +39,20 @@ if not os.path.exists(outPath):
 
 scorer = scoring.BM25F(K1 = 0)
 
+
+
+s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus', dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
 if n:
-    s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus')
     # Retrieval without external information
     posResults = s.get(queries, scorer, n, scoreWeights = (1., .0, .0, .0), resultsExpans = 0)
 if m:
-    s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus')
     # Retrieval without external information
     negResults = s.get(queries, scorer, m, scoreWeights = (1., .0, .0, .0), resultsExpans = 0, complementary=True)
 
-_storedStatus = index.open_dir(getIndexPath('storedStatus')).searcher()
-_storedHashtag = index.open_dir(getIndexPath('storedHashtag')).searcher()
-_storedLinkTitle = index.open_dir(getIndexPath('storedLinkTitle')).searcher()
-_storedNamedEntity = index.open_dir(getIndexPath('storedNamedEntity')).searcher()
+_storedStatus = getIndex('storedStatus')
+_storedHashtag = getIndex('storedHashtag')
+_storedLinkTitle = getIndex('storedLinkTitle')
+_storedNamedEntity = getIndex('storedNamedEntity')
 
 def getStatus(indexId):
     store = getStoredValue(_storedStatus, indexId, 'status')
@@ -75,7 +78,7 @@ for qNum in queries:
     if m:
         negResult = sorted(negResults[qNum], key=itemgetter(1), reverse=True)
         negatives = [r[0] for r in negResult[:m]]
-    # FIXME la query andrebbe aggiunta nel Filterer non qua
+    # FIXME the query should be passed to the Filterer
     # add the query as positive example
     samples = ([(qNum, queryFeatureExtractor.get(queries[qNum][0]))], [])
     for i in (0, 1):

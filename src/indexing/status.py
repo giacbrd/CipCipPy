@@ -1,3 +1,4 @@
+"""Function for creating twitter statuses index"""
 
 import os
 import shutil
@@ -16,8 +17,8 @@ def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
     schema = Schema(id = ID(stored = True, unique = True),
                     user = ID,
                     http = NUMERIC, # http state
-                    date = DATETIME(stored = stored), # INDICIZZARLO?
-                    status = TEXT(stored = stored), # CONTROLLA CHE ANALYZER USARE
+                    date = DATETIME(stored = stored), # tweet date
+                    status = TEXT(stored = stored), # status text of the tweet #TODO use a proper analyzer
                     hashtags = KEYWORD(stored = stored) # list of hashtags in the status
                     #replies = KEYWORD, # list of user replies in the status, as users
                     #vector = STORED
@@ -46,7 +47,7 @@ def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
         for tweet in iterTweets(os.path.join(corpusPath, fName)):
             if tweetTime and int(tweet[0]) > tweetTime:
                 continue
-            if tweet[2] != '302': #and not 'RT @' in tweet[4]:
+            if tweet[2] != '302': #and not 'RT @' in tweet[4]: # FIXME retweet filtering
                 #v = featureExtractor(tweet[4].encode('ascii', 'replace'))
                 writer.add_document(id = tweet[0],
                                     user = tweet[1],

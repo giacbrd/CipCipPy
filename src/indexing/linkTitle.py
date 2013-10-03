@@ -1,3 +1,4 @@
+"""Function for creating link titles index"""
 
 import os
 import shutil
@@ -36,7 +37,7 @@ def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
         for tweet in iterTweets(os.path.join(corpusPath, fName)):
             if tweetTime and int(tweet[0]) > tweetTime:
                 continue
-            if tweet[2] != '302': #and not 'RT @' in tweet[4]: # FILTRA I RETWEET, DA CORREGGERE!
+            if tweet[2] != '302': #and not 'RT @' in tweet[4]: # FIXME retweet filtering
                 writer.add_document(id = tweet[0],
                                     date = tweet[3],
                                     title = tweet[4]

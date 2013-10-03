@@ -1,3 +1,5 @@
+"""Explore optimal parameters for retrieval"""
+
 from CipCipPy.retrieval import Searcher
 from whoosh import scoring
 import sys
@@ -7,13 +9,16 @@ from CipCipPy.evaluation import AUC, ROC
 from itertools import product, permutations
 import EvalJig as ej
 from mb12eval import *
+from CipCipPy.config import RESOURCE_PATH
+import os, collections
 
 
 numOfResults = 10000 # how many tweets retrieve and filter, scores are biased on this value
 
 ### PARAMETERS ###
 
-resultsQueryExp = (0, 5, 10, 20, 30)#(0, 5, 10, 20, 30, 50) # number of results from wich hashtags are extracted to expand the query for the final retrieval
+# number of results from wich hashtags are extracted to expand the query for the final retrieval
+resultsQueryExp = (0, 5, 10, 20, 30)#(0, 5, 10, 20, 30, 50)
 
 # Weights for scores for final ranking, components are:
 #   weight for text retrieval scores of the tweets status
@@ -34,7 +39,8 @@ for x in combinations_with_replacement([0.4, 0.6, 0.3, 0.7, 0.2, 0.8, 0.1, 0.9, 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
 
-s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus' + nameSuffix)
+s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix,
+             'storedStatus' + nameSuffix, dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
 
 scorer = scoring.BM25F(K1 = 0)
 
@@ -47,7 +53,7 @@ jig.add_op(ej.PrecAt(10))
 jig.add_op(ej.PrecAt(20))
 jig.add_op(ej.PrecAt(30))
 jig.add_op(ej.RelString())
-#FIXME il minimo valore di rilevanza deve essere un parametro
+#FIXME minrel should be a parameter
 jig.minrel = 2
 jig.evaldepth = 1000
 jig.verbose = False

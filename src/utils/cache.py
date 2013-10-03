@@ -1,3 +1,5 @@
+"""Functions for caching data"""
+
 import hashlib
 import os
 import shutil
