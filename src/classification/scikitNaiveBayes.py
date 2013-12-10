@@ -9,22 +9,22 @@ class TrainingSet():
     def __init__(self, rawTweets, tweetsToPop):
         """rawTweets is the initial training set, the first tweetsToPop tweets can be successively removed to refine
         the training set, for example after a new sample is added to it"""
-        self.tweetId=[]
-        self.tweetTarget=[]
-        self.features=[]
+        self.tweetId = []
+        self.tweetTarget = []
+        self.features = []
         self.tweetsToPop = tweetsToPop
         for triple in rawTweets:
             self.tweetId.append(triple[0])
             self.tweetTarget.append(1 if triple[1] else 0)
             self.features.append(' '.join(triple[2]))
-        self.vectorcounts = None
+        self.vectoridf = None
         self.count_vect = CountVectorizer(min_df=1, binary=True)
         self.idf_transf = TfidfTransformer()
 
     def countVectorize(self):
         """Compute vectors of features presence (binary count), and inverse document frequency"""
-        self.vectorcounts = self.count_vect.fit_transform(self.features)
-        self.vectoridf = self.idf_transf.fit_transform(self.vectorcounts)
+        vectorcounts = self.count_vect.fit_transform(self.features)
+        self.vectoridf = self.idf_transf.fit_transform(vectorcounts)
 
     def vectorizeTest(self, testTweet):
         """Vectorize a tweet with idf"""
@@ -47,7 +47,7 @@ class TrainingSet():
 
 class NBClassifier():
     def __init__(self, vectorFeature,vectorTarget):
-        self.NB=MultinomialNB()
+        self.NB = MultinomialNB()
         self.NB.fit(vectorFeature, vectorTarget)
 
     def retrain(self, vectorFeature, vectorTarget):
@@ -61,7 +61,7 @@ class NBClassifier():
 
 class SVMClassifier():
     def __init__(self, vectorFeature, vectorTarget):
-        self.SVM=svm.SVC()
+        self.SVM = svm.SVC()
         self.SVM.fit(vectorFeature, vectorTarget)
 
     def retrain(self, vectorFeature, vectorTarget):
