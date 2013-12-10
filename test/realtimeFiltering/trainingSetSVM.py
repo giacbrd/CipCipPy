@@ -16,7 +16,7 @@ from CipCipPy.indexing import getIndexPath, getIndex
 from whoosh import scoring, index
 import cPickle
 from operator import itemgetter
-from CipCipPy.realtimeFiltering.feature import featureExtractText, queryFeatureExtractor
+from CipCipPy.realtimeFiltering import SVMFilterer
 from CipCipPy.config import RESOURCE_PATH
 
 
@@ -39,8 +39,6 @@ if not os.path.exists(outPath):
     os.makedirs(outPath)
 
 scorer = scoring.BM25F(K1 = 0)
-
-
 
 s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus', dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
 #if n:
@@ -68,6 +66,8 @@ def getAnnotation(indexId):
     store = getStoredValue(_storedAnnotation, indexId, 'annotations')
     return store if store else ""
 
+featureExtract = SVMFilterer().featureExtract
+
 queries = dict((q[0], q[1:]) for q in queries)
 
 for qNum in queries:
@@ -80,7 +80,7 @@ for qNum in queries:
 #    samples = ([(qNum, queryFeatureExtractor.get(queries[qNum][0]))], [])
     samples = ([], [])
     for tweetId in negatives:
-        samples[1].append((tweetId, featureExtractText(getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + \
+        samples[1].append((tweetId, featureExtract(getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + \
                             getTitle(tweetId) + '\t\t' + getAnnotation(tweetId), queries[qNum][0], external = external)))
     printOut = '__________________________________________________' + '\n'
     printOut += str((qNum, len(negResult))) + '\n'
