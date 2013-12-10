@@ -14,6 +14,7 @@ nameSuffix = "." + topicsFileName(sys.argv[1])
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')
 _storedLinkTitle = getIndex('storedLinkTitle')
+_storedAnnotation = getIndex('storedAnnotations20130805')
 #_storedNamedEntity = getIndex('storedNamedEntity')
 
 def getStatus(indexId):
@@ -22,6 +23,9 @@ def getTitle(indexId):
     return getStoredValue(_storedLinkTitle, indexId, 'title')
 def getHashtag(indexId):
     return getStoredValue(_storedHashtag, indexId, 'hashtags')
+def getAnnotation(indexId):
+    store = getStoredValue(_storedAnnotation, indexId, 'annotations')
+    return store if store else ""
 #def getNE(indexId):
 #    return getStoredValue(_storedNamedEntity, indexId, 'namedEntities')
 
@@ -41,5 +45,7 @@ for q in queries:
                 time = str(time)
                 status = getStatus(time)
                 title = getTitle(time)
+                annotations = getAnnotation(time)
                 if status or title:
-                    outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + clean(title) + '\n')
+                    outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \
+                                  clean(title) + '\t\t' + clean(annotations) + '\n')

@@ -53,6 +53,7 @@ negResults = s.get(queries, scorer, neg, scoreWeights = (1., .0, .0, .0), result
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')
 _storedLinkTitle = getIndex('storedLinkTitle')
+_storedAnnotation = getIndex('storedAnnotations20130805')
 
 def getStatus(indexId):
     store = getStoredValue(_storedStatus, indexId, 'status')
@@ -62,6 +63,9 @@ def getTitle(indexId):
     return store if store else ""
 def getHashtag(indexId):
     store = getStoredValue(_storedHashtag, indexId, 'hashtags')
+    return store if store else ""
+def getAnnotation(indexId):
+    store = getStoredValue(_storedAnnotation, indexId, 'annotations')
     return store if store else ""
 
 queries = dict((q[0], q[1:]) for q in queries)
@@ -76,7 +80,8 @@ for qNum in queries:
 #    samples = ([(qNum, queryFeatureExtractor.get(queries[qNum][0]))], [])
     samples = ([], [])
     for tweetId in negatives:
-        samples[1].append((tweetId, featureExtractText(getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + getTitle(tweetId), queries[qNum][0], external = external)))
+        samples[1].append((tweetId, featureExtractText(getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + \
+                            getTitle(tweetId) + '\t\t' + getAnnotation(tweetId), queries[qNum][0], external = external)))
     printOut = '__________________________________________________' + '\n'
     printOut += str((qNum, len(negResult))) + '\n'
     for i in (0, 1):
