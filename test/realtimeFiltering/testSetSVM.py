@@ -1,4 +1,5 @@
-"""For each query serialize tweet ids and corpus content in the time range. Last content is external, e.g. link titles.
+"""Test set generation for the SVM filterer.
+For each query serialize tweet ids and corpus content in the time range. Last content is external, e.g. link titles.
 usage: <topics file> <corpus directory> <output directory> [query numbers divided by :]"""
 
 import os
@@ -13,7 +14,7 @@ nameSuffix = "." + topicsFileName(sys.argv[1])
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')
 _storedLinkTitle = getIndex('storedLinkTitle')
-_storedNamedEntity = getIndex('storedNamedEntity')
+#_storedNamedEntity = getIndex('storedNamedEntity')
 
 def getStatus(indexId):
     return getStoredValue(_storedStatus, indexId, 'status')
@@ -21,8 +22,8 @@ def getTitle(indexId):
     return getStoredValue(_storedLinkTitle, indexId, 'title')
 def getHashtag(indexId):
     return getStoredValue(_storedHashtag, indexId, 'hashtags')
-def getNE(indexId):
-    return getStoredValue(_storedNamedEntity, indexId, 'namedEntities')
+#def getNE(indexId):
+#    return getStoredValue(_storedNamedEntity, indexId, 'namedEntities')
 
 if len(sys.argv) > 4:
     queries = [q for q in queries if q[0] in set(sys.argv[4].split(':'))]
@@ -41,4 +42,4 @@ for q in queries:
                 status = getStatus(time)
                 title = getTitle(time)
                 if status or title:
-                    outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + clean(getNE(time)) + '\t\t' + clean(title) + '\n')
+                    outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + clean(title) + '\n')

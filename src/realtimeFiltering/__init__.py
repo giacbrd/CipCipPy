@@ -26,10 +26,12 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
 
-from feature import *
+from ..classification.feature import *
 import cPickle
 from CipCipPy.classification.scikitNaiveBayes import TrainingSet, NBClassifier
 import os
+
+_extractor1 = FeatureExtractor((terms, bigrams))
 
 class Filterer:
 
@@ -45,6 +47,100 @@ class Filterer:
     def intersect(self, query, text):
         """How many terms query amd text have in common."""
         return len(set(terms(query)) & set(terms(text)))
+
+class SVMFilterer(Filterer):
+
+    def featureExtract(self, text, external = True):
+        """Extracts all the features from an sample of text + query"""
+        features = []
+        text = text.split('\t\t')
+        if text[0]: # status
+            features.extend(_extractor1.get(text[0]))
+        if text[1]: # hashtag
+            features.extend(_extractor1.get(text[1]))
+        if external and text[2]: # link title
+            features.extend(_extractor1.get(text[2]))
+        return features
+
+    def get(self, queries, neg, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath = None):
+        """ Return filtered tweets for query topics and the relative time ranges.
+        queries - queries from a topic file
+        neg - number of negative samples
+        trainingSetPath - training set dir
+        filteringIdsPath - path of ids and content per query (test set) for realtime filtering.
+                           The tweet line format is defined in the method featureExtract
+        qrels - relevance judgements
+        external - True for using external information, otherwise False
+        dumpsPath - path where to store serialized results
+        """
+        results = {}
+        for q in queries:
+            print neg, q
+            results[q[0]] = []
+            # (positives, negatives) ordered by relevance
+            # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
+            training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
+            rawTweets=[]
+            testFile = open(os.path.join(filteringIdsPath, q[0]))
+            # FIXME justify using reversed
+            rawTweets.append((q[0], True, self.featureExtract(q[1], external)))
+            # add the first tweet as positive example
+            for line in testFile:
+                tweetId, null, text = line.partition('\t\t')
+                results[q[0]].append((tweetId, '1.0\tyes'))
+                features = self.cleanUtf(self.featureExtract(text[:-1], external))
+                rawTweets.append((tweetId, True, self.cleanUtf(features)))
+                break
+            for tweetId, features in training[1][:neg]:
+                rawTweets.append((tweetId, False, self.cleanUtf(features)))
+            classifier = None
+            training = TrainingSet(rawTweets, 0)
+            if rawTweets:
+                training.countVectorize()
+                classifier=SVMClassifier(training.vectorcounts, training.tweetTarget)
+            # do not train the first tweet
+            firstTweet = True
+            for line in testFile:
+                tweetId, null, text = line.partition('\t\t')
+                features = self.cleanUtf(self.featureExtract(text[:-1], external))
+                if not features:
+                    continue
+                #nb.test(tweetId, features)
+                test=training.vectorizeTest((tweetId,False,features))
+                classification = classifier.classify(test)
+                #print tweetId, features, 'C' + str(classification[0])
+                #print classifier.getProb(test)
+                if classification[0] == 1:
+                    results[q[0]].append((tweetId, str(classifier.getProb(test)[0][1]) + '\tyes'))
+                    if tweetId in qrels[int(q[0][2:])][0]:
+                        training.addExample((tweetId, True, features))
+                        # TODO pop a old positive sample? only if rules are not used?
+                    else:
+                        training.addExample((tweetId, False, features))
+                    training.countVectorize()
+                    classifier.retrain(training.vectorcounts, training.tweetTarget)
+            testFile.close()
+            if dumpsPath:
+                cPickle.dump(results[q[0]], open(os.path.join(dumpsPath, q[0]), 'w'))
+        return results
+
+class NBFilterer(Filterer):
+
+    def featureExtract(self, text, query, external = True):
+        """Extracts all the features from an sample of text + query"""
+        features = []
+        text = text.split('\t\t')
+        if text[0]: # status
+            features.extend(_extractor1.get(text[0]))
+        if text[1]: # hashtag
+            features.extend(_extractor1.get(text[1]))
+        if external and text[2]: # named entity
+            features.extend(countSpecificAllEntities(text[2]))
+        if external and text[3]: # link title
+            features.extend(_extractor1.get(text[3]))
+        if query:
+            features.extend(countIntersectingTerms(';'.join(text), query))
+        return features
 
     def get(self, queries, n, m, rulesCount, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath = None):
         """ Return filtered tweets for query topics and the relative time ranges.
@@ -88,7 +184,7 @@ class Filterer:
                         if firstTweet:
                             firstTweet = False
                             continue
-                        features = self.cleanUtf(featureExtractText(text[:-1], q[1], external))
+                        features = self.cleanUtf(self.featureExtract(text[:-1], q[1], external))
                         if tweetId in qrels[int(q[0][2:])][0]:
                             training.addExample((tweetId, True, features))
                             currRulesCount -= 1
@@ -104,7 +200,7 @@ class Filterer:
                     else:
                         classifier=NBClassifier(training.vectorcounts, training.tweetTarget)
                     currRulesCount = -1
-                features = self.cleanUtf(featureExtractText(text[:-1], q[1], external))
+                features = self.cleanUtf(self.featureExtract(text[:-1], q[1], external))
                 if not features:
                     continue
                 #nb.test(tweetId, features)

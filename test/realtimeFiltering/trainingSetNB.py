@@ -1,4 +1,5 @@
-"""Select first n and last m tweets as positive and negative sample for each query in results, ordering by retrieval score.
+"""Training set generation for the Naive Bayes filterer.
+Select first n and last m tweets as positive and negative sample for each query in results, ordering by retrieval score.
 Arguments:
     n - first relevant tweets to vectorize 
     m - first less relevant tweets to vectorize
