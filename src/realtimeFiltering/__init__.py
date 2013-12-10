@@ -61,7 +61,7 @@ class SVMFilterer(Filterer):
         if external and text[2]: # link title
             features.extend(_extractor1.get(text[2]))
         if external and text[3]: # annotations
-            features.extend(text[3].split(' '))
+            features.extend(annotations(text[3]))
         return features
 
     def get(self, queries, neg, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath = None):

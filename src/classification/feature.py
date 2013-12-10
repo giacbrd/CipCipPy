@@ -114,3 +114,6 @@ def countIntersectingTerms(text, query):
         result.append('_intersect_')
     return result
 
+def annotations(annotationTweet):
+    return ['ann_' + a for a in annotationTweet.split(' ')]
+
