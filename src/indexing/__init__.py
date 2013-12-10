@@ -20,6 +20,8 @@ CipCipPy
 Indexing package.
 """
 
+#FIXME clean all the duplicate code in the index functions
+
 __version__ = "0.1"
 __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>", 
                "Andrea Esuli <andrea.esuli@isti.cnr.it>", 

@@ -28,7 +28,7 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
 
 from ..classification.feature import *
 import cPickle
-from CipCipPy.classification.scikitNaiveBayes import TrainingSet, NBClassifier
+from ..classification.scikitClassifiers import TrainingSet, NBClassifier, SVMClassifier
 import os
 
 _extractor1 = FeatureExtractor((terms, bigrams))
@@ -82,7 +82,6 @@ class SVMFilterer(Filterer):
             training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             rawTweets=[]
             testFile = open(os.path.join(filteringIdsPath, q[0]))
-            # FIXME justify using reversed
             rawTweets.append((q[0], True, self.featureExtract(q[1], external)))
             # add the first tweet as positive example
             for line in testFile:
@@ -97,7 +96,7 @@ class SVMFilterer(Filterer):
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
                 training.countVectorize()
-                classifier=SVMClassifier(training.vectorcounts, training.tweetTarget)
+                classifier=SVMClassifier(training.vectoridf, training.tweetTarget)
             # do not train the first tweet
             firstTweet = True
             for line in testFile:
@@ -111,14 +110,14 @@ class SVMFilterer(Filterer):
                 #print tweetId, features, 'C' + str(classification[0])
                 #print classifier.getProb(test)
                 if classification[0] == 1:
-                    results[q[0]].append((tweetId, str(classifier.getProb(test)[0][1]) + '\tyes'))
+                    results[q[0]].append((tweetId, '1.0\tyes'))
                     if tweetId in qrels[int(q[0][2:])][0]:
                         training.addExample((tweetId, True, features))
                         # TODO pop a old positive sample? only if rules are not used?
                     else:
                         training.addExample((tweetId, False, features))
                     training.countVectorize()
-                    classifier.retrain(training.vectorcounts, training.tweetTarget)
+                    classifier.retrain(training.vectoridf, training.tweetTarget)
             testFile.close()
             if dumpsPath:
                 cPickle.dump(results[q[0]], open(os.path.join(dumpsPath, q[0]), 'w'))

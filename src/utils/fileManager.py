@@ -2,6 +2,7 @@
 
 import datetime
 from . import replyRE, hashtagRE, months
+import gzip
 import os.path
 from ..retrieval import getStoredValue
 
@@ -96,7 +97,8 @@ def readQrels(filePath, queryNumbers = None):
 
 def iterTweets(filePath, skipNull = True):
     """Iterator over tweets in the plain text file filePath."""
-    for line in open(filePath):
+    file = open(filePath) if filePath[-2:] != 'gz' else gzip.open(filePath)
+    for line in file:
         try:
             line = unicode(line, errors = 'replace', encoding = 'utf8')
         except UnicodeDecodeError:
@@ -107,6 +109,7 @@ def iterTweets(filePath, skipNull = True):
             continue
         else:
             yield l
+    file.close()
 
 def tweetParser(line):
     """Return a tuple or None if the tweet is null:
