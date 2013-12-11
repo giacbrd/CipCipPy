@@ -68,7 +68,7 @@ class SVMFilterer(Filterer):
         """Extracts all the features from a query"""
         features = []
         text = text.split('\t\t')
-        if text[0]: # status
+        if text[0]: # topic
             features.extend(_extractor1.get(text[0]))
         if external and text[1]: # annotations
             features.extend(annotations(text[1]))
