@@ -124,7 +124,7 @@ class SVMFilterer(Filterer):
                 #print tweetId, features, 'C' + str(classification[0])
                 #print classifier.getProb(test)
                 if classification == 1:
-                    results[q[0]].append((tweetId, '%.3f\tyes' % classifier.getDecFunc(test)))
+                    results[q[0]].append((tweetId, '1.0\tyes'))
                     if tweetId in qrels[int(q[0][2:])][0]:
                         training.addExample((tweetId, True, features))
                         # TODO pop a old positive sample? only if rules are not used?
