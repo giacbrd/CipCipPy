@@ -15,10 +15,9 @@ arguments:
 import os
 import sys
 from CipCipPy.utils.fileManager import readQueries, readQrels
-from CipCipPy.realtimeFiltering import Filterer
+from CipCipPy.realtimeFiltering import SVMFilterer
 
 #FIXME use argparse
-from src.realtimeFiltering import SVMFilterer
 
 m = int(sys.argv[1])
 queries = readQueries(sys.argv[2])
