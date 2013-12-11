@@ -22,9 +22,10 @@ from CipCipPy.realtimeFiltering import SVMFilterer
 
 m = int(sys.argv[1])
 queries = readQueries(sys.argv[2])
-if len(sys.argv) > 8:
-    queries = [q for q in queries if q[0] in set(sys.argv[8].split(':'))]
 queriesAnnotated = readQueries(sys.argv[3])
+if len(sys.argv) > 9:
+    queries = [q for q in queries if q[0] in set(sys.argv[9].split(':'))]
+    queriesAnnotated = [q for q in queriesAnnotated if q[0] in set(sys.argv[9].split(':'))]
 assert len(queries) == len(queriesAnnotated)
 
 qrels = readQrels(sys.argv[4], set(q[0] for q in queries))
