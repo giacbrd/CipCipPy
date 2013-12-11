@@ -3,6 +3,7 @@ Test filtering.
 arguments:
     number of negative samples
     topics file
+    annotated topics file
     relevance judgements
     path of ids and content per query for realtime filtering (test set)
     training set dir
@@ -23,12 +24,16 @@ m = int(sys.argv[1])
 queries = readQueries(sys.argv[2])
 if len(sys.argv) > 8:
     queries = [q for q in queries if q[0] in set(sys.argv[8].split(':'))]
-qrels = readQrels(sys.argv[3], set(q[0] for q in queries))
-filteringIdsPath = sys.argv[4]
-trainingSetPath = sys.argv[5]
-resultsPath = sys.argv[6]
+queriesAnnotated = readQueries(sys.argv[3])
+assert len(queries) == len(queriesAnnotated)
+
+qrels = readQrels(sys.argv[4], set(q[0] for q in queries))
+filteringIdsPath = sys.argv[5]
+trainingSetPath = sys.argv[6]
+resultsPath = sys.argv[7]
+
 external = False
-if sys.argv[7] == 'external':
+if sys.argv[8] == 'external':
     external = True
 
 
@@ -39,7 +44,7 @@ if not os.path.exists(dumpsPath):
         os.makedirs(dumpsPath)
 
 f = SVMFilterer()
-results = f.get(queries, m, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath)
+results = f.get(queries, queriesAnnotated, m, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath)
 
 
 #indexForPrint = whoosh.index.open_dir(getIndexPath('storedStatus'))

@@ -51,7 +51,7 @@ class Filterer:
 class SVMFilterer(Filterer):
 
     def featureExtract(self, text, external = True):
-        """Extracts all the features from an sample of text + query"""
+        """Extracts all the features from an sample of text"""
         features = []
         text = text.split('\t\t')
         if text[0]: # status
@@ -64,9 +64,20 @@ class SVMFilterer(Filterer):
             features.extend(annotations(text[3]))
         return features
 
-    def get(self, queries, neg, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath = None):
+    def featureExtractQuery(self, text, external = True):
+        """Extracts all the features from a query"""
+        features = []
+        text = text.split('\t\t')
+        if text[0]: # status
+            features.extend(_extractor1.get(text[0]))
+        if external and text[1]: # annotations
+            features.extend(annotations(text[1]))
+        return features
+
+    def get(self, queries, queriesAnnotated, neg, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath = None):
         """ Return filtered tweets for query topics and the relative time ranges.
         queries - queries from a topic file
+        queriesAnnotated - queries from a topic file with annotated topics
         neg - number of negative samples
         trainingSetPath - training set dir
         filteringIdsPath - path of ids and content per query (test set) for realtime filtering.
@@ -76,7 +87,7 @@ class SVMFilterer(Filterer):
         dumpsPath - path where to store serialized results
         """
         results = {}
-        for q in queries:
+        for i, q in enumerate(queries):
             print neg, q
             results[q[0]] = []
             # (positives, negatives) ordered by relevance
@@ -84,7 +95,8 @@ class SVMFilterer(Filterer):
             training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             rawTweets=[]
             testFile = open(os.path.join(filteringIdsPath, q[0]))
-            rawTweets.append((q[0], True, self.featureExtract(q[1], external)))
+            # add the query as positive example
+            rawTweets.append((q[0], True, self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)))
             # add the first tweet as positive example
             for line in testFile:
                 tweetId, null, text = line.partition('\t\t')
@@ -111,8 +123,8 @@ class SVMFilterer(Filterer):
                 classification = classifier.classify(test)
                 #print tweetId, features, 'C' + str(classification[0])
                 #print classifier.getProb(test)
-                if classification[0] == 1:
-                    results[q[0]].append((tweetId, '1.0\tyes'))
+                if classification == 1:
+                    results[q[0]].append((tweetId, '%.3f\tyes' % classifier.getDecFunc(test)))
                     if tweetId in qrels[int(q[0][2:])][0]:
                         training.addExample((tweetId, True, features))
                         # TODO pop a old positive sample? only if rules are not used?

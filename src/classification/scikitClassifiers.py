@@ -68,4 +68,7 @@ class SVMClassifier():
         self.SVM.fit(vectorFeature, vectorTarget)
 
     def classify(self, vectorizedTest):
-        return self.SVM.predict(vectorizedTest)
+        return self.SVM.predict(vectorizedTest)[0]
+
+    def getDecFunc(self, vectorizedTest):
+        return self.SVM.decision_function(vectorizedTest)[0][0]
