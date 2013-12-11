@@ -82,11 +82,10 @@ for qNum in queries:
     for tweetId in negatives:
         samples[1].append((tweetId, featureExtract(getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + \
                             getTitle(tweetId) + '\t\t' + getAnnotation(tweetId), external = external)))
-    printOut = '__________________________________________________' + '\n'
-    printOut += str((qNum, len(negResult))) + '\n'
-    for i in (0, 1):
-        printOut += '\n'.join(str(p) for p in samples[i][:10])
-        printOut +=  '\n-----------------------\n'
+    printOut = '\n' + '__________________________________________________' + '\n'
+    printOut += str((qNum, queries[qNum][0], len(negResult))) + '\n'
+    printOut += '\n'.join(str(p) for p in samples[1][:10])
+    printOut +=  '\n-----------------------\n'
     print printOut
 
     cPickle.dump(samples, open(os.path.join(outPath, qNum), 'w'))
