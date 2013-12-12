@@ -82,4 +82,4 @@ class KNNClassifier():
         return self.KNN.predict(vectorizedTest)[0]
 
     def getProb(self, vectorizedTest):
-        return self.NB.predict_proba(vectorizedTest)[0][1]
+        return self.KNN.predict_proba(vectorizedTest)[0][1]
