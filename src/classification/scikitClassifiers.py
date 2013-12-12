@@ -72,7 +72,7 @@ class SVMClassifier():
 
 class KNNClassifier():
     def __init__(self, vectorFeature, vectorTarget):
-        self.KNN = neighbors.KNeighborsClassifier()
+        self.KNN = neighbors.KNeighborsClassifier(n_neighbors=5)
         self.KNN.fit(vectorFeature, vectorTarget)
 
     def retrain(self, vectorFeature, vectorTarget):
