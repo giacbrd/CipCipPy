@@ -17,7 +17,7 @@ import os
 import sys
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.realtimeFiltering import SupervisedFilterer
-from CipCipPy.classification.scikitClassifiers import SVMClassifier
+from CipCipPy.classification.scikitClassifiers import KNNClassifier
 
 #FIXME use argparse
 
@@ -39,13 +39,13 @@ if sys.argv[8] == 'external':
     external = True
 
 
-runName = 'runSVM_' + str(m) + ('_external' if external else '_internal')
+runName = 'runKNN_' + str(m) + ('_external' if external else '_internal')
 
 dumpsPath = os.path.join(resultsPath, 'dumps_' + runName)
 if not os.path.exists(dumpsPath):
         os.makedirs(dumpsPath)
 
-f = SupervisedFilterer(SVMClassifier)
+f = SupervisedFilterer(KNNClassifier)
 results = f.get(queries, queriesAnnotated, m, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath)
 
 

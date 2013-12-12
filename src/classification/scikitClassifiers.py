@@ -2,7 +2,7 @@
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn import svm
+from sklearn import svm, neighbors
 
 class TrainingSet():
 
@@ -18,7 +18,7 @@ class TrainingSet():
             self.tweetTarget.append(1 if triple[1] else 0)
             self.features.append(' '.join(triple[2]))
         self.vectoridf = None
-        self.count_vect = CountVectorizer(min_df=1, binary=True)
+        self.count_vect = CountVectorizer(min_df=1, binary=False)
         self.idf_transf = TfidfTransformer()
 
     def countVectorize(self):
@@ -54,10 +54,10 @@ class NBClassifier():
         self.NB.fit(vectorFeature, vectorTarget)
 
     def classify(self, vectorizedTest):
-        return self.NB.predict(vectorizedTest)
+        return self.NB.predict(vectorizedTest)[0]
 
     def getProb(self, vectorizedTest):
-        return self.NB.predict_proba(vectorizedTest)
+        return self.NB.predict_proba(vectorizedTest)[0][1]
 
 class SVMClassifier():
     def __init__(self, vectorFeature, vectorTarget):
@@ -70,5 +70,16 @@ class SVMClassifier():
     def classify(self, vectorizedTest):
         return self.SVM.predict(vectorizedTest)[0]
 
-    def getDecFunc(self, vectorizedTest):
-        return self.SVM.decision_function(vectorizedTest)[0][0]
+class KNNClassifier():
+    def __init__(self, vectorFeature, vectorTarget):
+        self.KNN = neighbors.KNeighborsClassifier()
+        self.KNN.fit(vectorFeature, vectorTarget)
+
+    def retrain(self, vectorFeature, vectorTarget):
+        self.KNN.fit(vectorFeature, vectorTarget)
+
+    def classify(self, vectorizedTest):
+        return self.KNN.predict(vectorizedTest)[0]
+
+    def getProb(self, vectorizedTest):
+        return self.NB.predict_proba(vectorizedTest)[0][1]

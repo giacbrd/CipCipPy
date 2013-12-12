@@ -1,4 +1,4 @@
-"""Training set generation for the SVM filterer.
+"""Training set generation for real-time filtering.
 Select neg negative samples and no positive samples for each query in results, ordering by retrieval score.
 Arguments:
     neg - number of negative tweets to vectorize
@@ -16,7 +16,7 @@ from CipCipPy.indexing import getIndexPath, getIndex
 from whoosh import scoring, index
 import cPickle
 from operator import itemgetter
-from CipCipPy.realtimeFiltering import SVMFilterer
+from CipCipPy.realtimeFiltering import Filterer
 from CipCipPy.config import RESOURCE_PATH
 
 
@@ -46,7 +46,7 @@ s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSu
 #    posResults = s.get(queries, scorer, n, scoreWeights = (1., .0, .0, .0), resultsExpans = 0)
 
 # Retrieval without external information
-negResults = s.get(queries, scorer, neg, scoreWeights = (1., .0, .0, .0), resultsExpans = 0, complementary=True)
+negResults = s.get(queries, scorer, neg, scoreWeights = (1., .0, .0, .0), resultsExpans = 0)
 
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')
@@ -66,7 +66,7 @@ def getAnnotation(indexId):
     store = getStoredValue(_storedAnnotation, indexId, 'annotations')
     return store if store else ""
 
-featureExtract = SVMFilterer().featureExtract
+featureExtract = Filterer().featureExtract
 
 queries = dict((q[0], q[1:]) for q in queries)
 

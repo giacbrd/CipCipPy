@@ -1,4 +1,4 @@
-"""Test set generation for the SVM filterer.
+"""Test set generation for real-time filtering.
 For each query serialize tweet ids and corpus content in the time range. Last content is external, e.g. link titles.
 usage: <topics file> <corpus directory> <output directory> [query numbers divided by :]"""
 

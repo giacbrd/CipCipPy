@@ -33,22 +33,9 @@ import os
 
 _extractor1 = FeatureExtractor((terms, bigrams))
 
+
+
 class Filterer:
-
-    def cleanUtf(self, features):
-        """Remove badly encoded terms."""
-        cleanedFeatures = []
-        for feat in features:
-            feat = feat.encode('ascii', 'replace')
-            if feat:
-                cleanedFeatures.append(feat)
-        return cleanedFeatures
-
-    def intersect(self, query, text):
-        """How many terms query amd text have in common."""
-        return len(set(terms(query)) & set(terms(text)))
-
-class SVMFilterer(Filterer):
 
     def featureExtract(self, text, external = True):
         """Extracts all the features from an sample of text"""
@@ -73,6 +60,24 @@ class SVMFilterer(Filterer):
         if external and text[1]: # annotations
             features.extend(annotations(text[1]))
         return features
+
+    def cleanUtf(self, features):
+        """Remove badly encoded terms."""
+        cleanedFeatures = []
+        for feat in features:
+            feat = feat.encode('ascii', 'replace')
+            if feat:
+                cleanedFeatures.append(feat)
+        return cleanedFeatures
+
+    def intersect(self, query, text):
+        """How many terms query amd text have in common."""
+        return len(set(terms(query)) & set(terms(text)))
+
+class SupervisedFilterer(Filterer):
+
+    def __init__(self, classifier):
+        self.classifier = classifier
 
     def get(self, queries, queriesAnnotated, neg, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath = None):
         """ Return filtered tweets for query topics and the relative time ranges.
@@ -110,7 +115,13 @@ class SVMFilterer(Filterer):
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
                 training.countVectorize()
-                classifier=SVMClassifier(training.vectoridf, training.tweetTarget)
+                classifier = self.classifier(training.vectoridf, training.tweetTarget)
+            #for e, v in enumerate(training.vectoridf[:2]):
+            #    fe = training.features[e].split(' ')
+            #    col = v.nonzero()[1]
+            #    for z in xrange(len(fe)):
+            #        print fe[z], v[0,col[z]]
+            #    print training.tweetTarget[e]
             # do not train the first tweet
             firstTweet = True
             for line in testFile:
@@ -120,11 +131,18 @@ class SVMFilterer(Filterer):
                     continue
                 #nb.test(tweetId, features)
                 test=training.vectorizeTest((tweetId,False,features))
+                #if tweetId in qrels[int(q[0][2:])][0]:
+                #    print ''
+                #    col = v.nonzero()[1]
+                #    if len(col):
+                #        for z in xrange(len(features)):
+                #            print features[z], v[0,col[z]]
                 classification = classifier.classify(test)
                 #print tweetId, features, 'C' + str(classification[0])
                 #print classifier.getProb(test)
                 if classification == 1:
-                    results[q[0]].append((tweetId, '1.0\tyes'))
+                    score = classifier.getProb(test) if callable(getattr(classifier, "getProb", None)) else 1.
+                    results[q[0]].append((tweetId, str(score) + '\tyes'))
                     if tweetId in qrels[int(q[0][2:])][0]:
                         training.addExample((tweetId, True, features))
                         # TODO pop a old positive sample? only if rules are not used?
@@ -137,6 +155,8 @@ class SVMFilterer(Filterer):
                 cPickle.dump(results[q[0]], open(os.path.join(dumpsPath, q[0]), 'w'))
         return results
 
+
+@DeprecationWarning
 class NBFilterer(Filterer):
 
     def featureExtract(self, text, query, external = True):
@@ -221,8 +241,8 @@ class NBFilterer(Filterer):
                 classification = classifier.classify(test)
                 #print tweetId, features, 'C' + str(classification[0])
                 #print classifier.getProb(test)
-                if classification[0] == 1:
-                    results[q[0]].append((tweetId, str(classifier.getProb(test)[0][1]) + '\tyes'))
+                if classification == 1:
+                    results[q[0]].append((tweetId, str(classifier.getProb(test)) + '\tyes'))
                     if firstTweet:
                         firstTweet = False
                         continue
