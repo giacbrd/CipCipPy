@@ -46,7 +46,7 @@ s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSu
 #    posResults = s.get(queries, scorer, n, scoreWeights = (1., .0, .0, .0), resultsExpans = 0)
 
 # Retrieval without external information
-negResults = s.get(queries, scorer, neg, scoreWeights = (1., .0, .0, .0), resultsExpans = 0)
+negResults = s.get(queries, scorer, neg, scoreWeights = (1., .0, .0, .0), resultsExpans = 0, complementary=True)
 
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')

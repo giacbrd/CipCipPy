@@ -131,12 +131,6 @@ class SupervisedFilterer(Filterer):
                     continue
                 #nb.test(tweetId, features)
                 test=training.vectorizeTest((tweetId,False,features))
-                #if tweetId in qrels[int(q[0][2:])][0]:
-                #    print ''
-                #    col = v.nonzero()[1]
-                #    if len(col):
-                #        for z in xrange(len(features)):
-                #            print features[z], v[0,col[z]]
                 classification = classifier.classify(test)
                 #print tweetId, features, 'C' + str(classification[0])
                 #print classifier.getProb(test)
