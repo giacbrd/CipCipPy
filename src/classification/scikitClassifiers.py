@@ -3,6 +3,7 @@
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import svm, neighbors
+from sklearn.ensemble import AdaBoostClassifier
 
 class TrainingSet():
 
@@ -83,3 +84,17 @@ class KNNClassifier():
 
     def getProb(self, vectorizedTest):
         return self.KNN.predict_proba(vectorizedTest)[0][1]
+
+class ADAClassifier():
+    def __init__(self, vectorFeature, vectorTarget):
+        self.ADA = neighbors.AdaBoostClassifier()
+        self.ADA.fit(vectorFeature, vectorTarget)
+
+    def retrain(self, vectorFeature, vectorTarget):
+        self.ADA.fit(vectorFeature, vectorTarget)
+
+    def classify(self, vectorizedTest):
+        return self.ADA.predict(vectorizedTest)[0]
+
+    def getProb(self, vectorizedTest):
+        return self.ADA.predict_proba(vectorizedTest)[0][1]

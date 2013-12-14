@@ -132,7 +132,7 @@ class SupervisedFilterer(Filterer):
                 #nb.test(tweetId, features)
                 test=training.vectorizeTest((tweetId,False,features))
                 classification = classifier.classify(test)
-                #print tweetId, features, 'C' + str(classification[0])
+                #print tweetId, features, 'C' + str(classification)
                 #print classifier.getProb(test)
                 if classification == 1:
                     score = classifier.getProb(test) if callable(getattr(classifier, "getProb", None)) else 1.
