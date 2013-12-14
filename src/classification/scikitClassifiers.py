@@ -87,7 +87,7 @@ class KNNClassifier():
 
 class ADAClassifier():
     def __init__(self, vectorFeature, vectorTarget):
-        self.ADA = neighbors.AdaBoostClassifier()
+        self.ADA = AdaBoostClassifier()
         self.ADA.fit(vectorFeature, vectorTarget)
 
     def retrain(self, vectorFeature, vectorTarget):
