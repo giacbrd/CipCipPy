@@ -114,12 +114,12 @@ class SupervisedFilterer(Filterer):
             for line in testFile:
                 tweetId, null, text = line.partition('\t\t')
                 results[q[0]].append((tweetId, '1.0\tyes'))
-                features = self.cleanUtf(self.featureExtract(text[:-1], external))
+                features = self.featureExtract(text[:-1], external)
                 posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
-                rawTweets.append((tweetId, True, self.cleanUtf(features)))
+                rawTweets.append((tweetId, True, features))
                 break
             for tweetId, features in training[1][:neg]:
-                rawTweets.append((tweetId, False, self.cleanUtf(features)))
+                rawTweets.append((tweetId, False, features))
             classifier = None
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
@@ -132,10 +132,9 @@ class SupervisedFilterer(Filterer):
             #        print fe[z], v[0,col[z]]
             #    print training.tweetTarget[e]
             # do not train the first tweet
-            firstTweet = True
             for line in testFile:
                 tweetId, null, text = line.partition('\t\t')
-                features = self.cleanUtf(self.featureExtract(text[:-1], external))
+                features = self.featureExtract(text[:-1], external)
                 if not features:
                     continue
                 if annotationFilter:

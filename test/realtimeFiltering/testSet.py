@@ -11,12 +11,15 @@ from CipCipPy.retrieval import getStoredValue
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
 
+_storedStatusAll = getIndex('storedStatusAll')
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')
 _storedLinkTitle = getIndex('storedLinkTitle')
 _storedAnnotation = getIndex('storedAnnotations20130805')
 #_storedNamedEntity = getIndex('storedNamedEntity')
 
+def getFirstStatus(indexId):
+    return getStoredValue(_storedStatusAll, indexId, 'status')
 def getStatus(indexId):
     return getStoredValue(_storedStatus, indexId, 'status')
 def getTitle(indexId):
@@ -33,7 +36,7 @@ if len(sys.argv) > 4:
     queries = [q for q in queries if q[0] in set(sys.argv[4].split(':'))]
 
 def clean(text):
-    return text.encode('ascii', 'replace') if text != None else ''
+    return text.encode('unicode', 'replace') if text != None else ''
 
 for q in queries:
     dirList = os.listdir(sys.argv[2])
@@ -43,7 +46,7 @@ for q in queries:
             time = int(tweet[0])
             if time >= q[3] and time <= q[4] and tweet[2] != '302':
                 time = str(time)
-                status = getStatus(time)
+                status = getStatus(time) if time > q[3] else getFirstStatus(time)
                 title = getTitle(time)
                 annotations = getAnnotation(time)
                 if status or title:
