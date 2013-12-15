@@ -79,7 +79,8 @@ class SupervisedFilterer(Filterer):
     def __init__(self, classifier):
         self.classifier = classifier
 
-    def get(self, queries, queriesAnnotated, neg, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath = None):
+    def get(self, queries, queriesAnnotated, neg, trainingSetPath, filteringIdsPath,
+            qrels, external, annotationFilter = False, dumpsPath = None):
         """ Return filtered tweets for query topics and the relative time ranges.
         queries - queries from a topic file
         queriesAnnotated - queries from a topic file with annotated topics
@@ -89,10 +90,14 @@ class SupervisedFilterer(Filterer):
                            The tweet line format is defined in the method featureExtract
         qrels - relevance judgements
         external - True for using external information, otherwise False
+        annotationFilter - If True a tweet is passed through supervised learning only if
+        the intersection of annotation with the query or the first tweet is not empty
         dumpsPath - path where to store serialized results
         """
         results = {}
         for i, q in enumerate(queries):
+            if int(q[0][2:]) not in qrels:
+                continue
             print neg, q
             results[q[0]] = []
             # (positives, negatives) ordered by relevance
@@ -100,13 +105,17 @@ class SupervisedFilterer(Filterer):
             training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             rawTweets=[]
             testFile = open(os.path.join(filteringIdsPath, q[0]))
+            posAnnotations = set()
             # add the query as positive example
-            rawTweets.append((q[0], True, self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)))
+            features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
+            posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
+            rawTweets.append((q[0], True, features))
             # add the first tweet as positive example
             for line in testFile:
                 tweetId, null, text = line.partition('\t\t')
                 results[q[0]].append((tweetId, '1.0\tyes'))
                 features = self.cleanUtf(self.featureExtract(text[:-1], external))
+                posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
                 rawTweets.append((tweetId, True, self.cleanUtf(features)))
                 break
             for tweetId, features in training[1][:neg]:
@@ -129,6 +138,10 @@ class SupervisedFilterer(Filterer):
                 features = self.cleanUtf(self.featureExtract(text[:-1], external))
                 if not features:
                     continue
+                if annotationFilter:
+                    testAnnotation = set(feat for feat in features if feat.startswith(ANNOTATION_PREFIX))
+                    if not posAnnotations.intersection(testAnnotation):
+                        continue
                 #nb.test(tweetId, features)
                 test=training.vectorizeTest((tweetId,False,features))
                 classification = classifier.classify(test)

@@ -47,7 +47,8 @@ if not os.path.exists(dumpsPath):
         os.makedirs(dumpsPath)
 
 f = SupervisedFilterer(ADAClassifier)
-results = f.get(queries, queriesAnnotated, m, trainingSetPath, filteringIdsPath, qrels, external, dumpsPath)
+results = f.get(queries, queriesAnnotated, m, trainingSetPath, filteringIdsPath,
+                qrels, external, annotationFilter = True, dumpsPath = dumpsPath)
 
 
 #indexForPrint = whoosh.index.open_dir(getIndexPath('storedStatus'))

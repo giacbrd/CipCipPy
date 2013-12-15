@@ -8,6 +8,8 @@ qrels = readQrels(sys.argv[2], set(q[0] for q in queries))
 filteringIdsPath = sys.argv[3]
 
 for i, q in enumerate(queries):
+    if int(q[0][2:]) not in qrels:
+        continue
     testFile = open(os.path.join(filteringIdsPath, q[0]))
     pos = 0
     for line in testFile:

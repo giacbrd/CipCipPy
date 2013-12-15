@@ -3,6 +3,8 @@ from ..utils.hashtag import Segmenter
 from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE
 import nltk, math
 
+ANNOTATION_PREFIX = '_ann_'
+
 class FeatureExtractor:
     """Concatenate feature extraction functions"""
 
@@ -115,5 +117,5 @@ def countIntersectingTerms(text, query):
     return result
 
 def annotations(annotationTweet):
-    return ['_ann_' + a for a in annotationTweet.split(' ')]
+    return [ANNOTATION_PREFIX + a for a in annotationTweet.split(' ')]
 
