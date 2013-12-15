@@ -88,13 +88,13 @@ class KNNClassifier():
 class ADAClassifier():
     def __init__(self, vectorFeature, vectorTarget):
         self.ADA = AdaBoostClassifier()
-        self.ADA.fit(vectorFeature, vectorTarget)
+        self.ADA.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
 
     def retrain(self, vectorFeature, vectorTarget):
-        self.ADA.fit(vectorFeature, vectorTarget)
+        self.ADA.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
 
     def classify(self, vectorizedTest):
-        return self.ADA.predict(vectorizedTest)[0]
+        return self.ADA.predict(vectorizedTest.toarray()[0])[0]
 
     def getProb(self, vectorizedTest):
-        return self.ADA.predict_proba(vectorizedTest)[0][1]
+        return self.ADA.predict_proba(vectorizedTest.toarray()[0])[0][1]
