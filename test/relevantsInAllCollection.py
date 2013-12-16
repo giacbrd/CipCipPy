@@ -11,6 +11,9 @@ dirList = os.listdir(collectionPath)
 
 pos = dict(((k, 0) for k in qrels))
 
+def clean(text):
+    return text.encode('utf8', 'replace') if text != None else ''
+
 for fName in dirList:
     for tweet in iterTweets(os.path.join(collectionPath, fName)):
         tweetId = tweet[0]
@@ -19,7 +22,7 @@ for fName in dirList:
             if qKey not in qrels:
                 continue
             if tweetId in qrels[qKey][0]:
-                print q[1], tweet[4]
+                print q[1], '>>>>>>' , clean(tweet[4])
                 pos[qKey] += 1
 
 for q in queries:

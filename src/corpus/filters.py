@@ -45,6 +45,18 @@ class English:
         else:
             return None
 
+class English2:
+
+    def __init__(self):
+        from langid.langid import LanguageIdentifier, model
+        self.identifier = LanguageIdentifier.from_modelstring(model, norm_probs=False)
+
+    def filter(self, line):
+            if self.identifier.classify(line.split('\t')[-1])[0] == 'en':
+                return line
+            else:
+                return None
+
 
 class LinkTitles:
     """Substitute the twitter status with the titles of links it contains."""

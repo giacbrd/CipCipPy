@@ -72,38 +72,31 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
         outFile = open(os.sep.join([outPath, fName]), 'w')
         iter1 = open(os.sep.join([corpusPath1, fName]))
         iter2 = open(os.sep.join([corpusPath2, fName]))
-        line1 = iter1.next()
-        line2 = iter2.next()
-        tweet1 = line1.strip().split('\t')
-        tweet2 = line2.strip().split('\t')
-        time1 = int(tweet1[0])
-        time2 = int(tweet2[0])
+        def goNext(iter):
+            line = iter.next()
+            tweet = line.strip().split('\t')
+            time = int(tweet[0])
+            return line, tweet, time
+        line1, tweet1, time1 = goNext(iter1)
+        line2, tweet2, time2 = goNext(iter2)
         while True:
             if time1 == time2:
                 outFile.write(line1 + '\n')
-                line1 = iter1.next()
-                line2 = iter2.next()
-                tweet1 = line1.strip().split('\t')
-                tweet2 = line2.strip().split('\t')
-                time1 = int(tweet1[0])
-                time2 = int(tweet2[0])
+                line1, tweet1, time1 = goNext(iter1)
+                line2, tweet2, time2 = goNext(iter2)
                 continue
             if time2 > time1:
                 outFile.write(line1 + '\n')
-                line1 = iter1.next()
-                tweet1 = line1.strip().split('\t')
-                time1 = int(tweet1[0])
+                line1, tweet1, time1 = goNext(iter1)
                 continue
             if time1 > time2:
                 for filter in filters:
                     line2 = filter.filter(line2)
                     if line2 == None:
                         break
-                    if line2 != None:
-                        outFile.write(line2 + '\n')
-                line2 = iter2.next()
-                tweet2 = line2.strip().split('\t')
-                time2 = int(tweet2[0])
+                if line2 != None:
+                    outFile.write(line2 + '\n')
+                line2, tweet2, time2 = goNext(iter2)
                 continue
 
 
