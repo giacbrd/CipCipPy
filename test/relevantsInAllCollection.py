@@ -9,7 +9,7 @@ collectionPath = sys.argv[3]
 
 dirList = os.listdir(collectionPath)
 
-pos = {(k, 0) for k in qrels}
+pos = dict(((k, 0) for k in qrels))
 
 for fName in dirList:
     for tweet in iterTweets(os.path.join(collectionPath, fName)):
@@ -19,6 +19,7 @@ for fName in dirList:
             if qKey not in qrels:
                 continue
             if tweetId in qrels[qKey][0]:
+                print q[1], tweet[4]
                 pos[qKey] += 1
 
 for q in queries:

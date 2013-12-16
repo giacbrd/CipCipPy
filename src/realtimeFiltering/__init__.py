@@ -151,6 +151,8 @@ class SupervisedFilterer(Filterer):
                     results[q[0]].append((tweetId, str(score) + '\tyes'))
                     if tweetId in qrels[int(q[0][2:])][0]:
                         training.addExample((tweetId, True, features))
+                        if annotationFilter:
+                            posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
                         # TODO pop a old positive sample? only if rules are not used?
                     else:
                         training.addExample((tweetId, False, features))

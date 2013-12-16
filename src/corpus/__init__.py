@@ -26,10 +26,10 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
                "Andrea Esuli <andrea.esuli@isti.cnr.it>",
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
-import os
+import os, shutil
 from filters import BaseFilter
 import httplib2
-from ..utils.fileManager import tweetParser
+from ..utils.fileManager import tweetParser, iterTweets
 import re
 from HTMLParser import HTMLParser
 
@@ -51,9 +51,62 @@ def build(filters, inPath, outPath):
                 outFile.write(line + '\n')
         outFile.close()
 
-def fuse(inPaths, outPath, separator = ' '):
-    """Fuse several corpus in one, appending the different contents of tweets with the same id"""
+def fuse(inPaths, filters, outPath, separator = '\t\t'):
+    """Fuse several corpus in one, appending the different contents of tweets with the same id,
+    divided by separator"""
     pass
+
+def enrich(corpusPath1, corpusPath2, filters, outPath):
+    """Create a corpus that contains the tweets of corpus1,
+    and the tweets of corpus2 those are not in corpus1
+    Filters are applied to corpus2"""
+    filters = [BaseFilter()] + list(filters)
+    if not os.path.exists(outPath):
+        os.makedirs(outPath)
+    dirList1 = os.listdir(corpusPath1)
+    dirList2 = os.listdir(corpusPath2)
+    for fName in dirList2:
+        if fName not in dirList1:
+            shutil.copy(os.sep.join([corpusPath2, fName]), os.sep.join([outPath, fName]))
+            continue
+        outFile = open(os.sep.join([outPath, fName]), 'w')
+        iter1 = open(os.sep.join([corpusPath1, fName]))
+        iter2 = open(os.sep.join([corpusPath2, fName]))
+        line1 = iter1.next()
+        line2 = iter2.next()
+        tweet1 = line1.strip().split('\t')
+        tweet2 = line2.strip().split('\t')
+        time1 = int(tweet1[0])
+        time2 = int(tweet2[0])
+        while True:
+            if time1 == time2:
+                outFile.write(line1 + '\n')
+                line1 = iter1.next()
+                line2 = iter2.next()
+                tweet1 = line1.strip().split('\t')
+                tweet2 = line2.strip().split('\t')
+                time1 = int(tweet1[0])
+                time2 = int(tweet2[0])
+                continue
+            if time2 > time1:
+                outFile.write(line1 + '\n')
+                line1 = iter1.next()
+                tweet1 = line1.strip().split('\t')
+                time1 = int(tweet1[0])
+                continue
+            if time1 > time2:
+                for filter in filters:
+                    line2 = filter.filter(line2)
+                    if line2 == None:
+                        break
+                    if line2 != None:
+                        outFile.write(line2 + '\n')
+                line2 = iter2.next()
+                tweet2 = line2.strip().split('\t')
+                time2 = int(tweet2[0])
+                continue
+
+
 
 _tweetBegin = "<span class=\"entry-content\">"
 _tweetEnd = "<span class=\"meta entry-meta\""

@@ -36,7 +36,7 @@ if len(sys.argv) > 4:
     queries = [q for q in queries if q[0] in set(sys.argv[4].split(':'))]
 
 def clean(text):
-    return text.encode('unicode', 'replace') if text != None else ''
+    return text.encode('utf8', 'replace') if text != None else ''
 
 for q in queries:
     dirList = os.listdir(sys.argv[2])
