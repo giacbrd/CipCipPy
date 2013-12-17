@@ -72,15 +72,21 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
         outFile = open(os.sep.join([outPath, fName]), 'w')
         iter1 = open(os.sep.join([corpusPath1, fName]))
         iter2 = open(os.sep.join([corpusPath2, fName]))
-        def goNext(iter):
-            line = iter.next()
-            tweet = line.strip().split('\t')
-            time = int(tweet[0])
-            return line, tweet, time
+        def goNext(iterFile):
+            try:
+                line = iterFile.next()
+                tweet = line.strip().split('\t')
+                time = int(tweet[0])
+                return line, tweet, time
+            except StopIteration:
+                iterFile.close()
+                return None, None, float('inf')
         line1, tweet1, time1 = goNext(iter1)
         line2, tweet2, time2 = goNext(iter2)
         while True:
             if time1 == time2:
+                if time1 == float('inf'):
+                    break
                 outFile.write(line1 + '\n')
                 line1, tweet1, time1 = goNext(iter1)
                 line2, tweet2, time2 = goNext(iter2)
@@ -98,6 +104,7 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
                     outFile.write(line2 + '\n')
                 line2, tweet2, time2 = goNext(iter2)
                 continue
+        outFile.close()
 
 
 

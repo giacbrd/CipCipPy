@@ -69,7 +69,7 @@ class LinkTitles:
     
     def getTitle(self, url):
         oldHandler = signal.signal(signal.SIGALRM, self.timeout_handler)
-        signal.alarm(90)
+        signal.alarm(15)
         try: 
             u = urllib2.urlopen(url)
             if u:
