@@ -40,7 +40,7 @@ class English:
         self.lingGuesser = language.Lang(languageTraining)
     
     def filter(self, line):
-        if self.lingGuesser.guess(line.split('\t')[-1]) == 'english':
+        if self.lingGuesser.guess(line.split('\t')) == 'english':
             return line
         else:
             return None
@@ -52,7 +52,7 @@ class English2:
         self.identifier = LanguageIdentifier.from_modelstring(model, norm_probs=False)
 
     def filter(self, line):
-            if self.identifier.classify(line.split('\t')[-1])[0] == 'en':
+            if self.identifier.classify(line.split('\t'))[0] == 'en':
                 return line
             else:
                 return None
