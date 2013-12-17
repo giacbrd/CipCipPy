@@ -1,6 +1,6 @@
 """Filter classes to use in this package builder method."""
 
-from ..utils import language, punctuations
+from ..utils import language, punctuations, urlRE
 import re
 import urllib2
 import signal
@@ -87,12 +87,13 @@ class LinkTitles:
     
     def filter(self, line):
         l = line.split('\t')
-        urls = re.findall(r'(http://\S+)', l[4])
+        urls = urlRE.findall(l[4])
         for i in xrange(len(urls)):
             if urls[i][-1] in punctuations:
                 urls[i] = urls[i][:-1]
         if len(urls) > 0:
-            l[4] = '\t'.join(self.getTitle(url) for url in urls)
-            return '\t'.join(l) + '\n'
+            titles = [self.getTitle(url) for url in urls]
+            l[4] = '\t'.join(t for t in titles if t)
+            return '\t'.join(l)
         else:
             return None
