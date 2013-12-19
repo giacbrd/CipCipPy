@@ -36,7 +36,7 @@ hashtagRE = re.compile('#(\S+)')
 # TODO some characters must be excluded, like ':' at the end of a username of a reply
 replyRE = re.compile('@(\S+)')
 hashReplRE = re.compile('[@|#]\S+')
-urlRE = regex = re.compile(
+urlRE = re.compile(
         r'^(?:http|ftp)s?://'  # http:// or https://
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
         r'localhost|'  # localhost...

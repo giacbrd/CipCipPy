@@ -40,7 +40,8 @@ class English:
         self.lingGuesser = language.Lang(languageTraining)
     
     def filter(self, line):
-        if self.lingGuesser.guess(line.split('\t')) == 'english':
+        l = line.split('\t', 4)
+        if self.lingGuesser.guess(l[4]) == 'english':
             return line
         else:
             return None
@@ -52,11 +53,22 @@ class English2:
         self.identifier = LanguageIdentifier.from_modelstring(model, norm_probs=False)
 
     def filter(self, line):
-            if self.identifier.classify(line.split('\t'))[0] == 'en':
+            l = line.split('\t', 4)
+            if self.identifier.classify(l[4])[0] == 'en':
                 return line
             else:
                 return None
 
+class htmlUnescape:
+
+    def __init__(self):
+        import HTMLParser
+        self.hp = HTMLParser.HTMLParser()
+
+    def filter(self, line):
+        l = line.split('\t', 4)
+        l[4] = self.hp.unescape(' '.join(l[4].splitlines()))
+        return '\t'.join(l)
 
 class LinkTitles:
     """Substitute the twitter status with the titles of links it contains."""
@@ -86,14 +98,16 @@ class LinkTitles:
             signal.alarm(0)
     
     def filter(self, line):
-        l = line.split('\t')
+        l = line.split('\t', 4)
+        if len(l) < 5:
+            return None
         urls = urlRE.findall(l[4])
         for i in xrange(len(urls)):
             if urls[i][-1] in punctuations:
                 urls[i] = urls[i][:-1]
         if len(urls) > 0:
             titles = [self.getTitle(url) for url in urls]
-            l[4] = '\t'.join(t for t in titles if t)
+            l[4] = '\t'.join(' '.join(line.splitlines(t)) for t in titles if t)
             return '\t'.join(l)
         else:
             return None

@@ -4,6 +4,7 @@ from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE
 import nltk, math
 
 ANNOTATION_PREFIX = '_ann_'
+URL_FEATURE = '__UrL__'
 
 class FeatureExtractor:
     """Concatenate feature extraction functions"""
@@ -53,6 +54,10 @@ def bigrams(text):
 def hashtags(text):
     """Returns hashtags of a text"""
     return [h.lower() for h in hashtagRE.findall(text)]
+
+def hasUrl(text):
+    """Return a feature if there is a url in the text"""
+    return URL_FEATURE if urlRE.findall(text) else ''
 
 def segmHashtags(text, dictionary):
     """Returns terms of the segmented hashtags of a text"""
@@ -117,5 +122,5 @@ def countIntersectingTerms(text, query):
     return result
 
 def annotations(annotationTweet):
-    return [ANNOTATION_PREFIX + a for a in annotationTweet.split(' ')]
+    return [ANNOTATION_PREFIX + a.split(' ')[0] for a in annotationTweet.split('\t')]
 

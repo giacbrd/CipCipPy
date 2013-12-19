@@ -56,7 +56,7 @@ def readQueries(filePath):
         else:
             i = e + len('<title>')
             j = topic.find('</title>', i)
-        query.append(unicode(topic[i:j].strip()))
+        query.append(unicode(topic[i:j].strip(), encoding='utf8'))
         i = topic.find('<querytime>', j) + len('<querytime>')
         j = topic.find('</querytime>', i)
         dateString = topic[i:j].strip()

@@ -30,7 +30,9 @@ from ..classification.feature import *
 import cPickle
 from ..classification.scikitClassifiers import TrainingSet, NBClassifier, SVMClassifier
 import os
+import codecs
 
+_extractorStatus = FeatureExtractor((terms, bigrams, hashtags))
 _extractor1 = FeatureExtractor((terms, bigrams))
 
 
@@ -42,7 +44,7 @@ class Filterer:
         features = []
         text = text.split('\t\t')
         if text[0]: # status
-            features.extend(_extractor1.get(text[0]))
+            features.extend(_extractorStatus.get(text[0]))
         if text[1]: # hashtag
             features.extend(_extractor1.get(text[1]))
         if external and text[2]: # link title
@@ -104,7 +106,7 @@ class SupervisedFilterer(Filterer):
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
             training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             rawTweets=[]
-            testFile = open(os.path.join(filteringIdsPath, q[0]))
+            testFile = codecs.open(os.path.join(filteringIdsPath, q[0]), encoding = 'utf8')
             posAnnotations = set()
             # add the query as positive example
             features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)

@@ -5,7 +5,6 @@ arguments:
     path of the tweet statuses corpus
     path of the corpus from which extract hashtags (usually is the statuses corpus)
     path of the link titles corpus
-    path of the tweet named entities corpus
 """
 
 #FIXME use argparse
@@ -29,20 +28,20 @@ def index(q):
         print "empty index, skipping!"
     print "status indexing"
     try:
+        hashtag.index(sys.argv[3], 'hashtag' + nameSuffix, tweetTime = q[3], dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
+    except Empty:
+        print "empty index, skipping!"
+    try:
         status.index(sys.argv[2], 'status' + nameSuffix, tweetTime = q[3])
     except Empty:
         print "empty index, skipping!"
     print "hashtags indexing"
-    try:
-        hashtag.index(sys.argv[3], 'hashtag' + nameSuffix, tweetTime = q[3], dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
-    except Empty:
-        print "empty index, skipping!"
 
 print "collection data indexing"
 status.index(sys.argv[2], 'storedStatus', stored = True)
-linkTitle.index(sys.argv[4], 'storedLinkTitle', stored = True)
 hashtag.index(sys.argv[3], 'storedHashtag' , stored = True, dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
-namedEntity.index(sys.argv[5], 'storedNamedEntity', stored = True, overwrite = False)
+linkTitle.index(sys.argv[4], 'storedLinkTitle', stored = True)
+#namedEntity.index(sys.argv[5], 'storedNamedEntity', stored = True, overwrite = False)
 
 try:
     for q in queries:

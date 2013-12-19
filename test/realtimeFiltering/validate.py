@@ -12,7 +12,7 @@ import sys, collections, re
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.evaluation import T11SU, F1
 from CipCipPy.classification.feature import terms
-from CipCipPy.realtimeFiltering import Filterer
+from CipCipPy.realtimeFiltering import SupervisedFilterer
 from mb12filteval import *
 import EvalJig as ej
 
@@ -26,8 +26,6 @@ if sys.argv[5] == 'external':
     external = True
 parameters = set(tuple(c.split('-')) for c in sys.argv[6].split(':'))
 
-def intersect(query, text):
-    return len(set(terms(query)) & set(terms(text)))
 
 jig = FilterJig()
 jig.add_op(ej.NumRetr())
@@ -39,8 +37,6 @@ jig.add_op(Precision())
 jig.add_op(Recall())
 jig.add_op(Fb(0.5))
 jig.add_op(T11SU())
-
-f = Filterer()
 
 # Identify query tweets from the topic file
 qtweets = dict()
@@ -63,8 +59,14 @@ with open(sys.argv[2]) as qrelsfile:
 
 
 for param in parameters:
+
+    ######   EDIT  ###########################################
+
     rulesCount, n, m = [int(p) for p in param]
+    f =  SupervisedFilterer()
     results = f.get(queries, n, m, rulesCount, trainingSetPath, filteringIdsPath, qrels2, external)
+
+    ##########################################################
 
     run = collections.defaultdict(list)
     for q, res in results.iteritems():
@@ -88,6 +90,7 @@ for param in parameters:
         else:
             jig.compute(topic, [], qrels[topic])
 
+    print param
     jig.print_scores()
     jig.comp_means()
     jig.print_means()

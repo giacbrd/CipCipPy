@@ -7,19 +7,20 @@ import sys
 from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
 from CipCipPy.indexing import getIndexPath, getIndex
 from CipCipPy.retrieval import getStoredValue
+import codecs
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
 
-_storedStatusAll = getIndex('storedStatusAll')
+#_storedStatusAll = getIndex('storedStatusAll')
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')
 _storedLinkTitle = getIndex('storedLinkTitle')
 _storedAnnotation = getIndex('storedAnnotations20130805')
 #_storedNamedEntity = getIndex('storedNamedEntity')
 
-def getFirstStatus(indexId):
-    return getStoredValue(_storedStatusAll, indexId, 'status')
+#def getFirstStatus(indexId):
+#    return getStoredValue(_storedStatusAll, indexId, 'status')
 def getStatus(indexId):
     return getStoredValue(_storedStatus, indexId, 'status')
 def getTitle(indexId):
@@ -36,17 +37,17 @@ if len(sys.argv) > 4:
     queries = [q for q in queries if q[0] in set(sys.argv[4].split(':'))]
 
 def clean(text):
-    return text.encode('utf8', 'replace') if text != None else ''
+    return text if text is not None else u''
 
 for q in queries:
     dirList = os.listdir(sys.argv[2])
-    outFile = open(os.path.join(sys.argv[3], q[0]), 'w')
+    outFile = codecs.open(os.path.join(sys.argv[3], q[0]), 'w', encoding='utf8')
     for fName in dirList:
         for tweet in iterTweets(os.sep.join([sys.argv[2], fName])):
-            time = int(tweet[0])
-            if time >= q[3] and time <= q[4] and tweet[2] != '302':
-                time = str(time)
-                status = getStatus(time) if time > q[3] else getFirstStatus(time)
+            timeInt = int(tweet[0])
+            if timeInt >= q[3] and timeInt <= q[4] and tweet[2] != '302':
+                time = str(timeInt)
+                status = getStatus(time)
                 title = getTitle(time)
                 annotations = getAnnotation(time)
                 if status or title:

@@ -7,6 +7,7 @@ import sys
 from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
 from CipCipPy.indexing import getIndexPath, getIndex
 from CipCipPy.retrieval import getStoredValue
+import codecs
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
@@ -29,11 +30,11 @@ if len(sys.argv) > 4:
     queries = [q for q in queries if q[0] in set(sys.argv[4].split(':'))]
 
 def clean(text):
-    return text.encode('ascii', 'replace') if text != None else ''
+    return text if text is not None else u''
 
 for q in queries:
     dirList = os.listdir(sys.argv[2])
-    outFile = open(os.path.join(sys.argv[3], q[0]), 'w')
+    outFile = codecs.open(os.path.join(sys.argv[3], q[0]), 'w', encoding='utf8')
     for fName in dirList:
         for tweet in iterTweets(os.sep.join([sys.argv[2], fName])):
             time = int(tweet[0])
