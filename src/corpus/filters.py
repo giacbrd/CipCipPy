@@ -12,7 +12,7 @@ class BaseFilter:
     def filter(self, line):
         l = line.split('\t')
         if l[3] != 'null' and l[2] != '302':
-            return line
+            return unicode(line, encoding='utf8')
         else:
             return None
 
@@ -96,7 +96,8 @@ class LinkTitles:
         finally:
             signal.signal(signal.SIGALRM, oldHandler)
             signal.alarm(0)
-    
+
+    #FIXME must return unicode string! (page titles could have different encodings)
     def filter(self, line):
         l = line.split('\t', 4)
         if len(l) < 5:

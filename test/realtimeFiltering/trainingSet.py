@@ -18,6 +18,7 @@ import cPickle
 from operator import itemgetter
 from CipCipPy.realtimeFiltering import Filterer
 from CipCipPy.config import RESOURCE_PATH
+import codecs
 
 
 neg = int(sys.argv[1])
@@ -88,4 +89,4 @@ for qNum in queries:
     printOut +=  '\n-----------------------\n'
     print printOut
 
-    cPickle.dump(samples, open(os.path.join(outPath, qNum), 'w'))
+    cPickle.dump(samples, codecs.open(os.path.join(outPath, qNum), 'w', encoding='utf8'))

@@ -32,6 +32,7 @@ import httplib2
 from ..utils.fileManager import tweetParser, iterTweets
 import re
 from HTMLParser import HTMLParser
+import codecs
 
 def build(filters, inPath, outPath):
     """filters is an iterator over objects for filtering, for each line they are applied in the iterator order."""
@@ -40,7 +41,7 @@ def build(filters, inPath, outPath):
         os.makedirs(outPath)
     dirList = os.listdir(inPath)
     for fName in dirList:
-        outFile = open(os.sep.join([outPath, fName]), 'w')
+        outFile = codecs.open(os.sep.join([outPath, fName]), 'w', encoding='utf8')
         for line in open(os.sep.join([inPath, fName])):
             line = line.strip()
             for filter in filters:
@@ -69,7 +70,7 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
         if fName not in dirList1:
             shutil.copy(os.sep.join([corpusPath2, fName]), os.sep.join([outPath, fName]))
             continue
-        outFile = open(os.sep.join([outPath, fName]), 'w')
+        outFile = codecs.open(os.sep.join([outPath, fName]), 'w', encoding='utf8')
         iter1 = open(os.sep.join([corpusPath1, fName]))
         iter2 = open(os.sep.join([corpusPath2, fName]))
         def goNext(iterFile):
@@ -105,6 +106,10 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
                 line2, tweet2, time2 = goNext(iter2)
                 continue
         outFile.close()
+        outList = set(os.listdir(outPath))
+        for fName in dirList1:
+            if fName not in outList:
+                shutil.copy(os.sep.join([corpusPath1, fName]), os.sep.join([outPath, fName]))
 
 
 
