@@ -75,7 +75,7 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
         iter2 = open(os.sep.join([corpusPath2, fName]))
         def goNext(iterFile):
             try:
-                line = iterFile.next().strip()
+                line = unicode(iterFile.next().strip(), encoding='utf8')
                 tweet = line.split('\t')
                 time = int(tweet[0])
                 return line, tweet, time

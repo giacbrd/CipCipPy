@@ -100,7 +100,7 @@ def iterTweets(filePath, skipNull = True):
     file = open(filePath) if filePath[-2:] != 'gz' else gzip.open(filePath)
     for line in file:
         try:
-            line = unicode(line, errors = 'replace', encoding = 'utf8')
+            line = unicode(line, encoding = 'utf8')
         except UnicodeDecodeError:
             print 'unicode error: ' + line
             continue

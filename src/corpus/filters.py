@@ -11,7 +11,7 @@ class BaseFilter:
     
     def filter(self, line):
         l = line.split('\t')
-        if l[3] != 'null' and l[2] != '302':
+        if l[3] != 'null' and l[2] != '302' and len(l) >= 5:
             return unicode(line, encoding='utf8')
         else:
             return None
