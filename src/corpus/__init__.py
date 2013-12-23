@@ -106,10 +106,10 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
                 line2, tweet2, time2 = goNext(iter2)
                 continue
         outFile.close()
-        outList = set(os.listdir(outPath))
-        for fName in dirList1:
-            if fName not in outList:
-                shutil.copy(os.sep.join([corpusPath1, fName]), os.sep.join([outPath, fName]))
+    outList = set(os.listdir(outPath))
+    for fName in dirList1:
+        if fName not in outList:
+            shutil.copy(os.sep.join([corpusPath1, fName]), os.sep.join([outPath, fName]))
 
 
 

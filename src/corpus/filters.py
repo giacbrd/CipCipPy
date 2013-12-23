@@ -70,6 +70,8 @@ class HtmlUnescape:
         l[4] = self.hp.unescape(' '.join(l[4].splitlines()))
         return '\t'.join(l)
 
+titleRE = re.compile('<title>(.*?)</title>', re.I | re.S)
+
 class LinkTitles:
     """Substitute the twitter status with the titles of links it contains."""
     
@@ -86,7 +88,7 @@ class LinkTitles:
             u = urllib2.urlopen(url)
             if u:
                 html = u.read()
-                titles = re.findall(r'<title>(.+)</title>', html, re.I)
+                titles = titleRE.findall(html)
                 if len(titles) > 0:
                     return unicode('\t'.join(titles), encoding='utf8', errors='xmlcharrefreplace')
         except self.TimeoutException:
