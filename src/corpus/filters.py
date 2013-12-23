@@ -12,7 +12,7 @@ class BaseFilter:
     def filter(self, line):
         l = line.split('\t')
         if l[3] != 'null' and l[2] != '302' and len(l) >= 5:
-            return unicode(line, encoding='utf8')
+            return unicode(line, encoding='utf8') if not isinstance(line, unicode) else line
         else:
             return None
 
@@ -59,7 +59,7 @@ class English2:
             else:
                 return None
 
-class htmlUnescape:
+class HtmlUnescape:
 
     def __init__(self):
         import HTMLParser
