@@ -4,6 +4,10 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import svm, neighbors
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.neighbors import NearestCentroid
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import RidgeClassifier
+
 
 class TrainingSet():
 
@@ -45,56 +49,62 @@ class TrainingSet():
             self.features.pop(0)
             self.tweetsToPop -= 1
 
-
-class NBClassifier():
-    def __init__(self, vectorFeature,vectorTarget):
-        self.NB = MultinomialNB()
-        self.NB.fit(vectorFeature, vectorTarget)
+class Classifier:
 
     def retrain(self, vectorFeature, vectorTarget):
-        self.NB.fit(vectorFeature, vectorTarget)
+        self.cl.fit(vectorFeature, vectorTarget)
 
     def classify(self, vectorizedTest):
-        return self.NB.predict(vectorizedTest)[0]
+        return self.cl.predict(vectorizedTest)[0]
 
     def getProb(self, vectorizedTest):
-        return self.NB.predict_proba(vectorizedTest)[0][1]
+        return self.cl.predict_proba(vectorizedTest)[0][1]
 
-class SVMClassifier():
-    def __init__(self, vectorFeature, vectorTarget):
-        self.SVM = svm.SVC()
-        self.SVM.fit(vectorFeature, vectorTarget)
+
+class NBClassifier(Classifier):
+
+    def __init__(self):
+        self.cl = MultinomialNB()
+
+
+class SVMClassifier(Classifier):
+
+    def __init__(self):
+        self.cl = svm.SVC()
+        delattr(self, 'getProb')
+
+
+class KNNClassifier(Classifier):
+
+    def __init__(self, neighbors=3):
+        self.cl = neighbors.KNeighborsClassifier(n_neighbors=neighbors)
+
+
+class ADAClassifier(Classifier):
+
+    def __init__(self, maxTreeDepth = 1, estimators=50, learningRate = 1.):
+        self.cl = AdaBoostClassifier(n_estimators=estimators, learning_rate=learningRate,
+                                      base_estimator=DecisionTreeClassifier(max_depth=maxTreeDepth))
 
     def retrain(self, vectorFeature, vectorTarget):
-        self.SVM.fit(vectorFeature, vectorTarget)
+        self.cl.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
 
     def classify(self, vectorizedTest):
-        return self.SVM.predict(vectorizedTest)[0]
-
-class KNNClassifier():
-    def __init__(self, vectorFeature, vectorTarget):
-        self.KNN = neighbors.KNeighborsClassifier(n_neighbors=3)
-        self.KNN.fit(vectorFeature, vectorTarget)
-
-    def retrain(self, vectorFeature, vectorTarget):
-        self.KNN.fit(vectorFeature, vectorTarget)
-
-    def classify(self, vectorizedTest):
-        return self.KNN.predict(vectorizedTest)[0]
+        return self.cl.predict(vectorizedTest.toarray()[0])[0]
 
     def getProb(self, vectorizedTest):
-        return self.KNN.predict_proba(vectorizedTest)[0][1]
+        return self.cl.predict_proba(vectorizedTest.toarray()[0])[0][1]
 
-class ADAClassifier():
-    def __init__(self, vectorFeature, vectorTarget):
-        self.ADA = AdaBoostClassifier()
-        self.ADA.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
 
-    def retrain(self, vectorFeature, vectorTarget):
-        self.ADA.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
+class RClassifier():
 
-    def classify(self, vectorizedTest):
-        return self.ADA.predict(vectorizedTest.toarray()[0])[0]
+    def __init__(self, alpha = 1.):
 
-    def getProb(self, vectorizedTest):
-        return self.ADA.predict_proba(vectorizedTest.toarray()[0])[0][1]
+        self.cl = RidgeClassifier(alpha=alpha)
+
+
+class NCClassifier():
+
+    def __init__(self, shrink = None):
+
+        self.cl = NearestCentroid(shrink_threshold=shrink)

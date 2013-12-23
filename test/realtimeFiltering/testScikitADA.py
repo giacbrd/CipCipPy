@@ -46,7 +46,7 @@ dumpsPath = os.path.join(resultsPath, 'dumps_' + runName)
 if not os.path.exists(dumpsPath):
         os.makedirs(dumpsPath)
 
-f = SupervisedFilterer(ADAClassifier)
+f = SupervisedFilterer(ADAClassifier())
 results = f.get(queries, queriesAnnotated, m, trainingSetPath, filteringIdsPath,
                 qrels, external, annotationFilter = True, dumpsPath = dumpsPath)
 

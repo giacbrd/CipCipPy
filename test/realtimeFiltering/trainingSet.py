@@ -89,4 +89,4 @@ for qNum in queries:
     printOut +=  '\n-----------------------\n'
     print printOut
 
-    cPickle.dump(samples, codecs.open(os.path.join(outPath, qNum), 'w', encoding='utf8'))
+    cPickle.dump(samples, open(os.path.join(outPath, qNum), 'w'))

@@ -1,30 +1,37 @@
 """
 arguments:
     validation topics file
+    validation annotated topics
     relevance judgements
     path of ids and content per query (test set) for realtime filtering
     training set dir
     "external" for using external information, otherwise internal"
-    parameters: rulesCount-posTrainCut-negTrainCut. e.g. 10-1-100:10-2-200:10-5-100:10-5-1000
+    parameters: classifier (R, NC), classifier parameter, number of negative samples, minimum link probability, annotation pre-filtering.
+        e.g. R-0.1:0.2-10:100-....
 """
 
 import sys, collections, re
+from CipCipPy.classification.scikitClassifiers import ADAClassifier
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.evaluation import T11SU, F1
 from CipCipPy.classification.feature import terms
 from CipCipPy.realtimeFiltering import SupervisedFilterer
 from mb12filteval import *
 import EvalJig as ej
+import itertools
+from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier
 
 queries = readQueries(sys.argv[1])
+queriesAnnotated = readQueries(sys.argv[2])
+assert len(queries) == len(queriesAnnotated)
 
-qrels2 = readQrels(sys.argv[2], set(q[0] for q in queries))
-filteringIdsPath = sys.argv[3]
-trainingSetPath = sys.argv[4]
+qrels2 = readQrels(sys.argv[3], set(q[0] for q in queries))
+filteringIdsPath = sys.argv[4]
+trainingSetPath = sys.argv[5]
 external = False
-if sys.argv[5] == 'external':
+if sys.argv[6] == 'external':
     external = True
-parameters = set(tuple(c.split('-')) for c in sys.argv[6].split(':'))
+parameters = set(tuple(c.split(':')) for c in sys.argv[7].split('-'))
 
 
 jig = FilterJig()
@@ -58,13 +65,19 @@ with open(sys.argv[2]) as qrelsfile:
         qrels[topic][docid] = int(rel)
 
 
-for param in parameters:
+for param in list(itertools.product(*parameters)):
 
-    ######   EDIT  ###########################################
+    #######  EDIT  ###########################################
 
-    rulesCount, n, m = [int(p) for p in param]
-    f =  SupervisedFilterer()
-    results = f.get(queries, n, m, rulesCount, trainingSetPath, filteringIdsPath, qrels2, external)
+    classifier, classifierParam, neg, minLinkProb, annotationRule = param
+    if classifier == 'NC':
+        classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
+    elif classifier == 'R':
+        classifier = RClassifier(alpha=float(classifierParam))
+
+    f = SupervisedFilterer(classifier)
+    results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
+                qrels2, external, float(minLinkProb), annotationFilter = True if annotationRule=='True' else False)
 
     ##########################################################
 

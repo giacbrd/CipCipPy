@@ -32,7 +32,7 @@ from ..classification.scikitClassifiers import TrainingSet, NBClassifier, SVMCla
 import os
 import codecs
 
-_extractorStatus = FeatureExtractor((terms, bigrams, hashtags))
+_extractorStatus = FeatureExtractor((terms, bigrams, hashtags, hasUrl))
 _extractor1 = FeatureExtractor((terms, bigrams))
 
 
@@ -81,8 +81,11 @@ class SupervisedFilterer(Filterer):
     def __init__(self, classifier):
         self.classifier = classifier
 
+    def cutOnLinkProb(self, features, linkProb):
+        return [f[0] for f in features if f.start.startswith(ANNOTATION_PREFIX) and float(f.split(' ')[2]) > linkProb]
+
     def get(self, queries, queriesAnnotated, neg, trainingSetPath, filteringIdsPath,
-            qrels, external, annotationFilter = False, dumpsPath = None):
+            qrels, external, minLinkProb, annotationFilter = False, dumpsPath = None):
         """ Return filtered tweets for query topics and the relative time ranges.
         queries - queries from a topic file
         queriesAnnotated - queries from a topic file with annotated topics
@@ -92,6 +95,7 @@ class SupervisedFilterer(Filterer):
                            The tweet line format is defined in the method featureExtract
         qrels - relevance judgements
         external - True for using external information, otherwise False
+        minLinkProb - minimum link probability for an annotation to be selected as feature
         annotationFilter - If True a tweet is passed through supervised learning only if
         the intersection of annotation with the query or the first tweet is not empty
         dumpsPath - path where to store serialized results
@@ -100,7 +104,7 @@ class SupervisedFilterer(Filterer):
         for i, q in enumerate(queries):
             if int(q[0][2:]) not in qrels:
                 continue
-            print neg, q
+            print q
             results[q[0]] = []
             # (positives, negatives) ordered by relevance
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
@@ -110,6 +114,7 @@ class SupervisedFilterer(Filterer):
             posAnnotations = set()
             # add the query as positive example
             features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
+            features = self.cutOnLinkProb(features, minLinkProb)
             posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
             rawTweets.append((q[0], True, features))
             # add the first tweet as positive example
@@ -117,16 +122,18 @@ class SupervisedFilterer(Filterer):
                 tweetId, null, text = line.partition('\t\t')
                 results[q[0]].append((tweetId, '1.0\tyes'))
                 features = self.featureExtract(text[:-1], external)
+                features = self.cutOnLinkProb(features, minLinkProb)
                 posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
                 rawTweets.append((tweetId, True, features))
                 break
             for tweetId, features in training[1][:neg]:
+                features = self.cutOnLinkProb(features, minLinkProb)
                 rawTweets.append((tweetId, False, features))
             classifier = None
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
                 training.countVectorize()
-                classifier = self.classifier(training.vectoridf, training.tweetTarget)
+                self.classifier.retrain(training.vectoridf, training.tweetTarget)
             #for e, v in enumerate(training.vectoridf[:2]):
             #    fe = training.features[e].split(' ')
             #    col = v.nonzero()[1]
@@ -137,6 +144,7 @@ class SupervisedFilterer(Filterer):
             for line in testFile:
                 tweetId, null, text = line.partition('\t\t')
                 features = self.featureExtract(text[:-1], external)
+                features = self.cutOnLinkProb(features, minLinkProb)
                 if not features:
                     continue
                 if annotationFilter:
@@ -145,11 +153,11 @@ class SupervisedFilterer(Filterer):
                         continue
                 #nb.test(tweetId, features)
                 test=training.vectorizeTest((tweetId,False,features))
-                classification = classifier.classify(test)
+                classification = self.classifier.classify(test)
                 #print tweetId, features, 'C' + str(classification)
                 #print classifier.getProb(test)
                 if classification == 1:
-                    score = classifier.getProb(test) if callable(getattr(classifier, "getProb", None)) else 1.
+                    score = self.classifier.getProb(test) if callable(getattr(self.classifier, "getProb", None)) else 1.
                     results[q[0]].append((tweetId, str(score) + '\tyes'))
                     if tweetId in qrels[int(q[0][2:])][0]:
                         training.addExample((tweetId, True, features))
@@ -159,7 +167,7 @@ class SupervisedFilterer(Filterer):
                     else:
                         training.addExample((tweetId, False, features))
                     training.countVectorize()
-                    classifier.retrain(training.vectoridf, training.tweetTarget)
+                    self.classifier.retrain(training.vectoridf, training.tweetTarget)
             testFile.close()
             if dumpsPath:
                 cPickle.dump(results[q[0]], open(os.path.join(dumpsPath, q[0]), 'w'))
