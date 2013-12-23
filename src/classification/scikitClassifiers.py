@@ -57,11 +57,13 @@ class Classifier:
     def classify(self, vectorizedTest):
         return self.cl.predict(vectorizedTest)[0]
 
+class ProbClassifier:
+
     def getProb(self, vectorizedTest):
         return self.cl.predict_proba(vectorizedTest)[0][1]
 
 
-class NBClassifier(Classifier):
+class NBClassifier(Classifier, ProbClassifier):
 
     def __init__(self):
         self.cl = MultinomialNB()
@@ -71,16 +73,15 @@ class SVMClassifier(Classifier):
 
     def __init__(self):
         self.cl = svm.SVC()
-        delattr(self, 'getProb')
 
 
-class KNNClassifier(Classifier):
+class KNNClassifier(Classifier, ProbClassifier):
 
     def __init__(self, neighbors=3):
         self.cl = neighbors.KNeighborsClassifier(n_neighbors=neighbors)
 
 
-class ADAClassifier(Classifier):
+class ADAClassifier(Classifier, ProbClassifier):
 
     def __init__(self, maxTreeDepth = 1, estimators=50, learningRate = 1.):
         self.cl = AdaBoostClassifier(n_estimators=estimators, learning_rate=learningRate,
@@ -96,15 +97,13 @@ class ADAClassifier(Classifier):
         return self.cl.predict_proba(vectorizedTest.toarray()[0])[0][1]
 
 
-class RClassifier():
+class RClassifier(Classifier):
 
     def __init__(self, alpha = 1.):
-
         self.cl = RidgeClassifier(alpha=alpha)
 
 
-class NCClassifier():
+class NCClassifier(Classifier):
 
     def __init__(self, shrink = None):
-
         self.cl = NearestCentroid(shrink_threshold=shrink)

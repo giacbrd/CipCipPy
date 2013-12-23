@@ -30,7 +30,6 @@ from ..classification.feature import *
 import cPickle
 from ..classification.scikitClassifiers import TrainingSet, NBClassifier, SVMClassifier
 import os
-import codecs
 
 _extractorStatus = FeatureExtractor((terms, bigrams, hashtags, mentions, hasUrl))
 _extractor1 = FeatureExtractor((terms, bigrams))
@@ -82,7 +81,14 @@ class SupervisedFilterer(Filterer):
         self.classifier = classifier
 
     def cutOnLinkProb(self, features, linkProb):
-        return [f[0] for f in features if f.start.startswith(ANNOTATION_PREFIX) and float(f.split(' ')[2]) > linkProb]
+        result = []
+        for f in features:
+            ff = f.split(' ')
+            if f.startswith(ANNOTATION_PREFIX) and len(ff) == 4 and float(ff[2]) > linkProb:
+                result.append(ff[0])
+            else:
+                result.append(f)
+        return result
 
     def get(self, queries, queriesAnnotated, neg, trainingSetPath, filteringIdsPath,
             qrels, external, minLinkProb, annotationFilter = False, dumpsPath = None):
@@ -110,7 +116,7 @@ class SupervisedFilterer(Filterer):
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
             training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             rawTweets=[]
-            testFile = codecs.open(os.path.join(filteringIdsPath, q[0]), encoding = 'utf8')
+            testFile = open(os.path.join(filteringIdsPath, q[0]))
             posAnnotations = set()
             # add the query as positive example
             features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
@@ -119,7 +125,7 @@ class SupervisedFilterer(Filterer):
             rawTweets.append((q[0], True, features))
             # add the first tweet as positive example
             for line in testFile:
-                tweetId, null, text = line.partition('\t\t')
+                tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 results[q[0]].append((tweetId, '1.0\tyes'))
                 features = self.featureExtract(text[:-1], external)
                 features = self.cutOnLinkProb(features, minLinkProb)
@@ -142,7 +148,7 @@ class SupervisedFilterer(Filterer):
             #    print training.tweetTarget[e]
             # do not train the first tweet
             for line in testFile:
-                tweetId, null, text = line.partition('\t\t')
+                tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 features = self.featureExtract(text[:-1], external)
                 features = self.cutOnLinkProb(features, minLinkProb)
                 if not features:

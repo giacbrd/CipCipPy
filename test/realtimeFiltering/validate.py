@@ -31,7 +31,7 @@ trainingSetPath = sys.argv[5]
 external = False
 if sys.argv[6] == 'external':
     external = True
-parameters = set(tuple(c.split(':')) for c in sys.argv[7].split('-'))
+parameters = tuple(tuple(c.split(':')) for c in sys.argv[7].split('-'))
 
 
 jig = FilterJig()
@@ -55,7 +55,7 @@ for t in tops.find_all('querytweettime'):
 
 # Read in relevance judgments, dropping the querytweet
 qrels = collections.defaultdict(dict)
-with open(sys.argv[2]) as qrelsfile:
+with open(sys.argv[3]) as qrelsfile:
     for line in qrelsfile:
         topic, _, docid, rel = line.split()
         if topic not in qtweets:
