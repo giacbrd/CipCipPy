@@ -114,10 +114,11 @@ def enrich(corpusPath1, corpusPath2, filters, outPath, processes = 1, overwrite 
     chunks =[dirList2[i:i+fileForChunk] for i in range(0,len(dirList2),fileForChunk)]
     for chunk in chunks:
         pool.apply_async(_enrich, (corpusPath1, corpusPath2, chunk, filters, outPath, overwrite))
-    outList = set(os.listdir(outPath))
-    for fName in dirList1:
-        if fName not in outList:
-            shutil.copy(os.sep.join([corpusPath1, fName]), os.sep.join([outPath, fName]))
+    #FIXME files that are only in corpus1 must be copied, synchronously (this code is not)
+    #outList = set(os.listdir(outPath))
+    #for fName in dirList1:
+    #    if fName not in outList:
+    #        shutil.copy(os.sep.join([corpusPath1, fName]), os.sep.join([outPath, fName]))
 
 
 _tweetBegin = "<span class=\"entry-content\">"
