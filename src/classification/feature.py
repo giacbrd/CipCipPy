@@ -57,7 +57,7 @@ def hashtags(text):
 
 def hasUrl(text):
     """Return a feature if there is a url in the text"""
-    return URL_FEATURE if urlRE.findall(text) else ''
+    return [URL_FEATURE if urlRE.findall(text) else '']
 
 def segmHashtags(text, dictionary):
     """Returns terms of the segmented hashtags of a text"""
