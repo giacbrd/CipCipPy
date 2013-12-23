@@ -22,6 +22,8 @@ for fName in dirList:
             if qKey not in qrels:
                 continue
             if tweetId in qrels[qKey][0]:
+                if int(q[3]) == int(tweetId):
+                    print q, 'FIRST', tweet
                 print q[1], '>>>>>>' , clean(tweet[4])
                 pos[qKey] += 1
 

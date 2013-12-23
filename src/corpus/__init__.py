@@ -33,6 +33,7 @@ from ..utils.fileManager import tweetParser, iterTweets
 import re
 from HTMLParser import HTMLParser
 import codecs
+from multiprocessing import Pool
 
 def build(filters, inPath, outPath):
     """filters is an iterator over objects for filtering, for each line they are applied in the iterator order."""
@@ -57,18 +58,13 @@ def fuse(inPaths, filters, outPath, separator = '\t\t'):
     divided by separator"""
     pass
 
-def enrich(corpusPath1, corpusPath2, filters, outPath):
+def _enrich(corpusPath1, corpusPath2, dirList2, filters, outPath, overwrite):
     """Create a corpus that contains the tweets of corpus1,
     and the tweets of corpus2 those are not in corpus1
     Filters are applied to corpus2"""
-    filters = [BaseFilter()] + list(filters)
-    if not os.path.exists(outPath):
-        os.makedirs(outPath)
-    dirList1 = os.listdir(corpusPath1)
-    dirList2 = os.listdir(corpusPath2)
+    filters = [BaseFilter()] + [f() for f in filters]
     for fName in dirList2:
-        if fName not in dirList1:
-            shutil.copy(os.sep.join([corpusPath2, fName]), os.sep.join([outPath, fName]))
+        if not overwrite and os.path.isfile(os.sep.join([outPath, fName])):
             continue
         outFile = codecs.open(os.sep.join([outPath, fName]), 'w', encoding='utf8')
         iter1 = open(os.sep.join([corpusPath1, fName]))
@@ -86,7 +82,7 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
         line2, tweet2, time2 = goNext(iter2)
         while True:
             if time1 == time2:
-                if time1 == float('inf'):
+                if time2 == float('inf'):
                     break
                 outFile.write(line1 + '\n')
                 line1, tweet1, time1 = goNext(iter1)
@@ -106,11 +102,22 @@ def enrich(corpusPath1, corpusPath2, filters, outPath):
                 line2, tweet2, time2 = goNext(iter2)
                 continue
         outFile.close()
+
+def enrich(corpusPath1, corpusPath2, filters, outPath, processes = 1, overwrite = False):
+    pool = Pool(processes)
+    if not os.path.exists(outPath):
+        os.makedirs(outPath)
+    dirList1 = os.listdir(corpusPath1)
+    dirList2 = os.listdir(corpusPath2)
+    #FIXME files that are only in corpus2 are not copied
+    fileForChunk = int(len(dirList2) / processes)
+    chunks =[dirList2[i:i+fileForChunk] for i in range(0,len(dirList2),fileForChunk)]
+    for chunk in chunks:
+        pool.apply_async(_enrich, (corpusPath1, corpusPath2, chunk, filters, outPath, overwrite))
     outList = set(os.listdir(outPath))
     for fName in dirList1:
         if fName not in outList:
             shutil.copy(os.sep.join([corpusPath1, fName]), os.sep.join([outPath, fName]))
-
 
 
 _tweetBegin = "<span class=\"entry-content\">"
