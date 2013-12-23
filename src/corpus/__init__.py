@@ -103,9 +103,6 @@ def _enrich(corpusPath1, corpusPath2, dirList2, filters, outPath, overwrite):
                 continue
         outFile.close()
 
-def unwrap_enrich(args):
-    return _enrich(*args)
-
 def enrich(corpusPath1, corpusPath2, filters, outPath, processes = 1, overwrite = False):
     pool = Pool(processes)
     if not os.path.exists(outPath):
@@ -116,7 +113,7 @@ def enrich(corpusPath1, corpusPath2, filters, outPath, processes = 1, overwrite 
     fileForChunk = int(len(dirList2) / processes)
     chunks =[dirList2[i:i+fileForChunk] for i in range(0,len(dirList2),fileForChunk)]
     for chunk in chunks:
-        pool.apply_async(unwrap_enrich, (corpusPath1, corpusPath2, chunk, filters, outPath, overwrite))
+        pool.apply_async(_enrich, [corpusPath1, corpusPath2, chunk, filters, outPath, overwrite])
     #FIXME files that are only in corpus1 must be copied, synchronously (this code is not)
     #outList = set(os.listdir(outPath))
     #for fName in dirList1:
