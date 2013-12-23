@@ -32,7 +32,7 @@ from ..classification.scikitClassifiers import TrainingSet, NBClassifier, SVMCla
 import os
 import codecs
 
-_extractorStatus = FeatureExtractor((terms, bigrams, hashtags, hasUrl))
+_extractorStatus = FeatureExtractor((terms, bigrams, hashtags, mentions, hasUrl))
 _extractor1 = FeatureExtractor((terms, bigrams))
 
 

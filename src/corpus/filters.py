@@ -88,7 +88,7 @@ class LinkTitles:
                 html = u.read()
                 titles = re.findall(r'<title>(.+)</title>', html, re.I)
                 if len(titles) > 0:
-                    return '\t'.join(titles)
+                    return unicode('\t'.join(titles), encoding='utf8', errors='xmlcharrefreplace')
         except self.TimeoutException:
             print 'timeout: ', url
         except Exception as err:

@@ -1,6 +1,6 @@
 """Methods for extracting features (list of strings) from a text string."""
 from ..utils.hashtag import Segmenter
-from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE
+from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE
 import nltk, math
 
 ANNOTATION_PREFIX = '_ann_'
@@ -54,6 +54,10 @@ def bigrams(text):
 def hashtags(text):
     """Returns hashtags of a text"""
     return [h.lower() for h in hashtagRE.findall(text)]
+
+def mentions(text):
+    """Returns mentioned users of a text"""
+    return [r.lower() for r in replyRE.findall(text)]
 
 def hasUrl(text):
     """Return a feature if there is a url in the text"""
