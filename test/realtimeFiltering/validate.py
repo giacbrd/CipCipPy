@@ -74,6 +74,8 @@ for param in list(itertools.product(*parameters)):
         classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
     elif classifier == 'R':
         classifier = RClassifier(alpha=float(classifierParam))
+    elif classifier == 'ADA':
+        classifier = ADAClassifier(estimators=int(classifierParam))
 
     f = SupervisedFilterer(classifier)
     results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
@@ -90,7 +92,7 @@ for param in list(itertools.product(*parameters)):
                 continue
             if r[0] == qtweets[q]:
                 continue
-            run[topic].append((float(score), r[0]))
+            run[q].append((float(score), r[0]))
 
     for topic in qrels.iterkeys():
         jig.zero(topic)

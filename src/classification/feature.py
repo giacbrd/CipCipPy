@@ -3,8 +3,8 @@ from ..utils.hashtag import Segmenter
 from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE
 import nltk, math
 
-ANNOTATION_PREFIX = '_ann_'
-URL_FEATURE = '__UrL__'
+ANNOTATION_PREFIX = 'NMIS__aNn__'
+URL_FEATURE = 'NMIS__UrL__'
 
 class FeatureExtractor:
     """Concatenate feature extraction functions"""

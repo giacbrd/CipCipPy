@@ -115,6 +115,8 @@ def tweetParser(line):
     """Return a tuple or None if the tweet is null:
         (tweet id, user, http status, date object, status, tuple of hashtags, tuple of replied users)"""
     l = line.strip().split('\t')
+    if len(l) < 5:
+        raise ValueError("Incorrect line format of the corpus:  " + line)
     if l[3] != 'null':
         if len(l) > 5:
             l[4] = '\t'.join(l[4:])

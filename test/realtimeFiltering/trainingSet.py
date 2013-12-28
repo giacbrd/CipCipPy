@@ -82,7 +82,7 @@ for qNum in queries:
     samples = ([], [])
     for tweetId in negatives:
         samples[1].append((tweetId, featureExtract(getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + \
-                            getTitle(tweetId) + '\t\t' + getAnnotation(tweetId), external = external)))
+                            getTitle(tweetId).strip() + '\t\t' + getAnnotation(tweetId), external = external)))
     printOut = '\n' + '__________________________________________________' + '\n'
     printOut += str((qNum, queries[qNum][0], len(negResult))) + '\n'
     printOut += '\n'.join(str(p) for p in samples[1][:10])

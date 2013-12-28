@@ -48,7 +48,7 @@ for q in queries:
             if timeInt >= q[3] and timeInt <= q[4] and tweet[2] != '302':
                 time = str(timeInt)
                 status = getStatus(time)
-                title = getTitle(time)
+                title = getTitle(time).strip()
                 annotations = getAnnotation(time)
                 if status or title:
                     outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \

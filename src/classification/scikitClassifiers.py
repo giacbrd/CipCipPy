@@ -1,4 +1,8 @@
 """Classification with scikit-learn"""
+import math
+import numpy
+import scipy.spatial.distance
+from scipy.stats.mstats_basic import threshold
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
@@ -107,3 +111,34 @@ class NCClassifier(Classifier):
 
     def __init__(self, shrink = None):
         self.cl = NearestCentroid(shrink_threshold=shrink)
+        self.shrink = shrink
+
+    def retrain(self, vectorFeature, vectorTarget):
+        if self.shrink != None:
+            self.cl.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
+        else:
+            super(NCClassifier, self).retrain(vectorFeature, vectorTarget)
+
+    def classify(self, vectorizedTest):
+        if self.shrink != None:
+            return self.cl.predict(vectorizedTest.toarray()[0])[0]
+        else:
+            return super(NCClassifier, self).classify(vectorizedTest)
+
+class RocchioClassifier(Classifier):
+
+    def __init__(self, threshold = 0.5, distance_func = scipy.spatial.distance.euclidean):
+        self.threshold = threshold
+        self.distance_func = distance_func
+
+    def retrain(self, vectorFeature, vectorTarget):
+        assert(len(vectorFeature) == len(vectorTarget))
+        #FIXME operations on sparse matrices
+        #vectors = [numpy.sign(vectorTarget[i] - .5) * v for i, v in enumerate(vectorFeature)]
+        #self.centroid = numpy.mean(vectors, axis=1)
+
+    def classify(self, vectorizedTest):
+        if self.distance_func(vectorizedTest, self.centroid) < threshold:
+            return 1
+        else:
+            return 0

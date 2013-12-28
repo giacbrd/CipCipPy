@@ -110,7 +110,7 @@ class LinkTitles:
                 urls[i] = urls[i][:-1]
         if len(urls) > 0:
             titles = [self.getTitle(url) for url in urls]
-            l[4] = '\t'.join(' '.join(t.splitlines()) for t in titles if t)
+            l[4] = '\t'.join(' '.join(t2.strip() for t2 in t1.strip().split()) for t1 in titles if t1.strip())
             return '\t'.join(l)
         else:
             return None

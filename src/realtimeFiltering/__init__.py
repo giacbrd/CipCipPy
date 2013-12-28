@@ -84,12 +84,13 @@ class SupervisedFilterer(Filterer):
         result = []
         for f in features:
             ff = f.split(' ')
-            try:
-                fl = float(ff[2])
-            except ValueError:
-                fl = 0.
-            if f.startswith(ANNOTATION_PREFIX) and len(ff) == 4 and fl > linkProb:
-                result.append(ff[0])
+            if f.startswith(ANNOTATION_PREFIX) and len(ff) == 4:
+                try:
+                    fl = float(ff[2])
+                except ValueError:
+                    fl = 0.
+                if fl > linkProb:
+                    result.append(ff[0])
             else:
                 result.append(f)
         return result
