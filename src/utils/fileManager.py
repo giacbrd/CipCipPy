@@ -104,7 +104,10 @@ def iterTweets(filePath, skipNull = True):
         except UnicodeDecodeError:
             print 'unicode error: ' + line
             continue
-        l = tweetParser(line)
+        try:
+            l = tweetParser(line)
+        except ValueError:
+            continue
         if skipNull and (l[3] == 'null' or len(l) <= 4):
             continue
         else:
