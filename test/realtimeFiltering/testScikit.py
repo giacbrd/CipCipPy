@@ -14,7 +14,7 @@ arguments:
 
 
 import os
-import sys
+import sys, errno
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.realtimeFiltering import SupervisedFilterer
 from CipCipPy.classification.scikitClassifiers import ADAClassifier, NCClassifier, RClassifier
@@ -50,14 +50,22 @@ elif classifier == 'ADA':
 
 f = SupervisedFilterer(classifier)
 
-runName = 'run' + param + '_' + str(m) + ('_external' if external else '_internal')
+runName = 'run' + '-'.join(param) + ('_external' if external else '_internal')
 
 dumpsPath = os.path.join(resultsPath, 'dumps_' + runName)
 if not os.path.exists(dumpsPath):
+    try:
         os.makedirs(dumpsPath)
+    except OSError as e:
+        if e.errno == errno.EEXIST:
+            print 'Error: ', e
+            print 'continuing...'
+        else:
+            raise
 
 results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
-                qrels, external, float(minLinkProb), annotationFilter = True if annotationRule=='True' else False)
+                qrels, external, float(minLinkProb), annotationFilter = True if annotationRule=='True' else False,
+                dumpsPath=dumpsPath)
 
 
 #indexForPrint = whoosh.index.open_dir(getIndexPath('storedStatus'))

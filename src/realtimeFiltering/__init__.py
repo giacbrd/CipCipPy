@@ -39,7 +39,7 @@ _extractor1 = FeatureExtractor((terms, bigrams))
 class Filterer:
 
     def featureExtract(self, text, external = True):
-        """Extracts all the features from an sample of text"""
+        """Extracts all the features from a sample"""
         features = []
         text = text.split('\t\t')
         if text[0]: # status
@@ -140,7 +140,6 @@ class SupervisedFilterer(Filterer):
             for tweetId, features in training[1][:neg]:
                 features = self.cutOnLinkProb(features, minLinkProb)
                 rawTweets.append((tweetId, False, features))
-            classifier = None
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
                 training.countVectorize()

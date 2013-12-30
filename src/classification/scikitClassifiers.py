@@ -128,6 +128,7 @@ class NCClassifier(Classifier):
 class RocchioClassifier(Classifier):
 
     def __init__(self, threshold = 0.5, distance_func = scipy.spatial.distance.euclidean):
+        raise NotImplementedError()
         self.threshold = threshold
         self.distance_func = distance_func
 
