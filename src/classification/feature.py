@@ -53,11 +53,11 @@ def bigrams(text):
 
 def hashtags(text):
     """Returns hashtags of a text"""
-    return [h.lower() for h in hashtagRE.findall(text)]
+    return [h for h in hashtagRE.findall(text)]
 
 def mentions(text):
     """Returns mentioned users of a text"""
-    return [r.lower() for r in replyRE.findall(text)]
+    return [r for r in replyRE.findall(text)]
 
 def hasUrl(text):
     """Return a feature if there is a url in the text"""
