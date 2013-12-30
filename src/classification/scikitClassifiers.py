@@ -27,7 +27,7 @@ class TrainingSet():
             self.tweetTarget.append(1 if triple[1] else 0)
             self.features.append(' '.join(triple[2]))
         self.vectoridf = None
-        self.count_vect = CountVectorizer(min_df=1, binary=False)
+        self.count_vect = CountVectorizer(lowercase=False)
         self.idf_transf = TfidfTransformer()
 
     def countVectorize(self):
