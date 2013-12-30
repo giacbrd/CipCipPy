@@ -111,6 +111,7 @@ class SupervisedFilterer(Filterer):
         the intersection of annotation with the query or the first tweet is not empty
         dumpsPath - path where to store serialized results
         """
+        print self.classifier, neg, external, minLinkProb, annotationFilter
         results = {}
         for i, q in enumerate(queries):
             if int(q[0][2:]) not in qrels:
