@@ -1,12 +1,11 @@
 """Classification with scikit-learn"""
-import math
-import numpy
+
 import scipy.spatial.distance
 from scipy.stats.mstats_basic import threshold
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn import svm, neighbors
+from sklearn import svm
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import NearestCentroid
 from sklearn.tree import DecisionTreeClassifier
@@ -53,7 +52,7 @@ class TrainingSet():
             self.features.pop(0)
             self.tweetsToPop -= 1
 
-class Classifier:
+class Classifier(object):
 
     def retrain(self, vectorFeature, vectorTarget):
         self.cl.fit(vectorFeature, vectorTarget)
@@ -61,7 +60,7 @@ class Classifier:
     def classify(self, vectorizedTest):
         return self.cl.predict(vectorizedTest)[0]
 
-class ProbClassifier:
+class ProbClassifier(object):
 
     def getProb(self, vectorizedTest):
         return self.cl.predict_proba(vectorizedTest)[0][1]
