@@ -9,7 +9,7 @@ from sklearn import svm
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import NearestCentroid
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.linear_model import RidgeClassifier
+from sklearn.linear_model import RidgeClassifier, LogisticRegression
 
 
 class TrainingSet():
@@ -104,6 +104,11 @@ class RClassifier(Classifier):
 
     def __init__(self, alpha = 1.):
         self.cl = RidgeClassifier(alpha=alpha)
+
+class LClassifier(Classifier):
+
+    def __init__(self, C = 1.):
+        self.cl = LogisticRegression(C=C,class_weight='auto')
 
 
 class NCClassifier(Classifier):

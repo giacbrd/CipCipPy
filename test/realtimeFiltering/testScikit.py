@@ -15,9 +15,10 @@ arguments:
 
 import os
 import sys, errno
+from CipCipPy.evaluation.trecTools import printEval
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.realtimeFiltering import SupervisedFilterer
-from CipCipPy.classification.scikitClassifiers import ADAClassifier, NCClassifier, RClassifier
+from CipCipPy.classification.scikitClassifiers import ADAClassifier, NCClassifier, RClassifier, LClassifier
 
 
 #FIXME use argparse
@@ -47,6 +48,8 @@ elif classifier == 'R':
     classifier = RClassifier(alpha=float(classifierParam))
 elif classifier == 'ADA':
     classifier = ADAClassifier(estimators=int(classifierParam))
+elif classifier == 'L':
+    classifier = LClassifier(C=float(classifierParam))
 
 f = SupervisedFilterer(classifier)
 
@@ -66,6 +69,8 @@ if not os.path.exists(dumpsPath):
 results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
                 qrels, external, float(minLinkProb), annotationFilter = True if annotationRule=='True' else False,
                 dumpsPath=dumpsPath)
+
+printEval(sys.argv[1], sys.argv[3], results)
 
 
 #indexForPrint = whoosh.index.open_dir(getIndexPath('storedStatus'))
