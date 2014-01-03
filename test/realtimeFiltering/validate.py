@@ -19,7 +19,7 @@ from CipCipPy.realtimeFiltering import SupervisedFilterer
 from mb12filteval import *
 import EvalJig as ej
 import itertools
-from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier
+from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier
 
 queries = readQueries(sys.argv[1])
 queriesAnnotated = readQueries(sys.argv[2])
@@ -76,6 +76,8 @@ for param in list(itertools.product(*parameters)):
         classifier = RClassifier(alpha=float(classifierParam))
     elif classifier == 'ADA':
         classifier = ADAClassifier(estimators=int(classifierParam))
+    elif classifier == 'L':
+        classifier = LClassifier(C=float(classifierParam))
 
     f = SupervisedFilterer(classifier)
     results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
