@@ -56,12 +56,10 @@ def build(filters, inPath, outPath):
 def fuse(inPaths, filters, outPath, separator = '\t\t'):
     """Fuse several corpus in one, appending the different contents of tweets with the same id,
     divided by separator"""
+    raise NotImplementedError()
     pass
 
 def _enrich(corpusPath1, corpusPath2, dirList2, filters, outPath, overwrite):
-    """Create a corpus that contains the tweets of corpus1,
-    and the tweets of corpus2 those are not in corpus1
-    Filters are applied to corpus2"""
     filters = [BaseFilter()] + [f() for f in filters]
     for fName in dirList2:
         if not overwrite and os.path.isfile(os.sep.join([outPath, fName])):
@@ -104,6 +102,9 @@ def _enrich(corpusPath1, corpusPath2, dirList2, filters, outPath, overwrite):
         outFile.close()
 
 def enrich(corpusPath1, corpusPath2, filters, outPath, processes = 1, overwrite = False):
+    """Create a corpus that contains the tweets of corpus1,
+    and the tweets of corpus2 those are not in corpus1
+    Filters are applied to corpus2"""
     pool = Pool(processes)
     if not os.path.exists(outPath):
         os.makedirs(outPath)

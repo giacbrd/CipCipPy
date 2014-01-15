@@ -24,7 +24,7 @@ for fName in dirList:
             if tweetId in qrels[qKey][0]:
                 if int(q[3]) == int(tweetId):
                     print q, 'FIRST', tweet
-                print q[1], '>>>>>>' , clean(tweet[4])
+                print q[0], q[1], '>>>>>>' , clean(tweet[4])
                 pos[qKey] += 1
 
 for q in queries:

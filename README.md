@@ -14,7 +14,7 @@ Installation
 ------------
 In *config.py* set the constant DATA_PATH to the directory where CipCipPy will store data (indexes, cache, ...).
 Install the package executing: python setup.py install.
-Some language training files are included in dada/resources/languageTraining.
+Some language training files are included in data/resources/languageTraining.
 For hashtag segmentation it is necessary to build a dictionary {term: frequency}, we have used Google 1-grams http://storage.googleapis.com/books/ngrams/books/datasetsv2.html.
 
 Dependencies
@@ -23,6 +23,7 @@ Dependencies
 * whoosh
 * sklearn
 * nltk
+* langid (for language detection)
 * httplib2 (only for corpus downloading)
 * TREC tools for evaluation (only in test scripts): mb12eval, mb12filteval, EvalJig
 

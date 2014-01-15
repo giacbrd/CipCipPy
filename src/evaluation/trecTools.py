@@ -36,10 +36,6 @@ def printEval(topicsPath, qrelsPath, results):
                 continue
             qrels[topic][docid] = int(rel)
 
-
-
-        ##########################################################
-
     run = collections.defaultdict(list)
     for q, res in results.iteritems():
         q = q.lstrip('MB0')

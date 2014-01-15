@@ -32,8 +32,8 @@ class TimeRange:
             return None
 
 
-class English:
-    """Filter out non english tweets."""
+class EnglishTri:
+    """Filter out non english tweets with trigrams similarity method."""
 
     # TODO pass a english corpus to verify if a tweet is already processed e.g. add only new tweets and copy the old ones
     def __init__(self, languageTraining):
@@ -46,7 +46,8 @@ class English:
         else:
             return None
 
-class English2:
+class EnglishLangid:
+    """Filter out non english tweets using https://github.com/saffsd/langid.py"""
 
     def __init__(self):
         from langid.langid import LanguageIdentifier, model
@@ -60,6 +61,7 @@ class English2:
                 return None
 
 class HtmlUnescape:
+    """Unescape html code"""
 
     def __init__(self):
         import HTMLParser
@@ -99,7 +101,7 @@ class LinkTitles:
             signal.signal(signal.SIGALRM, oldHandler)
             signal.alarm(0)
 
-    #FIXME must return unicode string! (page titles could have different encodings)
+    #FIXME must return unicode string! (page titles have different encodings)
     def filter(self, line):
         l = line.split('\t', 4)
         if len(l) < 5:

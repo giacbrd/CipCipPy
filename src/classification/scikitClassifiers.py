@@ -108,7 +108,7 @@ class RClassifier(Classifier):
 class LClassifier(Classifier):
 
     def __init__(self, C = 1.):
-        self.cl = LogisticRegression(C=C, class_weight='auto', penalty='l1')
+        self.cl = LogisticRegression(C=C, class_weight='auto', penalty='l2')
 
 
 class NCClassifier(Classifier):

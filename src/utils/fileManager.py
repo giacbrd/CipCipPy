@@ -7,9 +7,6 @@ import os.path
 from ..retrieval import getStoredValue
 
 
-#TODO usa encoding giusto nella funzione unicode!
-
-
 def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResults = float("inf")):
     """Write results text in TREC format
     queryIds - list of query numbers relative to results list
