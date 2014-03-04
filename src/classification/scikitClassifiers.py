@@ -39,7 +39,7 @@ class TrainingSet():
 
     def countVectorizeTfIdf(self):
         """Compute vectors of features presence (binary count), and inverse document frequency"""
-        self.tfidfMatrix = self.tfidf_vec.fit_transform(self.features)
+        self.tfidfMatrix = self.tfidf_vect.fit_transform(self.features)
 
 
     def countVectorizeBinary(self):
@@ -49,7 +49,7 @@ class TrainingSet():
 
     def vectorizeTestTfIdf(self, testTweet):
         """Vectorize a tweet with idf"""
-        return self.tfidf_vec.transform([' '.join(testTweet[2])])
+        return self.tfidf_vect.transform([' '.join(testTweet[2])])
 
 
     def vectorizeTestBinary(self, testTweet):
