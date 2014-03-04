@@ -1,6 +1,7 @@
 """Classification with scikit-learn"""
 
 import scipy.spatial.distance
+import numpy as np
 from scipy.stats.mstats_basic import threshold
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -12,6 +13,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import RidgeClassifier, LogisticRegression
 
 
+
 class TrainingSet():
 
     def __init__(self, rawTweets, tweetsToPop):
@@ -20,29 +22,66 @@ class TrainingSet():
         self.tweetId = []
         self.tweetTarget = []
         self.features = []
+        self.featuresBinary = []
         self.tweetsToPop = tweetsToPop
         for triple in rawTweets:
             self.tweetId.append(triple[0])
             self.tweetTarget.append(1 if triple[1] else 0)
             self.features.append(' '.join(triple[2]))
-        self.vectoridf = None
+            self.featuresBinary.append(' '.join(triple[3]))
+        self.idfMatrix = None
+        self.binaryMatrix = None
+        self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
         self.count_vect = CountVectorizer(lowercase=False)
         self.idf_transf = TfidfTransformer()
+        self.mergedMatrix = None
 
-    def countVectorize(self):
+
+    def countVectorizeIdf(self):
         """Compute vectors of features presence (binary count), and inverse document frequency"""
         vectorcounts = self.count_vect.fit_transform(self.features)
-        self.vectoridf = self.idf_transf.fit_transform(vectorcounts)
+        self.idfMatrix = self.idf_transf.fit_transform(vectorcounts)
 
-    def vectorizeTest(self, testTweet):
+
+    def countVectorizeBinary(self):
+        """Compute vectors of binary features"""
+        self.binaryMatrix = self.count_vect.fit_transform(self.featuresBinary)
+
+
+    def vectorizeTestIdf(self, testTweet):
         """Vectorize a tweet with idf"""
         return self.idf_transf.transform(self.count_vect.transform([' '.join(testTweet[2])]))
+
+
+    def vectorizeTestBinary(self, testTweet):
+        """Vectorize a tweet with binary features"""
+        return self.binary_count_vect.transform([' '.join(testTweet[3])])
+
+
+    def mergedIndex(self):
+        self.countVectorizeIdf()
+        if self.featuresBinary == []:
+            self.mergedMatrix = self.idfMatrix
+        else:
+            self.countVectorizeBinary()
+            self.mergedMatrix = np.concatenate((self.idfMatrix.todense(), self.binaryMatrix.todense()), axis=1)
+
+
+    def mergedIndexTest(self, testTweet):
+        idfTestVector = self.vectorizeTestIdf(testTweet)
+        if self.featuresBinary == []:
+            return idfTestVector
+        else:
+            binaryTestVector = self.vectorizeTestBinary(testTweet)
+            return np.concatenate((idfTestVector.todense(), binaryTestVector.todense()), axis=1)
+
 
     def addExample(self, rawTweet):
         """Add a new example for retraining"""
         self.tweetId.append(rawTweet[0])
         self.tweetTarget.append(1 if rawTweet[1] else 0)
         self.features.append(' '.join(rawTweet[2]))
+        self.featuresBinary.append(' '.join(rawTweet[3]))
 
     def popOldExample(self):
         """Pop out the first example inserted"""
