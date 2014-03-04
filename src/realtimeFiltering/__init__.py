@@ -42,17 +42,17 @@ class Filterer:
         """Extracts all the features from a sample"""
         features = []
         text = text.split('\t\t')
-        if text[0]: # status
+        if text[0]:  # status
             features.extend(_extractorStatus.get(text[0]))
-        if text[1]: # hashtag
+        if text[1]:  # hashtag
             features.extend(_extractor1.get(text[1]))
-        if external and text[2]: # link title
+        if external and text[2]:  # link title
             features.extend(_extractor1.get(text[2]))
-        if external and text[3]: # annotations
+        if external and text[3]:  # annotations
             features.extend(annotations(text[3]))
         return features
 
-    def featureExtractBinary(self, text, external = True):
+    def featureExtractBinary(self, text, external=True):
         """Extracts all the binary features from a sample"""
         binary_features = []
         text = text.split('\t\t')
@@ -64,10 +64,11 @@ class Filterer:
         #     binary_features.extend(_extractor1.get(text[2]))
         if external and text[3]:  # annotations
             binary_features.extend(annotations(text[3]))
-        return binary_features
+        # return binary_features
+        return []
 
 
-    def featureExtractQuery(self, text, external = True):
+    def featureExtractQuery(self, text, external=True):
         """Extracts all the features from a query"""
         features = []
         text = text.split('\t\t')

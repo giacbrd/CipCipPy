@@ -65,6 +65,7 @@ class TrainingSet():
         else:
             self.countVectorizeBinary()
             self.mergedMatrix = np.concatenate((self.idfMatrix.todense(), self.binaryMatrix.todense()), axis=1)
+            # self.idfMatrix = np.csc_matrix(self.idfMatrix)
 
 
     def mergedIndexTest(self, testTweet):
