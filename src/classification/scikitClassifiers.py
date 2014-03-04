@@ -4,7 +4,7 @@ import scipy.spatial.distance
 import numpy as np
 from scipy.stats.mstats_basic import threshold
 
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import svm
 from sklearn.ensemble import AdaBoostClassifier
@@ -28,28 +28,28 @@ class TrainingSet():
             self.tweetTarget.append(1 if triple[1] else 0)
             self.features.append(' '.join(triple[2]))
             self.featuresBinary.append(' '.join(triple[3]))
-        self.idfMatrix = None
+        self.tfidfMatrix = None
         self.binaryMatrix = None
         self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
-        self.count_vect = CountVectorizer(lowercase=False)
-        self.idf_transf = TfidfTransformer()
+        # self.count_vect = CountVectorizer(lowercase=False)
+        # self.idf_transf = TfidfTransformer()
+        self.tfidf_vect = TfidfVectorizer()
         self.mergedMatrix = None
 
 
-    def countVectorizeIdf(self):
+    def countVectorizeTfIdf(self):
         """Compute vectors of features presence (binary count), and inverse document frequency"""
-        vectorcounts = self.count_vect.fit_transform(self.features)
-        self.idfMatrix = self.idf_transf.fit_transform(vectorcounts)
+        self.tfidfMatrix = self.tfidf_vec.fit_transform(self.features)
 
 
     def countVectorizeBinary(self):
         """Compute vectors of binary features"""
-        self.binaryMatrix = self.count_vect.fit_transform(self.featuresBinary)
+        self.binaryMatrix = self.binary_count_vect.fit_transform(self.featuresBinary)
 
 
-    def vectorizeTestIdf(self, testTweet):
+    def vectorizeTestTfIdf(self, testTweet):
         """Vectorize a tweet with idf"""
-        return self.idf_transf.transform(self.count_vect.transform([' '.join(testTweet[2])]))
+        return self.tfidf_vec.transform([' '.join(testTweet[2])])
 
 
     def vectorizeTestBinary(self, testTweet):
@@ -59,18 +59,18 @@ class TrainingSet():
 
     def mergedIndex(self):
         """Creates and merge the idf matrix and the binary matrix """
-        self.countVectorizeIdf()
+        self.countVectorizeTfIdf()
         if not self.featuresBinary:
-            self.mergedMatrix = self.idfMatrix
+            self.mergedMatrix = self.tfidfMatrix
         else:
             self.countVectorizeBinary()
-            self.mergedMatrix = np.concatenate((self.idfMatrix.todense(), self.binaryMatrix.todense()), axis=1)
-            # self.idfMatrix = np.csc_matrix(self.idfMatrix)
+            self.mergedMatrix = np.concatenate((self.tfidfMatrix.todense(), self.binaryMatrix.todense()), axis=1)
+            # self.tfidfMatrix = np.csc_matrix(self.tfidfMatrix)
 
 
     def mergedIndexTest(self, testTweet):
         """Creates and merge the idf vector and the binary vector """
-        idfTestVector = self.vectorizeTestIdf(testTweet)
+        idfTestVector = self.vectorizeTestTfIdf(testTweet)
         if not self.featuresBinary:
             return idfTestVector
         else:

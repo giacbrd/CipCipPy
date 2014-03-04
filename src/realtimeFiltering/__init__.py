@@ -64,8 +64,7 @@ class Filterer:
         #     binary_features.extend(_extractor1.get(text[2]))
         if external and text[3]:  # annotations
             binary_features.extend(annotations(text[3]))
-        # return binary_features
-        return []
+        return binary_features
 
 
     def featureExtractQuery(self, text, external=True):
@@ -156,7 +155,7 @@ class SupervisedFilterer(Filterer):
             if rawTweets:
                 training.mergedIndex()
                 self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
-            #for e, v in enumerate(training.idfMatrix[:2]):
+            #for e, v in enumerate(training.tfidfMatrix[:2]):
             #    fe = training.features[e].split(' ')
             #    col = v.nonzero()[1]
             #    for z in xrange(len(fe)):
