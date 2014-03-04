@@ -13,7 +13,6 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import RidgeClassifier, LogisticRegression
 
 
-
 class TrainingSet():
 
     def __init__(self, rawTweets, tweetsToPop):
@@ -59,8 +58,9 @@ class TrainingSet():
 
 
     def mergedIndex(self):
+        """Creates and merge the idf matrix and the binary matrix """
         self.countVectorizeIdf()
-        if self.featuresBinary == []:
+        if not self.featuresBinary:
             self.mergedMatrix = self.idfMatrix
         else:
             self.countVectorizeBinary()
@@ -68,8 +68,9 @@ class TrainingSet():
 
 
     def mergedIndexTest(self, testTweet):
+        """Creates and merge the idf vector and the binary vector """
         idfTestVector = self.vectorizeTestIdf(testTweet)
-        if self.featuresBinary == []:
+        if not self.featuresBinary:
             return idfTestVector
         else:
             binaryTestVector = self.vectorizeTestBinary(testTweet)
