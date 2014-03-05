@@ -31,7 +31,7 @@ import cPickle
 from ..classification.scikitClassifiers import TrainingSet, NBClassifier, SVMClassifier
 import os
 
-_extractorStatus = FeatureExtractor((terms, bigrams, hashtags, mentions, hasUrl))
+_extractorStatus = FeatureExtractor((terms, bigrams, hashtags, mentions))
 _extractor1 = FeatureExtractor((terms, bigrams))
 
 _extractorBinary = FeatureExtractor([hasUrl])
