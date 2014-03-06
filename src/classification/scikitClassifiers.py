@@ -153,7 +153,7 @@ class LClassifier(Classifier):
 
 
 class NCClassifier(Classifier):
-
+    """Rocchio classifier"""
     def __init__(self, shrink = None):
         self.cl = NearestCentroid(shrink_threshold=shrink)
         self.shrink = shrink
@@ -171,7 +171,7 @@ class NCClassifier(Classifier):
             return super(NCClassifier, self).classify(vectorizedTest)
 
 class RocchioClassifier(Classifier):
-
+    """Rocchio classifier"""
     def __init__(self, threshold = 0.5, distance_func = scipy.spatial.distance.euclidean):
         raise NotImplementedError()
         self.threshold = threshold
@@ -188,3 +188,8 @@ class RocchioClassifier(Classifier):
             return 1
         else:
             return 0
+
+class DTClassifier(Classifier):
+    """Decision Tree classifier"""
+    def __init__(self):
+        self.cl = DecisionTreeClassifier(random_state=0)
