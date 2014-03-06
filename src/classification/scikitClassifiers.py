@@ -127,7 +127,7 @@ class KNNClassifier(Classifier, ProbClassifier):
 
 class ADAClassifier(Classifier, ProbClassifier):
 
-    def __init__(self, maxTreeDepth = 1, estimators=50, learningRate = 1.):
+    def __init__(self, maxTreeDepth=1, estimators=50, learningRate=1.):
         self.cl = AdaBoostClassifier(n_estimators=estimators, learning_rate=learningRate,
                                       base_estimator=DecisionTreeClassifier(max_depth=maxTreeDepth))
 

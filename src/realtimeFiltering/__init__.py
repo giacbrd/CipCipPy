@@ -38,7 +38,7 @@ _extractorBinary = FeatureExtractor([hasUrl])
 
 class Filterer:
 
-    def featureExtract(self, text, external = True):
+    def featureExtract(self, text, external=True):
         """Extracts all the features from a sample"""
         features = []
         text = text.split('\t\t')
@@ -66,6 +66,19 @@ class Filterer:
             binary_features.extend(annotations(text[3]))
         return binary_features
 
+    def featureExtractQueryBinary(self, text, external=True):
+        """Extracts all the binary features from a sample"""
+        binary_features = []
+        text = text.split('\t\t')
+        # if text[0]:  # status
+        #     binary_features.extend(_extractorBinary.get(text[0]))
+        # if text[1]:  # hashtag
+        #     binary_features.extend(_extractor1.get(text[1]))
+        # if external and text[2]:  # link title
+        #     binary_features.extend(_extractor1.get(text[2]))
+        if external and text[1]:  # annotations
+            binary_features.extend(annotations(text[1]))
+        return binary_features
 
     def featureExtractQuery(self, text, external=True):
         """Extracts all the features from a query"""
@@ -135,9 +148,10 @@ class SupervisedFilterer(Filterer):
             # add the query as positive example
             features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
             features = self.cutOnLinkProb(features, minLinkProb)
+            features_binary = self.featureExtractQueryBinary(q[1] + '\t\t' + queriesAnnotated[i][1], external)
             # features_binary = self.featureExtractBinary(q[1] + '\t\t' + queriesAnnotated[i][1], external)
             posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
-            rawTweets.append((q[0], True, features, []))
+            rawTweets.append((q[0], True, features, features_binary))
             # add the first tweet as positive example
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
