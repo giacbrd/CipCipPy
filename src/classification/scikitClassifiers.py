@@ -60,7 +60,7 @@ class TrainingSet():
     def mergedIndex(self):
         """Creates and merge the idf matrix and the binary matrix """
         self.countVectorizeTfIdf()
-        if not self.featuresBinary:
+        if not [item for sublist in self.featuresBinary for item in sublist]:
             self.mergedMatrix = self.tfidfMatrix
         else:
             self.countVectorizeBinary()
@@ -71,7 +71,7 @@ class TrainingSet():
     def mergedIndexTest(self, testTweet):
         """Creates and merge the idf vector and the binary vector """
         idfTestVector = self.vectorizeTestTfIdf(testTweet)
-        if not self.featuresBinary:
+        if not [item for sublist in self.featuresBinary for item in sublist]:
             return idfTestVector
         else:
             binaryTestVector = self.vectorizeTestBinary(testTweet)
