@@ -28,8 +28,8 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
 
 from ..classification.feature import *
 import cPickle
-from ..classification.scikitClassifiers import TrainingSet, NBClassifier, SVMClassifier
-import os
+from ..classification.scikitClassifiers import TrainingSet
+import os, time
 
 _extractorStatus = FeatureExtractor((terms, bigrams, hashtags, mentions))
 _extractor1 = FeatureExtractor((terms, bigrams))
@@ -137,6 +137,7 @@ class SupervisedFilterer(Filterer):
             if int(q[0][2:]) not in qrels:
                 continue
             print q
+            start_time = time.time()
             results[q[0]] = []
             # (positives, negatives) ordered by relevance
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
@@ -222,6 +223,7 @@ class SupervisedFilterer(Filterer):
                         training.addExample((tweetId, False, features, features_binary))
                     training.mergedIndex()
                     self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
+            print '[Debug] Query processed in ',time.time() - start_time, 'seconds.'
             testFile.close()
             if dumpsPath:
                 cPickle.dump(results[q[0]], open(os.path.join(dumpsPath, q[0]), 'w'))
