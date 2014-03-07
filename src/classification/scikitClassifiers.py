@@ -121,7 +121,7 @@ class SVMClassifier(Classifier):
 
 class KNNClassifier(Classifier, ProbClassifier):
 
-    def __init__(self, neighbors=3):
+    def __init__(self, neighbors=2):
         self.cl = neighbors.KNeighborsClassifier(n_neighbors=neighbors)
 
 
@@ -132,7 +132,8 @@ class ADAClassifier(Classifier, ProbClassifier):
                                       base_estimator=DecisionTreeClassifier(max_depth=maxTreeDepth))
 
     def retrain(self, vectorFeature, vectorTarget):
-        self.cl.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
+        # self.cl.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
+        self.cl.fit(vectorFeature.todense(), vectorTarget)
 
     def classify(self, vectorizedTest):
         return self.cl.predict(vectorizedTest.toarray()[0])[0]
