@@ -8,7 +8,7 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, T
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import svm
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.neighbors import NearestCentroid
+from sklearn.neighbors import NearestCentroid, KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import RidgeClassifier, LogisticRegression
 
@@ -122,7 +122,7 @@ class SVMClassifier(Classifier):
 class KNNClassifier(Classifier, ProbClassifier):
 
     def __init__(self, neighbors=2):
-        self.cl = neighbors.KNeighborsClassifier(n_neighbors=neighbors)
+        self.cl = KNeighborsClassifier(n_neighbors=neighbors)
 
 
 class ADAClassifier(Classifier, ProbClassifier):
