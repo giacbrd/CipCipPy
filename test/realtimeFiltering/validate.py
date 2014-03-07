@@ -19,8 +19,7 @@ from CipCipPy.realtimeFiltering import SupervisedFilterer
 from mb12filteval import *
 import EvalJig as ej
 import itertools
-from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier
-from src.classification.scikitClassifiers import DTClassifier
+from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier, DTClassifier
 
 queries = readQueries(sys.argv[1])
 queriesAnnotated = readQueries(sys.argv[2])
