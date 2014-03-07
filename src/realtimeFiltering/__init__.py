@@ -31,10 +31,10 @@ import cPickle
 from ..classification.scikitClassifiers import TrainingSet
 import os, time
 
-_extractorStatus = FeatureExtractor((terms, bigrams, hashtags, mentions))
+_extractorStatus = FeatureExtractor((terms, bigrams, hashtags))
 _extractor1 = FeatureExtractor((terms, bigrams))
 
-_extractorBinary = FeatureExtractor([hasUrl])
+_extractorBinary = FeatureExtractor((hasUrl, mentions, hasMentions, hasHashtags))
 
 class Filterer:
 
@@ -44,12 +44,12 @@ class Filterer:
         text = text.split('\t\t')
         if text[0]:  # status
             features.extend(_extractorStatus.get(text[0]))
-        if text[1]:  # hashtag
+        if text[1]:  # segmented hashtag
             features.extend(_extractor1.get(text[1]))
         if external and text[2]:  # link title
             features.extend(_extractor1.get(text[2]))
-        if external and text[3]:  # annotations
-            features.extend(annotations(text[3]))
+        # if external and text[3]:  # annotations
+        #     features.extend(annotations(text[3]))
         return features
 
     def featureExtractBinary(self, text, external=True):
@@ -62,12 +62,12 @@ class Filterer:
         #     binary_features.extend(_extractor1.get(text[1]))
         # if external and text[2]:  # link title
         #     binary_features.extend(_extractor1.get(text[2]))
-        if external and text[3]:  # annotations
-            binary_features.extend(annotations(text[3]))
+        # if external and text[3]:  # annotations
+        #     binary_features.extend(annotations(text[3]))
         return binary_features
 
     def featureExtractQueryBinary(self, text, external=True):
-        """Extracts all the binary features from a sample"""
+        """Extracts all the binary features from the query"""
         binary_features = []
         text = text.split('\t\t')
         # if text[0]:  # status
@@ -76,8 +76,8 @@ class Filterer:
         #     binary_features.extend(_extractor1.get(text[1]))
         # if external and text[2]:  # link title
         #     binary_features.extend(_extractor1.get(text[2]))
-        if external and text[1]:  # annotations
-            binary_features.extend(annotations(text[1]))
+        # if external and text[1]:  # annotations
+        #     binary_features.extend(annotations(text[1]))
         return binary_features
 
     def featureExtractQuery(self, text, external=True):
@@ -86,8 +86,8 @@ class Filterer:
         text = text.split('\t\t')
         if text[0]:  # topic
             features.extend(_extractor1.get(text[0]))
-        if external and text[1]:  # annotations
-            features.extend(annotations(text[1]))
+        # if external and text[1]:  # annotations
+        #     features.extend(annotations(text[1]))
         return features
 
     def intersect(self, query, text):

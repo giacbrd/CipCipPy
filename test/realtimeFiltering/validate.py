@@ -19,7 +19,7 @@ from CipCipPy.realtimeFiltering import SupervisedFilterer
 from mb12filteval import *
 import EvalJig as ej
 import itertools
-from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier, DTClassifier
+from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier, DTClassifier, KNNClassifier
 
 queries = readQueries(sys.argv[1])
 queriesAnnotated = readQueries(sys.argv[2])
@@ -80,6 +80,9 @@ for param in list(itertools.product(*parameters)):
         classifier = LClassifier(C=float(classifierParam))
     elif classifier == 'DT':
         classifier = DTClassifier()
+    elif classifier == 'KNN':
+        classifier == KNNClassifier(estimators=int(classifierParam))
+
 
     f = SupervisedFilterer(classifier)
     results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
