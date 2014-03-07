@@ -6,7 +6,7 @@ import nltk, math
 ANNOTATION_PREFIX = 'NMIS__aNn__'
 URL_FEATURE = 'NMIS__UrL__'
 HASHTAG_FEATURE = 'NMIS__Hashtag__'
-MENTION_FEATURE = 'NMIS__Mention'
+MENTION_FEATURE = 'NMIS__Mention__'
 
 class FeatureExtractor:
     """Concatenate feature extraction functions"""
