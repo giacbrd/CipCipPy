@@ -20,6 +20,7 @@ from mb12filteval import *
 import EvalJig as ej
 import itertools
 from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier
+from src.classification.scikitClassifiers import DTClassifier
 
 queries = readQueries(sys.argv[1])
 queriesAnnotated = readQueries(sys.argv[2])
@@ -78,10 +79,12 @@ for param in list(itertools.product(*parameters)):
         classifier = ADAClassifier(estimators=int(classifierParam))
     elif classifier == 'L':
         classifier = LClassifier(C=float(classifierParam))
+    elif classifier == 'DT':
+        classifier = DTClassifier()
 
     f = SupervisedFilterer(classifier)
     results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
-                qrels2, external, float(minLinkProb), annotationFilter = True if annotationRule=='True' else False)
+                qrels2, external, float(minLinkProb), annotationFilter=True if annotationRule == 'True' else False)
 
     ##########################################################
 
