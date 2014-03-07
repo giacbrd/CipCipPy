@@ -5,6 +5,8 @@ import nltk, math
 
 ANNOTATION_PREFIX = 'NMIS__aNn__'
 URL_FEATURE = 'NMIS__UrL__'
+HASHTAG_FEATURE = 'NMIS__Hashtag__'
+MENTION_FEATURE = 'NMIS__Mention'
 
 class FeatureExtractor:
     """Concatenate feature extraction functions"""
@@ -58,6 +60,14 @@ def hashtags(text):
 def mentions(text):
     """Returns mentioned users of a text"""
     return [r for r in replyRE.findall(text)]
+
+def hasHashtags(text):
+    """Returns hashtags of a text"""
+    return [HASHTAG_FEATURE]if hashtagRE.findall(text) else []
+
+def hasMentions(text):
+    """Returns mentioned users of a text"""
+    return [MENTION_FEATURE] if replyRE.findall(text) else []
 
 def hasUrl(text):
     """Return a feature if there is a url in the text"""
