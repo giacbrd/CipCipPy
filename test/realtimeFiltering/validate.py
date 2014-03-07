@@ -81,7 +81,7 @@ for param in list(itertools.product(*parameters)):
     elif classifier == 'DT':
         classifier = DTClassifier()
     elif classifier == 'KNN':
-        classifier == KNNClassifier(estimators=int(classifierParam))
+        classifier == KNNClassifier()
 
 
     f = SupervisedFilterer(classifier)

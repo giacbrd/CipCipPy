@@ -133,7 +133,7 @@ class ADAClassifier(Classifier, ProbClassifier):
 
     def retrain(self, vectorFeature, vectorTarget):
         # self.cl.fit([v.toarray()[0] for v in vectorFeature], vectorTarget)
-        self.cl.fit(vectorFeature.todense(), vectorTarget)
+        self.cl.fit(vectorFeature, vectorTarget)
 
     def classify(self, vectorizedTest):
         return self.cl.predict(vectorizedTest.toarray()[0])[0]
