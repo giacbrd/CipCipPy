@@ -206,8 +206,8 @@ class SupervisedFilterer(Filterer):
                 #nb.test(tweetId, features)
                 test = training.mergedIndexTest((tweetId, False, features, features_binary))
                 classification = self.classifier.classify(test)
-                if (classification == 1 and not tweetId in qrels[int(q[0][2:])][0]) or \
-						(classification == 0 and tweetId in qrels[int(q[0][2:])][0]):
+                if (classification == 1 and not (tweetId in qrels[int(q[0][2:])][0])) or \
+						(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
                     print '[Debug]', tweetId, features, features_binary, 'C' + str(classification), \
                         'Target'+tweetId in qrels[int(q[0][2:])][0]
                 #print classifier.getProb(test)
