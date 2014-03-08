@@ -166,7 +166,7 @@ class SupervisedFilterer(Filterer):
                 rawTweets.append((tweetId, True, features, features_binary))
                 break
             for tweetId, features in training[1][:neg]:
-                features = self.cutOnLinkProb(features, minLinkProb)
+                # features = self.cutOnLinkProb(features, minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
