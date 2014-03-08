@@ -148,9 +148,9 @@ class SupervisedFilterer(Filterer):
             posAnnotations = set()
             # add the query as positive example
             features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
-            features = self.cutOnLinkProb(features, minLinkProb)
+            # features = self.cutOnLinkProb(features, minLinkProb)
             features_binary = self.featureExtractQueryBinary(q[1] + '\t\t' + queriesAnnotated[i][1], external)
-            features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+            # features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
             # features_binary = self.featureExtractBinary(q[1] + '\t\t' + queriesAnnotated[i][1], external)
             posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
             rawTweets.append((q[0], True, features, features_binary))
@@ -159,9 +159,9 @@ class SupervisedFilterer(Filterer):
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 results[q[0]].append((tweetId, '1.0\tyes'))
                 features = self.featureExtract(text[:-1], external)
-                features = self.cutOnLinkProb(features, minLinkProb)
+                # features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text[:-1], external)
-                features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+                # features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
                 rawTweets.append((tweetId, True, features, features_binary))
                 break
@@ -182,9 +182,9 @@ class SupervisedFilterer(Filterer):
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 features = self.featureExtract(text[:-1], external)
-                features = self.cutOnLinkProb(features, minLinkProb)
+                # features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text[:-1], external)
-                features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+                # features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 if not features:
                     continue
                 if annotationFilter or bootstrapCount >= 0:
