@@ -34,7 +34,7 @@ import os, time
 _extractorStatus = FeatureExtractor((terms, bigrams, hashtags))
 _extractor1 = FeatureExtractor((terms, bigrams))
 
-_extractorBinary = FeatureExtractor((hasUrl, mentions, hasMentions, hasHashtags))
+_extractorBinary = FeatureExtractor((hasUrl, mentions))
 
 class Filterer:
 
