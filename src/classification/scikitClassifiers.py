@@ -33,7 +33,7 @@ class TrainingSet():
         self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
         # self.count_vect = CountVectorizer(lowercase=False)
         # self.idf_transf = TfidfTransformer()
-        self.tfidf_vect = TfidfVectorizer()
+        self.tfidf_vect = TfidfVectorizer(min_df=1)
         self.mergedMatrix = None
 
 
