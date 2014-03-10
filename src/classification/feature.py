@@ -2,6 +2,7 @@
 from ..utils.hashtag import Segmenter
 from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE
 import nltk, math
+from nltk.stem import WordNetLemmatizer
 
 ANNOTATION_PREFIX = 'NMIS__aNn__'
 URL_FEATURE = 'NMIS__UrL__'
@@ -41,6 +42,14 @@ def terms(text):
             terms.extend(nltk.word_tokenize(subSent))
     terms = [t.lower() for t in terms if t.strip() and len(t) > 1 and t != u'\ufffd']
     return [t for t in terms if t not in filterSet and not len(set(t) & punctuations2)]
+
+def lemmas(text):
+    text_terms = terms(text)
+    return [nltk.stem.WordNetLemmatizer().lemmatize(t) for t in text_terms]
+
+def stems(text):
+    text_terms = terms(text)
+    return [nltk.stem.porter.PorterStemmer().stem(t) for t in text_terms]
 
 def bigrams(text):
     """Returns term pairs of a text"""

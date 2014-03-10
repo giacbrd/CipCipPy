@@ -227,7 +227,7 @@ class SupervisedFilterer(Filterer):
                         training.addExample((tweetId, False, features, features_binary))
                     training.mergedIndex()
                     self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
-            print '[Debug] Query processed in ',time.time() - start_time, 'seconds.'
+            print '[Debug] Query processed in ', time.time() - start_time, 'seconds.'
             testFile.close()
             if dumpsPath:
                 cPickle.dump(results[q[0]], open(os.path.join(dumpsPath, q[0]), 'w'))
