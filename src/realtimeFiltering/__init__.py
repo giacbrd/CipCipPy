@@ -220,7 +220,7 @@ class SupervisedFilterer(Filterer):
                 classification = self.classifier.classify(test)
                 if (classification == 1 and (tweetId in qrels[int(q[0][2:])][1])) or \
 						(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
-                    print '[Debug]', tweetId, text[:-1], features, features_binary, 'C ' + str(classification), \
+                    print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
                         'Target '+str(tweetId in qrels[int(q[0][2:])][0])
                 #print classifier.getProb(test)
                 if classification == 1:
