@@ -33,7 +33,7 @@ class TrainingSet():
         self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
         # self.count_vect = CountVectorizer(lowercase=False)
         # self.idf_transf = TfidfTransformer()
-        self.tfidf_vect = TfidfVectorizer(min_df=1)
+        self.tfidf_vect = TfidfVectorizer(lowercase=False, min_df=1, binary=False)
         self.mergedMatrix = None
 
 
@@ -61,7 +61,7 @@ class TrainingSet():
         """Creates and merge the idf matrix and the binary matrix """
         self.countVectorizeTfIdf()
         if not [item for sublist in self.featuresBinary for item in sublist]:
-            self.mergedMatrix = self.tfidfMatrix
+            self.mergedMatrix = self.tfidfMatrix.todense()
         else:
             self.countVectorizeBinary()
             self.mergedMatrix = np.concatenate((self.tfidfMatrix.todense(), self.binaryMatrix.todense()), axis=1)
@@ -72,7 +72,7 @@ class TrainingSet():
         """Creates and merge the idf vector and the binary vector """
         idfTestVector = self.vectorizeTestTfIdf(testTweet)
         if not [item for sublist in self.featuresBinary for item in sublist]:
-            return idfTestVector
+            return idfTestVector.todense()
         else:
             binaryTestVector = self.vectorizeTestBinary(testTweet)
             return np.concatenate((idfTestVector.todense(), binaryTestVector.todense()), axis=1)
@@ -136,26 +136,27 @@ class ADAClassifier(Classifier, ProbClassifier):
         self.cl.fit(vectorFeature, vectorTarget)
 
     def classify(self, vectorizedTest):
-        return self.cl.predict(vectorizedTest.toarray()[0])[0]
+        # return self.cl.predict(vectorizedTest.toarray()[0])[0]
+        return self.cl.predict(vectorizedTest)[0]
 
     def getProb(self, vectorizedTest):
-        return self.cl.predict_proba(vectorizedTest.toarray()[0])[0][1]
-
+        # return self.cl.predict_proba(vectorizedTest.toarray()[0])[0][1]
+        return self.cl.predict_proba(vectorizedTest)[0][1]
 
 class RClassifier(Classifier):
 
-    def __init__(self, alpha = 1.):
+    def __init__(self, alpha=1.):
         self.cl = RidgeClassifier(alpha=alpha)
 
 class LClassifier(Classifier):
 
-    def __init__(self, C = 1.):
+    def __init__(self, C=1.):
         self.cl = LogisticRegression(C=C, class_weight='auto', penalty='l2')
 
 
 class NCClassifier(Classifier):
     """Rocchio classifier"""
-    def __init__(self, shrink = None):
+    def __init__(self, shrink=None):
         self.cl = NearestCentroid(shrink_threshold=shrink)
         self.shrink = shrink
 
@@ -194,3 +195,19 @@ class DTClassifier(Classifier):
     """Decision Tree classifier"""
     def __init__(self):
         self.cl = DecisionTreeClassifier(random_state=0)
+
+
+class idfVectorizer():
+    """Vectorizes a dataset with its IDF weights, same behaviour of TFIDF vectorizer"""
+    def __init__(self):
+        self.binary_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
+        self.idf_transf = TfidfTransformer()
+
+    def fit_transform(self, dataset):
+        return self.idf_transf.transform(self.binary_vect.fit_transform(dataset))
+
+    def fit(self, dataset):
+        return self.binary_vect.fit(dataset)
+
+    def transform(self, dataset):
+        return self.idf_transf.transform(self.binary_vect.transform(dataset))
