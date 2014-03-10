@@ -39,7 +39,7 @@ if len(sys.argv) > 5:
 if not os.path.exists(outPath):
     os.makedirs(outPath)
 
-scorer = scoring.BM25F(K1 = 0)
+scorer = scoring.BM25F()
 
 s = Searcher('status' + nameSuffix, 'hashtag' + nameSuffix, 'linkTitle' + nameSuffix, 'storedStatus', dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
 #if n:
@@ -68,6 +68,7 @@ def getAnnotation(indexId):
     return store if store else ""
 
 featureExtract = Filterer().featureExtract
+featureExtractBinary = Filterer().featureExtractBinary
 
 queries = dict((q[0], q[1:]) for q in queries)
 
@@ -81,8 +82,8 @@ for qNum in queries:
 #    samples = ([(qNum, queryFeatureExtractor.get(queries[qNum][0]))], [])
     samples = ([], [])
     for tweetId in negatives:
-        samples[1].append((tweetId, featureExtract(getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + \
-                            getTitle(tweetId).strip() + '\t\t' + getAnnotation(tweetId), external = external)))
+        content = getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + getTitle(tweetId).strip() + '\t\t' + getAnnotation(tweetId)
+        samples[1].append((tweetId, featureExtract(content, external = external), featureExtractBinary(content, external=external)))
     printOut = '\n' + '__________________________________________________' + '\n'
     printOut += str((qNum, queries[qNum][0], len(negResult))) + '\n'
     printOut += '\n'.join(str(p) for p in samples[1][:10])
