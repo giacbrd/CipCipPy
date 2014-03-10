@@ -8,6 +8,7 @@ ANNOTATION_PREFIX = 'NMIS__aNn__'
 URL_FEATURE = 'NMIS__UrL__'
 HASHTAG_FEATURE = 'NMIS__Hashtag__'
 MENTION_FEATURE = 'NMIS__Mention__'
+STEM_PREFIX = 'NMIS__Stem__'
 
 class FeatureExtractor:
     """Concatenate feature extraction functions"""
@@ -49,7 +50,7 @@ def lemmas(text):
 
 def stems(text):
     text_terms = terms(text)
-    return [nltk.stem.porter.PorterStemmer().stem(t) for t in text_terms]
+    return [STEM_PREFIX + nltk.stem.porter.PorterStemmer().stem(t) for t in text_terms]
 
 def bigrams(text):
     """Returns term pairs of a text"""
