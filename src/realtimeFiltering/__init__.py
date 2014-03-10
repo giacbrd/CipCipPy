@@ -31,10 +31,10 @@ import cPickle
 from ..classification.scikitClassifiers import TrainingSet
 import os, time
 
-_extractorStatus = FeatureExtractor((terms, bigrams, hashtags))
-_extractor1 = FeatureExtractor((terms, bigrams))
+_extractorStatus = FeatureExtractor((terms, bigrams, hashtags, stems))
+_extractor1 = FeatureExtractor((terms, bigrams, stems))
 
-_extractorBinary = FeatureExtractor((hasUrl, mentions))
+_extractorBinary = FeatureExtractor((hasUrl, hasMentions))
 
 class Filterer:
 
@@ -58,6 +58,7 @@ class Filterer:
         text = text.split('\t\t')
         if text[0]:  # status
             binary_features.extend(_extractorBinary.get(text[0]))
+        #FIXME cosa va de-commentato?
         # if text[1]:  # hashtag
         #     binary_features.extend(_extractor1.get(text[1]))
         # if external and text[2]:  # link title
@@ -99,7 +100,13 @@ class SupervisedFilterer(Filterer):
     def __init__(self, classifier):
         self.classifier = classifier
 
+    def get_annotations(self, features):
+        """Returns the tuple of annotations in a list of features"""
+        return (feat for feat in features if feat.startswith(ANNOTATION_PREFIX))
+
     def cutOnLinkProb(self, features, linkProb):
+        """Clean extra information on annotation features,
+        and filter out annotations with link probability lower than linkProb"""
         result = []
         for f in features:
             ff = f.split(' ')
@@ -150,8 +157,9 @@ class SupervisedFilterer(Filterer):
             features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
             features = self.cutOnLinkProb(features, minLinkProb)
             features_binary = self.featureExtractQueryBinary(q[1], external)
+            features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
             if annotationFilter:
-                posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
+                posAnnotations.update(self.get_annotations(features))
             rawTweets.append((q[0], True, features, features_binary))
             # add the first tweet as positive example
             for line in testFile:
@@ -160,12 +168,14 @@ class SupervisedFilterer(Filterer):
                 features = self.featureExtract(text[:-1], external)
                 features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text[:-1], external)
+                features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 if annotationFilter:
-                    posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
+                    posAnnotations.update(self.get_annotations(features))
                 rawTweets.append((tweetId, True, features, features_binary))
                 break
             for tweetId, features, features_binary in training[1][:neg]:
                 features = self.cutOnLinkProb(features, minLinkProb)
+                features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
@@ -183,9 +193,10 @@ class SupervisedFilterer(Filterer):
                 features = self.featureExtract(text[:-1], external)
                 features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text[:-1], external)
+                features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 if not features:
                     continue
-                testAnnotation = set(feat for feat in features if feat.startswith(ANNOTATION_PREFIX))
+                testAnnotation = set(self.get_annotations(features))
                 if annotationFilter and not posAnnotations.intersection(testAnnotation):
                     continue
                 if bootstrapCount > 0:
@@ -194,7 +205,7 @@ class SupervisedFilterer(Filterer):
                         if tweetId in qrels[int(q[0][2:])][0]:
                             training.addExample((tweetId, True, features, features_binary))
                             if annotationFilter:
-                                posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
+                                posAnnotations.update(self.get_annotations(features))
                             # TODO pop a old positive sample? only if rules are not used?
                         else:
                             training.addExample((tweetId, False, features, features_binary))
@@ -209,7 +220,7 @@ class SupervisedFilterer(Filterer):
                 classification = self.classifier.classify(test)
                 if (classification == 1 and (tweetId not in qrels[int(q[0][2:])][0])) or \
 						(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
-                    print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
+                    print '[Debug]', tweetId, text[:-1], features, features_binary, 'C ' + str(classification), \
                         'Target '+str(tweetId in qrels[int(q[0][2:])][0])
                 #print classifier.getProb(test)
                 if classification == 1:
@@ -218,7 +229,7 @@ class SupervisedFilterer(Filterer):
                     if tweetId in qrels[int(q[0][2:])][0]:
                         training.addExample((tweetId, True, features, features_binary))
                         if annotationFilter:
-                            posAnnotations.update((feat for feat in features if feat.startswith(ANNOTATION_PREFIX)))
+                            posAnnotations.update(self.get_annotations(features))
                         # TODO pop a old positive sample? only if rules are not used?
                     else:
                         training.addExample((tweetId, False, features, features_binary))
