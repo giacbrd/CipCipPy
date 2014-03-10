@@ -207,7 +207,7 @@ class SupervisedFilterer(Filterer):
                             if annotationFilter:
                                 posAnnotations.update(self.get_annotations(features))
                             # TODO pop a old positive sample? only if rules are not used?
-                        else:
+                        elif tweetId in qrels[int(q[0][2:])][1]:
                             training.addExample((tweetId, False, features, features_binary))
                     bootstrapCount -= 1
                     if bootstrapCount == 0:
@@ -231,10 +231,12 @@ class SupervisedFilterer(Filterer):
                         if annotationFilter:
                             posAnnotations.update(self.get_annotations(features))
                         # TODO pop a old positive sample? only if rules are not used?
-                    else:
+                        training.mergedIndex()
+                        self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
+                    elif tweetId in qrels[int(q[0][2:])][1]:
                         training.addExample((tweetId, False, features, features_binary))
-                    training.mergedIndex()
-                    self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
+                        training.mergedIndex()
+                        self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
             print '[Debug] Query processed in ', time.time() - start_time, 'seconds.'
             testFile.close()
             if dumpsPath:
