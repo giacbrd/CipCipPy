@@ -156,7 +156,7 @@ class SupervisedFilterer(Filterer):
             # add the query as positive example
             features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
             features = self.cutOnLinkProb(features, minLinkProb)
-            features_binary = self.featureExtractQueryBinary(q[1], external)
+            features_binary = self.featureExtractQueryBinary(q[1]+'\t\t' + queriesAnnotated[i][1], external)
             features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
             if annotationFilter:
                 posAnnotations.update(self.get_annotations(features))
