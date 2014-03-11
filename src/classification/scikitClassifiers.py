@@ -7,7 +7,7 @@ from scipy.stats.mstats_basic import threshold
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import svm
-from sklearn.ensemble import AdaBoostClassifier
+from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
 from sklearn.neighbors import NearestCentroid, KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import RidgeClassifier, LogisticRegression
@@ -144,7 +144,7 @@ class ADAClassifier(Classifier, ProbClassifier):
         return self.cl.predict_proba(vectorizedTest)[0][1]
 
 class RClassifier(Classifier):
-
+    """Ridge classifier"""
     def __init__(self, alpha=1.):
         self.cl = RidgeClassifier(alpha=alpha)
 
@@ -195,6 +195,12 @@ class DTClassifier(Classifier):
     """Decision Tree classifier"""
     def __init__(self):
         self.cl = DecisionTreeClassifier(random_state=0)
+
+
+class RFClassifier(Classifier):
+    """Random forest classifier"""
+    def __init__(self):
+        self.cl = RandomForestClassifier(n_jobs=2)
 
 
 class idfVectorizer():

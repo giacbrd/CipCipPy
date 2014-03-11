@@ -63,8 +63,8 @@ class Filterer:
         #     binary_features.extend(_extractor1.get(text[1]))
         # if external and text[2]:  # link title
         #     binary_features.extend(_extractor1.get(text[2]))
-        # if external and text[3]:  # annotations
-        #     binary_features.extend(annotations(text[3]))
+        if external and text[3]:  # annotations
+            binary_features.extend(annotations(text[3]))
         return binary_features
 
     def featureExtractQueryBinary(self, text, external=True):
@@ -77,8 +77,8 @@ class Filterer:
         #     binary_features.extend(_extractor1.get(text[1]))
         # if external and text[2]:  # link title
         #     binary_features.extend(_extractor1.get(text[2]))
-        # if external and text[1]:  # annotations
-        #     binary_features.extend(annotations(text[1]))
+        if external and text[1]:  # annotations
+            binary_features.extend(annotations(text[1]))
         return binary_features
 
     def featureExtractQuery(self, text, external=True):
