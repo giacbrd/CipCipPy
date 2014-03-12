@@ -31,23 +31,25 @@ import cPickle
 from ..classification.scikitClassifiers import TrainingSet
 import os, time
 
-_extractorStatus = FeatureExtractor((terms, bigrams, hashtags, stems))
-_extractor1 = FeatureExtractor((terms, bigrams, stems))
 
-_extractorBinary = FeatureExtractor((hasUrl, hasMentions))
 
 class Filterer:
+
+    def setFeatureExtractor(self, statusFeatEx, genericFeatEx, binaryFeatEx):
+        self.statusFeatEx = FeatureExtractor(statusFeatEx)
+        self.genericFeatEx = FeatureExtractor(genericFeatEx)
+        self.binaryFeatEx = FeatureExtractor(binaryFeatEx)
 
     def featureExtract(self, text, external=True):
         """Extracts all the features from a sample"""
         features = []
         text = text.split('\t\t')
         if text[0]:  # status
-            features.extend(_extractorStatus.get(text[0]))
+            features.extend(self.statusFeatEx.get(text[0]))
         if text[1]:  # segmented hashtag
-            features.extend(_extractor1.get(text[1]))
+            features.extend(self.genericFeatEx.get(text[1]))
         if external and text[2]:  # link title
-            features.extend(_extractor1.get(text[2]))
+            features.extend(self.genericFeatEx.get(text[2]))
         if external and text[3]:  # annotations
             features.extend(annotations(text[3]))
         return features
@@ -57,7 +59,7 @@ class Filterer:
         binary_features = []
         text = text.split('\t\t')
         if text[0]:  # status
-            binary_features.extend(_extractorBinary.get(text[0]))
+            binary_features.extend(self.binaryFeatEx.get(text[0]))
         #FIXME cosa va de-commentato?
         # if text[1]:  # hashtag
         #     binary_features.extend(_extractor1.get(text[1]))
@@ -86,7 +88,7 @@ class Filterer:
         features = []
         text = text.split('\t\t')
         if text[0]:  # topic
-            features.extend(_extractor1.get(text[0]))
+            features.extend(self.genericFeatEx.get(text[0]))
         if external and text[1]:  # annotations
             features.extend(annotations(text[1]))
         return features
@@ -95,10 +97,12 @@ class Filterer:
         """How many terms query amd text have in common."""
         return len(set(terms(query)) & set(terms(text)))
 
+
 class SupervisedFilterer(Filterer):
 
-    def __init__(self, classifier):
+    def __init__(self, classifier, statusFeatures, genericFeatures, binaryFeatures):
         self.classifier = classifier
+        self.setFeatureExtractor(statusFeatures, genericFeatures, binaryFeatures)
 
     def get_annotations(self, features):
         """Returns the tuple of annotations in a list of features"""
@@ -149,7 +153,7 @@ class SupervisedFilterer(Filterer):
             # (positives, negatives) ordered by relevance
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
             bootstrapCount = bootstrap if bootstrap > 0 else 0
-            training = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
+            trainingData = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
             rawTweets=[]
             testFile = open(os.path.join(filteringIdsPath, q[0]))
             posAnnotations = set()
@@ -173,8 +177,10 @@ class SupervisedFilterer(Filterer):
                     posAnnotations.update(self.get_annotations(features))
                 rawTweets.append((tweetId, True, features, features_binary))
                 break
-            for tweetId, features, features_binary in training[1][:neg]:
+            for tweetId, content in trainingData[1][:neg]:
+                features = self.featureExtract(content, external)
                 features = self.cutOnLinkProb(features, minLinkProb)
+                features_binary = self.featureExtractBinary(content, external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
             training = TrainingSet(rawTweets, 0)

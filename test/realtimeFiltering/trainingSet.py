@@ -67,8 +67,6 @@ def getAnnotation(indexId):
     store = getStoredValue(_storedAnnotation, indexId, 'annotations')
     return store if store else ""
 
-featureExtract = Filterer().featureExtract
-featureExtractBinary = Filterer().featureExtractBinary
 
 queries = dict((q[0], q[1:]) for q in queries)
 
@@ -83,7 +81,7 @@ for qNum in queries:
     samples = ([], [])
     for tweetId in negatives:
         content = getStatus(tweetId) + '\t\t' + getHashtag(tweetId) + '\t\t' + getTitle(tweetId).strip() + '\t\t' + getAnnotation(tweetId)
-        samples[1].append((tweetId, featureExtract(content, external = external), featureExtractBinary(content, external=external)))
+        samples[1].append((tweetId, content))
     printOut = '\n' + '__________________________________________________' + '\n'
     printOut += str((qNum, queries[qNum][0], len(negResult))) + '\n'
     printOut += '\n'.join(str(p) for p in samples[1][:10])

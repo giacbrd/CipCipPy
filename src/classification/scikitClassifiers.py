@@ -13,6 +13,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import RidgeClassifier, LogisticRegression
 
 
+
 class TrainingSet():
 
     def __init__(self, rawTweets, tweetsToPop):
@@ -61,7 +62,7 @@ class TrainingSet():
         """Creates and merge the idf matrix and the binary matrix """
         self.countVectorizeTfIdf()
         if not [item for sublist in self.featuresBinary for item in sublist]:
-            self.mergedMatrix = self.tfidfMatrix.todense()
+            self.mergedMatrix = self.tfidfMatrix
         else:
             self.countVectorizeBinary()
             self.mergedMatrix = np.concatenate((self.tfidfMatrix.todense(), self.binaryMatrix.todense()), axis=1)
@@ -71,8 +72,8 @@ class TrainingSet():
     def mergedIndexTest(self, testTweet):
         """Creates and merge the idf vector and the binary vector """
         idfTestVector = self.vectorizeTestTfIdf(testTweet)
-        if not [item for sublist in self.featuresBinary for item in sublist]:
-            return idfTestVector.todense()
+        if not testTweet[3]:
+            return idfTestVector
         else:
             binaryTestVector = self.vectorizeTestBinary(testTweet)
             return np.concatenate((idfTestVector.todense(), binaryTestVector.todense()), axis=1)
@@ -83,7 +84,8 @@ class TrainingSet():
         self.tweetId.append(rawTweet[0])
         self.tweetTarget.append(1 if rawTweet[1] else 0)
         self.features.append(' '.join(rawTweet[2]))
-        self.featuresBinary.append(' '.join(rawTweet[3]))
+        if rawTweet[3]:
+            self.featuresBinary.append(' '.join(rawTweet[3]))
 
     def popOldExample(self):
         """Pop out the first example inserted"""
@@ -92,6 +94,12 @@ class TrainingSet():
             self.tweetTarget.pop(0)
             self.features.pop(0)
             self.tweetsToPop -= 1
+
+
+
+
+########################################################################################
+
 
 class Classifier(object):
 
