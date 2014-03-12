@@ -65,8 +65,8 @@ class Filterer:
         #     binary_features.extend(_extractor1.get(text[1]))
         # if external and text[2]:  # link title
         #     binary_features.extend(_extractor1.get(text[2]))
-        # if external and text[3]:  # annotations
-        #     binary_features.extend(annotations(text[3]))
+        if external and text[3]:  # annotations
+            binary_features.extend(annotations(text[3]))
         return binary_features
 
     def featureExtractQueryBinary(self, text, external=True):
@@ -79,8 +79,8 @@ class Filterer:
         #     binary_features.extend(_extractor1.get(text[1]))
         # if external and text[2]:  # link title
         #     binary_features.extend(_extractor1.get(text[2]))
-        # if external and text[1]:  # annotations
-        #     binary_features.extend(annotations(text[1]))
+        if external and text[1]:  # annotations
+            binary_features.extend(annotations(text[1]))
         return binary_features
 
     def featureExtractQuery(self, text, external=True):
@@ -160,7 +160,7 @@ class SupervisedFilterer(Filterer):
             # add the query as positive example
             features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
             features = self.cutOnLinkProb(features, minLinkProb)
-            features_binary = self.featureExtractQueryBinary(q[1], external)
+            features_binary = self.featureExtractQueryBinary(q[1]+'\t\t' + queriesAnnotated[i][1], external)
             features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
             if annotationFilter:
                 posAnnotations.update(self.get_annotations(features))
