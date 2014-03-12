@@ -6,8 +6,10 @@ arguments:
     path of ids and content per query (test set) for realtime filtering
     training set dir
     "external" for using external information, otherwise internal"
-    parameters: classifier (R, NC), classifier parameter, number of negative samples, minimum link probability, annotation pre-filtering.
-        e.g. R-0.1:0.2-10:100-....
+    parameters: classifier (R, NC), classifier parameter, number of negative samples,
+        minimum link probability, annotation pre-filtering, feature extraction function names (divided by .) for twitter status,
+        for generic feature extraction, for binary features.
+        e.g. R-0.1:0.2-10:100-....-terms.bigrams-terms-hasUrl.hasMention
 """
 
 import sys, collections, re
@@ -20,6 +22,7 @@ from mb12filteval import *
 import EvalJig as ej
 import itertools
 from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier, DTClassifier, KNNClassifier, RFClassifier
+from CipCipPy.classification.feature import *
 
 queries = readQueries(sys.argv[1])
 queriesAnnotated = readQueries(sys.argv[2])
@@ -69,7 +72,7 @@ for param in list(itertools.product(*parameters)):
 
     #######  EDIT  ###########################################
 
-    classifier, classifierParam, neg, minLinkProb, annotationRule = param
+    classifier, classifierParam, neg, minLinkProb, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
     if classifier == 'NC':
         classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
     elif classifier == 'R':
@@ -87,6 +90,10 @@ for param in list(itertools.product(*parameters)):
 
 
     f = SupervisedFilterer(classifier)
+    f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],
+                          [eval(feat) for feat in genericFeatures.split('.')],
+                          [eval(feat) for feat in binaryFeatures.split('.')])
+
     results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
                 qrels2, external, float(minLinkProb), annotationFilter=True if annotationRule == 'True' else False)
 
