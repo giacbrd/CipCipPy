@@ -18,8 +18,9 @@ class FeatureExtractor:
 
     def get(self, text):
         result = []
-        for f in self.functions:
-            result.extend(f(text))
+        if self.functions != [None]:
+            for f in self.functions:
+                result.extend(f(text))
         return result
 
 filterSet = stopwords | punctuations
