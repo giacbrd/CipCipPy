@@ -60,11 +60,6 @@ class Filterer:
         text = text.split('\t\t')
         if text[0]:  # status
             binary_features.extend(self.binaryFeatEx.get(text[0]))
-        #FIXME cosa va de-commentato?
-        # if text[1]:  # hashtag
-        #     binary_features.extend(_extractor1.get(text[1]))
-        # if external and text[2]:  # link title
-        #     binary_features.extend(_extractor1.get(text[2]))
         if external and text[3]:  # annotations
             binary_features.extend(annotations(text[3]))
         return binary_features
@@ -73,12 +68,6 @@ class Filterer:
         """Extracts all the binary features from the query"""
         binary_features = []
         text = text.split('\t\t')
-        # if text[0]:  # status
-        #     binary_features.extend(_extractorBinary.get(text[0]))
-        # if text[1]:  # hashtag
-        #     binary_features.extend(_extractor1.get(text[1]))
-        # if external and text[2]:  # link title
-        #     binary_features.extend(_extractor1.get(text[2]))
         if external and text[1]:  # annotations
             binary_features.extend(annotations(text[1]))
         return binary_features
@@ -100,9 +89,8 @@ class Filterer:
 
 class SupervisedFilterer(Filterer):
 
-    def __init__(self, classifier, statusFeatures, genericFeatures, binaryFeatures):
+    def __init__(self, classifier):
         self.classifier = classifier
-        self.setFeatureExtractor(statusFeatures, genericFeatures, binaryFeatures)
 
     def get_annotations(self, features):
         """Returns the tuple of annotations in a list of features"""

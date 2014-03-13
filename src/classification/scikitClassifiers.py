@@ -36,6 +36,7 @@ class TrainingSet():
         # self.idf_transf = TfidfTransformer()
         self.tfidf_vect = TfidfVectorizer(lowercase=False, min_df=1, binary=False)
         self.mergedMatrix = None
+        self.has_binary = True
 
 
     def countVectorizeTfIdf(self):
@@ -62,6 +63,7 @@ class TrainingSet():
         """Creates and merge the idf matrix and the binary matrix """
         self.countVectorizeTfIdf()
         if not [item for sublist in self.featuresBinary for item in sublist]:
+            self.has_binary = False
             self.mergedMatrix = self.tfidfMatrix
         else:
             self.countVectorizeBinary()
@@ -72,7 +74,7 @@ class TrainingSet():
     def mergedIndexTest(self, testTweet):
         """Creates and merge the idf vector and the binary vector """
         idfTestVector = self.vectorizeTestTfIdf(testTweet)
-        if not testTweet[3]:
+        if not self.has_binary:
             return idfTestVector
         else:
             binaryTestVector = self.vectorizeTestBinary(testTweet)
@@ -84,7 +86,7 @@ class TrainingSet():
         self.tweetId.append(rawTweet[0])
         self.tweetTarget.append(1 if rawTweet[1] else 0)
         self.features.append(' '.join(rawTweet[2]))
-        if rawTweet[3]:
+        if self.has_binary:
             self.featuresBinary.append(' '.join(rawTweet[3]))
 
     def popOldExample(self):
