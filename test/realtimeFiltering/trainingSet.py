@@ -67,7 +67,6 @@ def getAnnotation(indexId):
     store = getStoredValue(_storedAnnotation, indexId, 'annotations')
     return store if store else ""
 
-
 queries = dict((q[0], q[1:]) for q in queries)
 
 for qNum in queries:

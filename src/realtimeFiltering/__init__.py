@@ -171,6 +171,8 @@ class SupervisedFilterer(Filterer):
                 features_binary = self.featureExtractBinary(content, external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
+            # add a negative sample at the axis origin
+            rawTweets.append((0, False, [], []))
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
                 training.mergedIndex()
@@ -184,6 +186,9 @@ class SupervisedFilterer(Filterer):
             # do not train the first tweet
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
+                # exclude retweets
+                if text.startswith("RT @"):
+                    continue
                 features = self.featureExtract(text[:-1], external)
                 features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text[:-1], external)
@@ -227,7 +232,8 @@ class SupervisedFilterer(Filterer):
                         # TODO pop a old positive sample? only if rules are not used?
                         training.mergedIndex()
                         self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
-                    elif tweetId in qrels[int(q[0][2:])][1]:
+                    #elif tweetId in qrels[int(q[0][2:])][1]:
+                    else:
                         training.addExample((tweetId, False, features, features_binary))
                         training.mergedIndex()
                         self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
