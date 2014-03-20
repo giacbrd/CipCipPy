@@ -4,6 +4,7 @@ import scipy.spatial.distance
 import numpy as np
 from scipy.stats.mstats_basic import threshold
 
+import sklearn
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn import svm
@@ -184,16 +185,17 @@ class NCClassifier(Classifier):
 
 class RocchioClassifier(Classifier):
     """Rocchio classifier"""
-    def __init__(self, threshold = 0.5, distance_func = scipy.spatial.distance.euclidean):
-        raise NotImplementedError()
+    def __init__(self, threshold = 0.5, distance_func = sklearn.metrics.pairwise_distances):
         self.threshold = threshold
         self.distance_func = distance_func
 
     def retrain(self, vectorFeature, vectorTarget):
-        assert(len(vectorFeature) == len(vectorTarget))
+        assert(vectorFeature.shape[0] == len(vectorTarget))
         #FIXME operations on sparse matrices
-        #vectors = [numpy.sign(vectorTarget[i] - .5) * v for i, v in enumerate(vectorFeature)]
-        #self.centroid = numpy.mean(vectors, axis=1)
+        trueRows = [i for i, t in enumerate(vectorTarget) if t]
+        # get the rows with target==1 (positive samples)
+        vectors = vectorFeature[trueRows, :]
+        self.centroid = vectors.mean(0)
 
     def classify(self, vectorizedTest):
         if self.distance_func(vectorizedTest, self.centroid) < threshold:

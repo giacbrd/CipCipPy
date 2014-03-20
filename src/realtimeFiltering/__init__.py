@@ -218,7 +218,7 @@ class SupervisedFilterer(Filterer):
                 test = training.mergedIndexTest((tweetId, False, features, features_binary))
                 classification = self.classifier.classify(test)
                 if (classification == 1 and (tweetId in qrels[int(q[0][2:])][1])) or \
-						(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
+						(classification == 0 and (tweetId not in qrels[int(q[0][2:])][1])):
                     print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
                         'Target '+str(tweetId in qrels[int(q[0][2:])][0])
                 #print classifier.getProb(test)
