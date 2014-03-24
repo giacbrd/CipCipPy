@@ -140,6 +140,7 @@ class SupervisedFilterer(Filterer):
             results[q[0]] = []
             # (positives, negatives) ordered by relevance
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
+            negCount = neg
             bootstrapCount = bootstrap if bootstrap > 0 else 0
             trainingFile = open(os.path.join(trainingSetPath, q[0]))
             rawTweets=[]
@@ -168,7 +169,7 @@ class SupervisedFilterer(Filterer):
                 rawTweets.append((tweetId, True, features, features_binary))
                 break
             for line in trainingFile:
-                if neg < 1:
+                if negCount < 1:
                     break
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 features = self.featureExtract(text[:-1], external)
@@ -176,7 +177,7 @@ class SupervisedFilterer(Filterer):
                 features_binary = self.featureExtractBinary(text[:-1], external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
-                neg -= 1
+                negCount -= 1
             # add a negative sample at the axis origin
             #rawTweets.append((0, False, [], []))
             training = TrainingSet(rawTweets, 0)
