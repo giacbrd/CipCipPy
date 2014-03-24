@@ -41,11 +41,13 @@ def clean(text):
 
 for q in queries:
     dirList = os.listdir(sys.argv[2])
-    outFile = codecs.open(os.path.join(sys.argv[3], q[0]), 'w', encoding='utf8')
+    outName = os.path.join(sys.argv[3], q[0])
+    tempOutName = os.path.join(sys.argv[3], "TEMP_" + q[0])
+    outFile = codecs.open(tempOutName, 'w', encoding='utf8')
     for fName in dirList:
         for tweet in iterTweets(os.sep.join([sys.argv[2], fName])):
             timeInt = int(tweet[0])
-            if timeInt >= q[3] and timeInt <= q[4] and tweet[2] != '302':
+            if timeInt < q[3] and tweet[2] != '302':
                 time = str(timeInt)
                 status = getStatus(time)
                 title = getTitle(time)
@@ -54,3 +56,5 @@ for q in queries:
                     outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \
                                   clean(title).strip() + '\t\t' + clean(annotations) + '\n')
     outFile.close()
+    os.system("tac " + tempOutName + " > " + outName)
+    os.remove(tempOutName)

@@ -141,7 +141,7 @@ class SupervisedFilterer(Filterer):
             # (positives, negatives) ordered by relevance
             # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
             bootstrapCount = bootstrap if bootstrap > 0 else 0
-            trainingData = cPickle.load(open(os.path.join(trainingSetPath, q[0])))
+            trainingFile = open(os.path.join(trainingSetPath, q[0]))
             rawTweets=[]
             testFile = open(os.path.join(filteringIdsPath, q[0]))
             posAnnotations = set()
@@ -150,6 +150,8 @@ class SupervisedFilterer(Filterer):
             features = self.cutOnLinkProb(features, minLinkProb)
             features_binary = self.featureExtractQueryBinary(q[1]+'\t\t' + queriesAnnotated[i][1], external)
             features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+            # the set of features that any positive sample must contain
+            initialFeatures = set(features + features_binary)
             if annotationFilter:
                 posAnnotations.update(self.get_annotations(features))
             rawTweets.append((q[0], True, features, features_binary))
@@ -165,14 +167,18 @@ class SupervisedFilterer(Filterer):
                     posAnnotations.update(self.get_annotations(features))
                 rawTweets.append((tweetId, True, features, features_binary))
                 break
-            for tweetId, content in trainingData[1][:neg]:
-                features = self.featureExtract(content, external)
+            for line in trainingFile:
+                if neg < 1:
+                    break
+                tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
+                features = self.featureExtract(text[:-1], external)
                 features = self.cutOnLinkProb(features, minLinkProb)
-                features_binary = self.featureExtractBinary(content, external)
+                features_binary = self.featureExtractBinary(text[:-1], external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
+                neg -= 1
             # add a negative sample at the axis origin
-            rawTweets.append((0, False, [], []))
+            #rawTweets.append((0, False, [], []))
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
                 training.mergedIndex()
@@ -193,7 +199,7 @@ class SupervisedFilterer(Filterer):
                 features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text[:-1], external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
-                if not features:
+                if not features or not (len(initialFeatures & set(features + features_binary))):
                     continue
                 testAnnotation = set(self.get_annotations(features))
                 if annotationFilter and not posAnnotations.intersection(testAnnotation):
@@ -217,8 +223,8 @@ class SupervisedFilterer(Filterer):
                 #nb.test(tweetId, features)
                 test = training.mergedIndexTest((tweetId, False, features, features_binary))
                 classification = self.classifier.classify(test)
-                if (classification == 1 and (tweetId in qrels[int(q[0][2:])][1])) or \
-						(classification == 0 and (tweetId not in qrels[int(q[0][2:])][1])):
+                if (classification == 1 and (tweetId not in qrels[int(q[0][2:])][0])) or \
+						(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
                     print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
                         'Target '+str(tweetId in qrels[int(q[0][2:])][0])
                 #print classifier.getProb(test)

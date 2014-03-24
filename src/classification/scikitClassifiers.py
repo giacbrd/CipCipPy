@@ -2,7 +2,7 @@
 
 import scipy.spatial.distance
 import numpy as np
-from scipy.stats.mstats_basic import threshold
+from scipy.sparse import csr_matrix
 
 import sklearn
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
@@ -185,7 +185,7 @@ class NCClassifier(Classifier):
 
 class RocchioClassifier(Classifier):
     """Rocchio classifier"""
-    def __init__(self, threshold = 0.5, distance_func = sklearn.metrics.pairwise_distances):
+    def __init__(self, threshold = 0.5, distance_func = scipy.spatial.distance.cosine):
         self.threshold = threshold
         self.distance_func = distance_func
 
@@ -195,10 +195,11 @@ class RocchioClassifier(Classifier):
         trueRows = [i for i, t in enumerate(vectorTarget) if t]
         # get the rows with target==1 (positive samples)
         vectors = vectorFeature[trueRows, :]
+        #self.centroid = csr_matrix(vectors.mean(0))
         self.centroid = vectors.mean(0)
 
     def classify(self, vectorizedTest):
-        if self.distance_func(vectorizedTest, self.centroid) < threshold:
+        if vectorizedTest.nnz > 0 and self.distance_func(vectorizedTest.toarray(), self.centroid) < self.threshold:
             return 1
         else:
             return 0
