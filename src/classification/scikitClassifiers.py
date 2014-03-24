@@ -2,7 +2,7 @@
 
 import scipy.spatial.distance
 import numpy as np
-from scipy.sparse import csr_matrix
+from scipy.sparse import csr_matrix, issparse
 
 import sklearn
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer, TfidfVectorizer
@@ -199,7 +199,9 @@ class RocchioClassifier(Classifier):
         self.centroid = vectors.mean(0)
 
     def classify(self, vectorizedTest):
-        if vectorizedTest.nnz > 0 and self.distance_func(vectorizedTest.toarray(), self.centroid) < self.threshold:
+        if issparse(vectorizedTest):
+            vectorizedTest = vectorizedTest.toarray()
+        if self.distance_func(vectorizedTest, self.centroid) < self.threshold:
             return 1
         else:
             return 0

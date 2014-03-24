@@ -19,6 +19,7 @@ CipCipPy
 
 Real-time filtering package.
 """
+from scipy.sparse import csr_matrix
 
 __version__ = "0.1"
 __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
