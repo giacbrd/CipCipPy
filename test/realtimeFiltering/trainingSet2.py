@@ -1,5 +1,5 @@
-"""Test set generation for real-time filtering.
-For each query serialize tweet ids and corpus content in the time range. Last content is external, e.g. link titles.
+"""Training set generation for real-time filtering.
+For each query serialize tweet ids and corpus content previous to query time. Last content is external, e.g. link titles.
 usage: <topics file> <corpus directory> <output directory> [query numbers divided by :]"""
 
 import os
@@ -11,6 +11,8 @@ import codecs
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
+
+outPath = sys.argv[3]
 
 #_storedStatusAll = getIndex('storedStatusAll')
 _storedStatus = getIndex('storedStatus')
@@ -39,10 +41,13 @@ if len(sys.argv) > 4:
 def clean(text):
     return text if text is not None else u''
 
+if not os.path.exists(outPath):
+    os.makedirs(outPath)
+
 for q in queries:
     dirList = os.listdir(sys.argv[2])
-    outName = os.path.join(sys.argv[3], q[0])
-    tempOutName = os.path.join(sys.argv[3], "TEMP_" + q[0])
+    outName = os.path.join(outPath, q[0])
+    tempOutName = os.path.join(outPath, "TEMP_" + q[0])
     outFile = codecs.open(tempOutName, 'w', encoding='utf8')
     for fName in dirList:
         for tweet in iterTweets(os.sep.join([sys.argv[2], fName])):
