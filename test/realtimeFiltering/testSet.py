@@ -52,5 +52,5 @@ for q in queries:
                 annotations = getAnnotation(time)
                 if status or title:
                     outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \
-                                  clean(title).strip() + '\t\t' + clean(annotations) + '\n')
+                                  clean(title).strip().replace('\t', ' ') + '\t\t' + clean(annotations) + '\n')
     outFile.close()

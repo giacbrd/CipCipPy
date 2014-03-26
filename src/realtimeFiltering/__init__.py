@@ -31,7 +31,7 @@ from ..classification.feature import *
 import cPickle
 from ..classification.scikitClassifiers import TrainingSet
 import os, time
-
+from ..utils import viaUserRE, retweetRE
 
 
 class Filterer:
@@ -195,7 +195,8 @@ class SupervisedFilterer(Filterer):
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 # exclude retweets
-                if text.startswith("RT @"):
+                if retweetRE.findall(text):# or viaUserRE.findall(text.split('\t\t')[0]):
+                    print text
                     continue
                 features = self.featureExtract(text[:-1], external)
                 features = self.cutOnLinkProb(features, minLinkProb)
