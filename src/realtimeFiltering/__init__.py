@@ -196,7 +196,6 @@ class SupervisedFilterer(Filterer):
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 # exclude retweets
                 if retweetRE.findall(text):# or viaUserRE.findall(text.split('\t\t')[0]):
-                    print text
                     continue
                 features = self.featureExtract(text[:-1], external)
                 features = self.cutOnLinkProb(features, minLinkProb)
