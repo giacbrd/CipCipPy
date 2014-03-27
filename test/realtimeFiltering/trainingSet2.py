@@ -8,6 +8,7 @@ from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
 from CipCipPy.indexing import getIndexPath, getIndex
 from CipCipPy.retrieval import getStoredValue
 import codecs
+import errno
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
@@ -41,8 +42,16 @@ if len(sys.argv) > 4:
 def clean(text):
     return text if text is not None else u''
 
+
 if not os.path.exists(outPath):
-    os.makedirs(outPath)
+    try:
+        os.makedirs(outPath)
+    except OSError as e:
+        if e.errno == errno.EEXIST:
+            print 'Error: ', e
+            print 'continuing...'
+        else:
+            raise
 
 for q in queries:
     dirList = os.listdir(sys.argv[2])

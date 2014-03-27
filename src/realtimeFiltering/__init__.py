@@ -19,7 +19,7 @@ CipCipPy
 
 Real-time filtering package.
 """
-from scipy.sparse import csr_matrix
+
 
 __version__ = "0.1"
 __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
@@ -32,6 +32,7 @@ import cPickle
 from ..classification.scikitClassifiers import TrainingSet
 import os, time
 from ..utils import viaUserRE, retweetRE
+from scipy.sparse import csr_matrix
 
 
 class Filterer:

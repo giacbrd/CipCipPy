@@ -10,6 +10,7 @@ arguments:
         minimum link probability, annotation pre-filtering, feature extraction function names (divided by .) for twitter status,
         for generic feature extraction, for binary features.
         e.g. R-0.1:0.2-10:100-....-terms.bigrams-terms-hasUrl.hasMention
+    [query numbers divided by :]
 """
 
 import sys, collections, re

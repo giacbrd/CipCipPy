@@ -9,6 +9,10 @@ arguments:
     training set dir
     results dir
     "external" for using external information, otherwise "internal"
+    parameters: classifier (R, NC), classifier parameter, number of negative samples,
+        minimum link probability, annotation pre-filtering, feature extraction function names (divided by .) for twitter status,
+        for generic feature extraction, for binary features.
+        e.g. R-0.2-100-....-terms.bigrams-terms-hasUrl.hasMention
     [query numbers divided by :]
 """
 
@@ -18,7 +22,8 @@ import sys, errno
 from CipCipPy.evaluation.trecTools import printEval
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.realtimeFiltering import SupervisedFilterer
-from CipCipPy.classification.scikitClassifiers import ADAClassifier, NCClassifier, RClassifier, LClassifier
+from CipCipPy.classification.scikitClassifiers import ADAClassifier, NCClassifier, RClassifier, LClassifier, \
+    DTClassifier, KNNClassifier, RFClassifier, RocchioClassifier
 
 
 #FIXME use argparse
@@ -41,7 +46,7 @@ if sys.argv[7] == 'external':
 
 param = sys.argv[8].split('-')
 
-classifier, classifierParam, neg, minLinkProb, annotationRule = param
+classifier, classifierParam, neg, minLinkProb, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
 if classifier == 'NC':
     classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
 elif classifier == 'R':
@@ -50,8 +55,19 @@ elif classifier == 'ADA':
     classifier = ADAClassifier(estimators=int(classifierParam))
 elif classifier == 'L':
     classifier = LClassifier(C=float(classifierParam))
+elif classifier == 'DT':
+    classifier = DTClassifier()
+elif classifier == 'KNN':
+    classifier = KNNClassifier()
+elif classifier == 'RF':
+    classifier = RFClassifier()
+elif classifier == 'RO':
+    classifier = RocchioClassifier(threshold=float(classifierParam))
 
 f = SupervisedFilterer(classifier)
+f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],
+                      [eval(feat) for feat in genericFeatures.split('.')],
+                      [eval(feat) for feat in binaryFeatures.split('.')])
 
 runName = 'run' + '-'.join(param) + ('_external' if external else '_internal')
 

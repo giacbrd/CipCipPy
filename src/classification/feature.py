@@ -1,4 +1,5 @@
 """Methods for extracting features (list of strings) from a text string."""
+from inspect import isfunction
 from ..utils.hashtag import Segmenter
 from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE
 import nltk, math
@@ -18,10 +19,11 @@ class FeatureExtractor:
 
     def get(self, text):
         result = []
-        if self.functions != [None]:
-            for f in self.functions:
+        for f in self.functions:
+            if isfunction(f):
                 result.extend(f(text))
         return result
+
 
 filterSet = stopwords | punctuations
 
