@@ -153,6 +153,7 @@ class SupervisedFilterer(Filterer):
             features = self.cutOnLinkProb(features, minLinkProb)
             features_binary = self.featureExtractQueryBinary(q[1]+'\t\t' + queriesAnnotated[i][1], external)
             features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+            print '[Debug]', 'QUERY', features, features_binary
             # the set of features that any positive sample must contain
             initialFeatures = set(features + features_binary)
             if annotationFilter:
@@ -162,10 +163,11 @@ class SupervisedFilterer(Filterer):
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 results[q[0]].append((tweetId, '1.0\tyes'))
-                features = self.featureExtract(text[:-1], external)
+                features = self.featureExtract(text.strip('\n'), external)
                 features = self.cutOnLinkProb(features, minLinkProb)
-                features_binary = self.featureExtractBinary(text[:-1], external)
+                features_binary = self.featureExtractBinary(text.strip('\n'), external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+                print '[Debug]', 'FIRST', features, features_binary
                 if annotationFilter:
                     posAnnotations.update(self.get_annotations(features))
                 rawTweets.append((tweetId, True, features, features_binary))
@@ -174,9 +176,9 @@ class SupervisedFilterer(Filterer):
                 if negCount < 1:
                     break
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
-                features = self.featureExtract(text[:-1], external)
+                features = self.featureExtract(text.strip('\n'), external)
                 features = self.cutOnLinkProb(features, minLinkProb)
-                features_binary = self.featureExtractBinary(text[:-1], external)
+                features_binary = self.featureExtractBinary(text.strip('\n'), external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
                 negCount -= 1
@@ -198,11 +200,12 @@ class SupervisedFilterer(Filterer):
                 # exclude retweets
                 if retweetRE.findall(text):# or viaUserRE.findall(text.split('\t\t')[0]):
                     continue
-                features = self.featureExtract(text[:-1], external)
+                features = self.featureExtract(text.strip('\n'), external)
                 features = self.cutOnLinkProb(features, minLinkProb)
-                features_binary = self.featureExtractBinary(text[:-1], external)
+                features_binary = self.featureExtractBinary(text.strip('\n'), external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
-                if not features or not (len(initialFeatures & set(features + features_binary))):
+                if not features or not (len(initialFeatures & set(features + features_binary))) \
+                        or not hasUrl(text.strip('\n').split('\t\t')[0]):
                     continue
                 testAnnotation = set(self.get_annotations(features))
                 if annotationFilter and not posAnnotations.intersection(testAnnotation):
@@ -230,6 +233,8 @@ class SupervisedFilterer(Filterer):
 						(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
                     print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
                         'Target '+str(tweetId in qrels[int(q[0][2:])][0])
+                if tweetId in qrels[int(q[0][2:])][0]:
+                    print '[Debug]', 'POSITIVE', tweetId, features, features_binary
                 #print classifier.getProb(test)
                 if classification == 1:
                     score = self.classifier.getProb(test) if callable(getattr(self.classifier, "getProb", None)) else 1.
