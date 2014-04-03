@@ -1,7 +1,7 @@
 """Methods for extracting features (list of strings) from a text string."""
 from inspect import isfunction
 from ..utils.hashtag import Segmenter
-from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE
+from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE, wordDotsRE
 import nltk, math
 from nltk.stem import WordNetLemmatizer
 
@@ -25,9 +25,9 @@ class FeatureExtractor:
         return result
 
 
-filterSet = stopwords | punctuations
+filterSet = stopwords #| punctuations
 
-punctuations2 = set(('\'', '"', '`'))
+punctuations2 = set(('\'', '"', '`')) | punctuations
 
 segmenter = None
 def getSegmenter(dictionary):
@@ -41,11 +41,12 @@ def terms(text):
     terms = []
     text = hashReplRE.sub(" ", text)
     text = urlRE.sub(" ", text)
+    text = wordDotsRE.sub(".", text)
     for sent in nltk.sent_tokenize(text):
         for subSent in sent.split(';'):
             terms.extend(nltk.word_tokenize(subSent))
     terms = [t.lower() for t in terms if t.strip() and len(t) > 1 and t != u'\ufffd']
-    return [t for t in terms if t not in filterSet and not len(set(t) & punctuations2)]
+    return [t for t in terms if t not in filterSet and not set(t).issubset(punctuations2)]
 
 def lemmas(text):
     text_terms = terms(text)

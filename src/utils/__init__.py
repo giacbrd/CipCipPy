@@ -39,6 +39,7 @@ hashReplRE = re.compile('[@|#]\S+')
 urlRE = re.compile('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', re.IGNORECASE)
 viaUserRE = re.compile("via @(\S+)", re.IGNORECASE)
 retweetRE = re.compile("^RT @", re.IGNORECASE)
+wordDotsRE = re.compile("\S+\.\.+", re.IGNORECASE)
 
 def substPunct(text, subst = ''):
     return ''.join(c if c not in punctuations else subst for c in text)
