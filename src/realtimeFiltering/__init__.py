@@ -140,8 +140,6 @@ class SupervisedFilterer(Filterer):
             print q
             start_time = time.time()
             results[q[0]] = []
-            # (positives, negatives) ordered by relevance
-            # ((tweetId, [features..]), (tweetId, [features..]), ..], [(tweetId, [features..]), ...])
             negCount = neg
             bootstrapCount = bootstrap if bootstrap > 0 else 0
             trainingFile = open(os.path.join(trainingSetPath, q[0]))
@@ -153,7 +151,7 @@ class SupervisedFilterer(Filterer):
             features = self.cutOnLinkProb(features, minLinkProb)
             features_binary = self.featureExtractQueryBinary(q[1]+'\t\t' + queriesAnnotated[i][1], external)
             features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
-            print '[Debug]', 'QUERY', features, features_binary
+            #print '[Debug]', 'QUERY', features, features_binary
             # the set of features that any positive sample must contain
             initialFeatures = set(features + features_binary)
             if annotationFilter:
@@ -167,7 +165,7 @@ class SupervisedFilterer(Filterer):
                 features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text.strip('\n'), external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
-                print '[Debug]', 'FIRST', features, features_binary
+                #print '[Debug]', 'FIRST', features, features_binary
                 if annotationFilter:
                     posAnnotations.update(self.get_annotations(features))
                 rawTweets.append((tweetId, True, features, features_binary))
@@ -229,12 +227,12 @@ class SupervisedFilterer(Filterer):
                 #nb.test(tweetId, features)
                 test = training.mergedIndexTest((tweetId, False, features, features_binary))
                 classification = self.classifier.classify(test)
-                if (classification == 1 and (tweetId not in qrels[int(q[0][2:])][0])) or \
-						(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
-                    print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
-                        'Target '+str(tweetId in qrels[int(q[0][2:])][0])
-                if tweetId in qrels[int(q[0][2:])][0]:
-                    print '[Debug]', 'POSITIVE', tweetId, features, features_binary
+                # if (classification == 1 and (tweetId not in qrels[int(q[0][2:])][0])) or \
+					# 	(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
+                #     print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
+                #         'Target '+str(tweetId in qrels[int(q[0][2:])][0])
+                # if tweetId in qrels[int(q[0][2:])][0]:
+                #     print '[Debug]', 'POSITIVE', tweetId, features, features_binary
                 #print classifier.getProb(test)
                 if classification == 1:
                     score = self.classifier.getProb(test) if callable(getattr(self.classifier, "getProb", None)) else 1.
@@ -251,7 +249,7 @@ class SupervisedFilterer(Filterer):
                         training.addExample((tweetId, False, features, features_binary))
                         training.mergedIndex()
                         self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
-            print '[Debug] Query processed in ', time.time() - start_time, 'seconds.'
+            #print '[Debug] Query processed in ', time.time() - start_time, 'seconds.'
             testFile.close()
             if dumpsPath:
                 cPickle.dump(results[q[0]], open(os.path.join(dumpsPath, q[0]), 'w'))
