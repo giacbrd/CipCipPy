@@ -8,6 +8,12 @@ import os.path
 from ..retrieval import getStoredValue
 
 
+
+
+Tweet = namedtuple("Tweet", "id user http date status hashtags replies")
+Query = namedtuple("Query", "number topic date tweettime newesttime")
+Qrels = namedtuple("Qrels", "rel notrel")
+
 def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResults = float("inf")):
     """Write results text in TREC format
     queryIds - list of query numbers relative to results list
@@ -39,7 +45,6 @@ def readQueries(filePath):
     """Returns tuples of query string and date from a topics file:
     (number, query topic, query date, query date as tweet id [, query date as tweet id of the most recent tweet])"""
     queries = []
-    Query = namedtuple("Query", "number topic date tweettime newesttime")
     f = open(filePath)
     topics = f.read().split('\n</top>\n\n<top>\n')
     topics[0] = topics[0][6:]
@@ -70,13 +75,12 @@ def readQueries(filePath):
             i = e + len('<querynewesttweet>')
             j = topic.find('</querynewesttweet>', i)
             query.append(int(topic[i:j].strip()))
-        queries.append(Query(query))
+        queries.append(Query(*query))
     return queries
 
 def readQrels(filePath, queryNumbers = None):
     """Return a map of queries and a set of relevant and a set of non-relevant tweet ids.
     queryNumbers is an iterator of query numbers in the TREC topics file format."""
-    Qrels = namedtuple("Qrels", "rel notrel")
     queryNumbersSet = None
     if queryNumbers:
         queryNumbersSet = set(int(qNum[2:]) for qNum in queryNumbers)
@@ -117,7 +121,6 @@ def iterTweets(filePath, skipNull = True):
 def tweetParser(line):
     """Return a tuple or None if the tweet is null:
         (tweet id, user, http status, date object, status, tuple of hashtags, tuple of replied users)"""
-    Tweet = namedtuple("Tweet", "id user http date status hashtags replies")
     l = line.strip().split('\t')
     if len(l) < 5:
         raise ValueError("Incorrect line format of the corpus:  " + line)
@@ -131,7 +134,7 @@ def tweetParser(line):
         if len(l) > 4:
             l.append(tuple(hashtagRE.findall(l[4])))
             l.append(tuple(replyRE.findall(l[4])))
-    return Tweet(l)
+    return Tweet(*l)
 
 def dateFromFileName(fileName):
     """Return the datetime of a collection file name."""
