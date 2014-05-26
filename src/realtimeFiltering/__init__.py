@@ -132,12 +132,13 @@ class SupervisedFilterer(Filterer):
         bootstrap - number of samples to add to the training set before starting classification
         dumpsPath - path where to store serialized results
         """
-        print self.classifier, neg, external, minLinkProb, annotationFilter, bootstrap
+        #print self.classifier, neg, external, minLinkProb, annotationFilter, bootstrap
         results = {}
+        printOut = {}
         for i, q in enumerate(queries):
             if int(q[0][2:]) not in qrels:
                 continue
-            print q
+            #print q
             start_time = time.time()
             results[q[0]] = []
             negCount = neg
@@ -151,6 +152,7 @@ class SupervisedFilterer(Filterer):
             features = self.cutOnLinkProb(features, minLinkProb)
             features_binary = self.featureExtractQueryBinary(q[1]+'\t\t' + queriesAnnotated[i][1], external)
             features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+            positives = [q[1]]
             #print '[Debug]', 'QUERY', features, features_binary
             # the set of features that any positive sample must contain
             initialFeatures = set(features + features_binary)
@@ -166,6 +168,7 @@ class SupervisedFilterer(Filterer):
                 features_binary = self.featureExtractBinary(text.strip('\n'), external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 #print '[Debug]', 'FIRST', features, features_binary
+                positives.append((tweetId, text.strip('\n')))
                 if annotationFilter:
                     posAnnotations.update(self.get_annotations(features))
                 rawTweets.append((tweetId, True, features, features_binary))
@@ -193,6 +196,7 @@ class SupervisedFilterer(Filterer):
             #        print fe[z], v[0,col[z]]
             #    print training.tweetTarget[e]
             # do not train the first tweet
+            tp, fp, fn = [], [], []
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 # exclude retweets
@@ -227,12 +231,15 @@ class SupervisedFilterer(Filterer):
                 #nb.test(tweetId, features)
                 test = training.mergedIndexTest((tweetId, False, features, features_binary))
                 classification = self.classifier.classify(test)
-                # if (classification == 1 and (tweetId not in qrels[int(q[0][2:])][0])) or \
-					# 	(classification == 0 and (tweetId in qrels[int(q[0][2:])][0])):
-                #     print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
-                #         'Target '+str(tweetId in qrels[int(q[0][2:])][0])
-                # if tweetId in qrels[int(q[0][2:])][0]:
-                #     print '[Debug]', 'POSITIVE', tweetId, features, features_binary
+                if classification == 1 and (tweetId not in qrels[int(q[0][2:])][0]):
+                    fp.append((tweetId, text.strip('\n')))
+                if classification == 0 and (tweetId in qrels[int(q[0][2:])][0]):
+                    fn.append((tweetId, text.strip('\n')))
+                    #print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
+                    #    'Target '+str(tweetId in qrels[int(q[0][2:])][0])
+                if tweetId in qrels[int(q[0][2:])][0]:
+                    tp.append((tweetId, text.strip('\n')))
+                    #print '[Debug]', 'POSITIVE', tweetId, features, features_binary
                 #print classifier.getProb(test)
                 if classification == 1:
                     score = self.classifier.getProb(test) if callable(getattr(self.classifier, "getProb", None)) else 1.
@@ -251,6 +258,7 @@ class SupervisedFilterer(Filterer):
                         self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
             #print '[Debug] Query processed in ', time.time() - start_time, 'seconds.'
             testFile.close()
+            printOut[q[0]] = (positives, tp, fp, fn)
             if dumpsPath:
                 cPickle.dump(results[q[0]], open(os.path.join(dumpsPath, q[0]), 'w'))
-        return results
+        return results, printOut

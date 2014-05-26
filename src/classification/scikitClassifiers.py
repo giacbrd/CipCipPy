@@ -32,10 +32,10 @@ class TrainingSet():
             self.featuresBinary.append(' '.join(triple[3]))
         self.tfidfMatrix = None
         self.binaryMatrix = None
-        self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=2)
+        self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
         # self.count_vect = CountVectorizer(lowercase=False)
         # self.idf_transf = TfidfTransformer()
-        self.tfidf_vect = TfidfVectorizer(lowercase=False, min_df=2, binary=False)
+        self.tfidf_vect = TfidfVectorizer(lowercase=False, min_df=1, binary=False)
         self.mergedMatrix = None
         self.has_binary = True
 

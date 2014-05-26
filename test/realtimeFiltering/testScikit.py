@@ -82,11 +82,12 @@ if not os.path.exists(dumpsPath):
         else:
             raise
 
-results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
+results, printOut = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
                 qrels, external, float(minLinkProb), annotationFilter = True if annotationRule=='True' else False,
                 dumpsPath=dumpsPath)
 
-printEval(sys.argv[1], sys.argv[3], results)
+print printOut
+#printEval(sys.argv[1], sys.argv[3], results)
 
 
 #indexForPrint = whoosh.index.open_dir(getIndexPath('storedStatus'))

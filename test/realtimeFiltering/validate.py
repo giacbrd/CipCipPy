@@ -97,7 +97,7 @@ for param in list(itertools.product(*parameters)):
                           [eval(feat) for feat in genericFeatures.split('.')],
                           [eval(feat) for feat in binaryFeatures.split('.')])
 
-    results = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
+    results, printOut = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
                 qrels2, external, float(minLinkProb), annotationFilter=True if annotationRule == 'True' else False)
 
     ##########################################################
@@ -128,6 +128,8 @@ for param in list(itertools.product(*parameters)):
     jig.print_scores()
     jig.comp_means()
     jig.print_means()
+
+    print printOut
 
     # Using CipCipPy evaluation tools
     # T11SUs = T11SU(results, qrels)
