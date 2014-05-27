@@ -124,12 +124,13 @@ for param in list(itertools.product(*parameters)):
         else:
             jig.compute(topic, [], qrels[topic])
 
+    print printOut
+
     print param
     jig.print_scores()
     jig.comp_means()
     jig.print_means()
 
-    print printOut
 
     # Using CipCipPy evaluation tools
     # T11SUs = T11SU(results, qrels)
