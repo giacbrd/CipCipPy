@@ -25,8 +25,7 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
                "Andrea Esuli <andrea.esuli@isti.cnr.it>", 
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
-import re
-import string
+import re, string, hashlib
 
 punctuations = set(string.punctuation)
 
@@ -43,6 +42,18 @@ wordDotsRE = re.compile("\S+\.\.+", re.IGNORECASE)
 
 def substPunct(text, subst = ''):
     return ''.join(c if c not in punctuations else subst for c in text)
+
+def queryNumToId(q):
+    """Returns the query id string from an integer id"""
+    return 'MB{num:03d}'.format(num=q)
+
+def queryIdToNum(q):
+    """Returns the query id integer from an string id"""
+    return int(q[2:])
+
+def textHash(text):
+    """hash integer of a string"""
+    return int(hashlib.md5(text.encode('ascii', 'replace')).hexdigest()[:12], 16)
 
 stopwords = frozenset(("secondly", "all",
 					"consider", "whoever", "go", "evermore", "causes",

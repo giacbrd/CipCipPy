@@ -31,7 +31,7 @@ from ..classification.feature import *
 import cPickle
 from ..classification.scikitClassifiers import TrainingSet
 import os, time
-from ..utils import viaUserRE, retweetRE
+from ..utils import viaUserRE, retweetRE, textHash
 from scipy.sparse import csr_matrix
 
 
@@ -88,6 +88,9 @@ class Filterer:
         """How many terms query amd text have in common."""
         return len(set(terms(query)) & set(terms(text)))
 
+    def tweetHash(self, tweet):
+        return textHash(tweet.partition('\t\t')[0])
+
 
 class SupervisedFilterer(Filterer):
 
@@ -136,6 +139,7 @@ class SupervisedFilterer(Filterer):
         results = {}
         printOut = {}
         for i, q in enumerate(queries):
+            alreadySeen = set()
             if int(q[0][2:]) not in qrels:
                 continue
             #print q
@@ -162,13 +166,15 @@ class SupervisedFilterer(Filterer):
             # add the first tweet as positive example
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
+                text = text.strip('\n')
+                alreadySeen.add(self.tweetHash(text))
                 results[q[0]].append((tweetId, '1.0\tyes'))
-                features = self.featureExtract(text.strip('\n'), external)
+                features = self.featureExtract(text, external)
                 features = self.cutOnLinkProb(features, minLinkProb)
-                features_binary = self.featureExtractBinary(text.strip('\n'), external)
+                features_binary = self.featureExtractBinary(text, external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 #print '[Debug]', 'FIRST', features, features_binary
-                positives.append((tweetId, text.strip('\n')))
+                positives.append((tweetId, text))
                 if annotationFilter:
                     posAnnotations.update(self.get_annotations(features))
                 rawTweets.append((tweetId, True, features, features_binary))
@@ -177,9 +183,10 @@ class SupervisedFilterer(Filterer):
                 if negCount < 1:
                     break
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
-                features = self.featureExtract(text.strip('\n'), external)
+                text = text.strip('\n')
+                features = self.featureExtract(text, external)
                 features = self.cutOnLinkProb(features, minLinkProb)
-                features_binary = self.featureExtractBinary(text.strip('\n'), external)
+                features_binary = self.featureExtractBinary(text, external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
                 negCount -= 1
@@ -199,15 +206,18 @@ class SupervisedFilterer(Filterer):
             tp, fp, fn = [], [], []
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
+                text = text.strip('\n')
+                currTweetHash = self.tweetHash(text)
                 # exclude retweets
-                if retweetRE.findall(text):# or viaUserRE.findall(text.split('\t\t')[0]):
+                if retweetRE.findall(text) or currTweetHash in alreadySeen:# or viaUserRE.findall(text.split('\t\t')[0]):
                     continue
-                features = self.featureExtract(text.strip('\n'), external)
+                alreadySeen.add(self.tweetHash(text))
+                features = self.featureExtract(text, external)
                 features = self.cutOnLinkProb(features, minLinkProb)
-                features_binary = self.featureExtractBinary(text.strip('\n'), external)
+                features_binary = self.featureExtractBinary(text, external)
                 features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
                 if not features or not (len(initialFeatures & set(features + features_binary))) \
-                        or not hasUrl(text.strip('\n').split('\t\t')[0]):
+                        or not hasUrl(text.split('\t\t')[0]):
                     continue
                 testAnnotation = set(self.get_annotations(features))
                 if annotationFilter and not posAnnotations.intersection(testAnnotation):
@@ -232,13 +242,13 @@ class SupervisedFilterer(Filterer):
                 test = training.mergedIndexTest((tweetId, False, features, features_binary))
                 classification = self.classifier.classify(test)
                 if classification == 1 and tweetId not in qrels[int(q[0][2:])][0]:
-                    fp.append((tweetId, text.strip('\n')))
+                    fp.append((tweetId, text))
                 if classification == 0 and tweetId in qrels[int(q[0][2:])][0]:
-                    fn.append((tweetId, text.strip('\n')))
+                    fn.append((tweetId, text))
                     #print '[Debug]', tweetId, features, features_binary, 'C ' + str(classification), \
                     #    'Target '+str(tweetId in qrels[int(q[0][2:])][0])
                 if classification == 1 and tweetId in qrels[int(q[0][2:])][0]:
-                    tp.append((tweetId, text.strip('\n')))
+                    tp.append((tweetId, text))
                     #print '[Debug]', 'POSITIVE', tweetId, features, features_binary
                 #print classifier.getProb(test)
                 if classification == 1:
