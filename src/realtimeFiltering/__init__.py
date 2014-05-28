@@ -211,7 +211,7 @@ class SupervisedFilterer(Filterer):
                 # exclude retweets
                 if retweetRE.findall(text) or currTweetHash in alreadySeen:# or viaUserRE.findall(text.split('\t\t')[0]):
                     continue
-                alreadySeen.add(self.tweetHash(text))
+                alreadySeen.add(currTweetHash)
                 features = self.featureExtract(text, external)
                 features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text, external)
