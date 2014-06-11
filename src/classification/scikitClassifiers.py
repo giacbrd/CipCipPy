@@ -220,13 +220,13 @@ class NegativeRocchioClassifier(Classifier):
         neg_rows = [i for i, t in enumerate(vectorTarget) if not t]
         # get the rows with target==1 (positive samples)
         pos_vectors = vectorFeature[pos_rows, :]
-        neg_vectors = vectorFeature[neg_rows, :]
+        neg_vectors = [v.toarray() for v in vectorFeature[neg_rows, :] if v.getnnz()]
         self.pos_centroid = pos_vectors.mean(0)
         if not self.neg_centroid.any() and self.neg_centroid.shape[0] != self.pos_centroid.shape[0]:
             self.neg_centroid = np.zeros(self.pos_centroid.shape[0])
         else:
             #FIXME efficiency!
-            self.neg_centroid = np.array([v for v in neg_vectors if self.distance_func(v.toarray(), self.pos_centroid) > self.threshold]).mean(0)
+            self.neg_centroid = np.array([v for v in neg_vectors if self.distance_func(v, self.pos_centroid) > self.threshold]).mean(0)
 
     def classify(self, vectorizedTest):
         if issparse(vectorizedTest):
