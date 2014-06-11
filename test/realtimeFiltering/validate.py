@@ -22,7 +22,7 @@ from CipCipPy.realtimeFiltering import SupervisedFilterer
 from mb12filteval import *
 import EvalJig as ej
 import itertools
-from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier, DTClassifier, KNNClassifier, RFClassifier, RocchioClassifier
+from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier, DTClassifier, KNNClassifier, RFClassifier, RocchioClassifier, NegativeRocchioClassifier
 from CipCipPy.classification.feature import *
 
 queries = readQueries(sys.argv[1])
@@ -90,7 +90,8 @@ for param in list(itertools.product(*parameters)):
         classifier = RFClassifier()
     elif classifier == 'RO':
         classifier = RocchioClassifier(threshold=float(classifierParam))
-
+    elif classifier == 'NRO':
+        classifier = NegativeRocchioClassifier(threshold=float(classifierParam))
 
     f = SupervisedFilterer(classifier)
     f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],

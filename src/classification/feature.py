@@ -36,6 +36,20 @@ def getSegmenter(dictionary):
         segmenter = Segmenter(dictionary)
     return segmenter
 
+stemmer = None
+def getStemmer():
+    global stemmer
+    if not stemmer:
+        stemmer = nltk.stem.PorterStemmer()
+    return stemmer
+
+lemmatizer = None
+def getLemmatizer():
+    global lemmatizer
+    if not lemmatizer:
+        lemmatizer = nltk.stem.WordNetLemmatizer()
+    return lemmatizer
+
 def terms(text):
     """Returns the unique, filtered, terms of a text"""
     terms = []
@@ -50,11 +64,11 @@ def terms(text):
 
 def lemmas(text):
     text_terms = terms(text)
-    return [nltk.stem.WordNetLemmatizer().lemmatize(t) for t in text_terms]
+    return [getLemmatizer().lemmatize(t) for t in text_terms]
 
 def stems(text):
     text_terms = terms(text)
-    return [STEM_PREFIX + nltk.stem.porter.PorterStemmer().stem(t) for t in text_terms]
+    return [STEM_PREFIX + getStemmer().stem(t) for t in text_terms]
 
 def bigrams(text):
     """Returns term pairs of a text"""

@@ -206,6 +206,36 @@ class RocchioClassifier(Classifier):
         else:
             return 0
 
+class NegativeRocchioClassifier(Classifier):
+    """Rocchio classifier"""
+    def __init__(self, threshold = 0.5, distance_func = scipy.spatial.distance.cosine):
+        self.threshold = threshold
+        self.distance_func = distance_func
+        self.neg_centroid = np.zeros(1)
+
+    def retrain(self, vectorFeature, vectorTarget):
+        assert(vectorFeature.shape[0] == len(vectorTarget))
+        #FIXME operations on sparse matrices
+        pos_rows = [i for i, t in enumerate(vectorTarget) if t]
+        neg_rows = [i for i, t in enumerate(vectorTarget) if not t]
+        # get the rows with target==1 (positive samples)
+        pos_vectors = vectorFeature[pos_rows, :]
+        neg_vectors = vectorFeature[neg_rows, :]
+        self.pos_centroid = pos_vectors.mean(0)
+        if not self.neg_centroid.any() and self.neg_centroid.shape[0] != self.pos_centroid.shape[0]:
+            self.neg_centroid = np.zeros(self.pos_centroid.shape[0])
+        else:
+            #FIXME efficiency!
+            self.neg_centroid = np.array([v for v in neg_vectors if self.distance_func(v.toarray(), self.pos_centroid) > self.threshold]).mean(0)
+
+    def classify(self, vectorizedTest):
+        if issparse(vectorizedTest):
+            vectorizedTest = vectorizedTest.toarray()
+        #FIXME optime!
+        pos_dist = self.distance_func(vectorizedTest, self.pos_centroid)
+        neg_dist = self.distance_func(vectorizedTest, self.neg_centroid)
+        return 1 if pos_dist < neg_dist else 0
+
 class DTClassifier(Classifier):
     """Decision Tree classifier"""
     def __init__(self):

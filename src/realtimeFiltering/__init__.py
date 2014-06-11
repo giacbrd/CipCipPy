@@ -139,7 +139,7 @@ class SupervisedFilterer(Filterer):
         results = {}
         printOut = {}
         for i, q in enumerate(queries):
-            alreadySeen = set()
+            #alreadySeen = set()
             if int(q[0][2:]) not in qrels:
                 continue
             #print q
@@ -167,7 +167,7 @@ class SupervisedFilterer(Filterer):
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 text = text.strip('\n')
-                alreadySeen.add(self.tweetHash(text))
+                #alreadySeen.add(self.tweetHash(text))
                 results[q[0]].append((tweetId, '1.0\tyes'))
                 features = self.featureExtract(text, external)
                 features = self.cutOnLinkProb(features, minLinkProb)
@@ -207,11 +207,11 @@ class SupervisedFilterer(Filterer):
             for line in testFile:
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 text = text.strip('\n')
-                currTweetHash = self.tweetHash(text)
+                #currTweetHash = self.tweetHash(text)
                 # exclude retweets
-                if retweetRE.findall(text) or currTweetHash in alreadySeen:# or viaUserRE.findall(text.split('\t\t')[0]):
+                if retweetRE.findall(text):# or currTweetHash in alreadySeen or viaUserRE.findall(text.split('\t\t')[0]):
                     continue
-                alreadySeen.add(currTweetHash)
+                #alreadySeen.add(currTweetHash)
                 features = self.featureExtract(text, external)
                 features = self.cutOnLinkProb(features, minLinkProb)
                 features_binary = self.featureExtractBinary(text, external)
