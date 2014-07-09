@@ -1,22 +1,24 @@
-"""Function for creating annoated entities index"""
+"""Function for creating link titles index"""
 
 import os
 import shutil
-from ..config import MEM_SIZE, PROC_NUM
-from ..utils.fileManager import iterTweets, dateFromFileName
+
 from whoosh.fields import Schema, TEXT, ID, DATETIME
 import whoosh.index
+
+from ..config import MEM_SIZE, PROC_NUM
+from ..utils.fileManager import iterTweets
 from . import getIndexPath
 
 
 def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
-    """Indexing of the annotated entities in the tweets."""
+    """Indexing of titles of the linked pages."""
     
     dirList = os.listdir(corpusPath)
     
     schema = Schema(id = ID(stored = True, unique = True),
                     date = DATETIME,
-                    annotations = TEXT(stored = stored)
+                    title = TEXT(stored = stored)
                     )
 
     indexPath = getIndexPath(name, tweetTime)
@@ -40,7 +42,7 @@ def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
             if tweet[2] != '302': #and not 'RT @' in tweet[4]: # FIXME retweet filtering
                 writer.add_document(id = tweet[0],
                                     date = tweet[3],
-                                    annotations = tweet[4]
+                                    title = tweet[4]
                                     )
     
     writer.commit()

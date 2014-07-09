@@ -1,14 +1,18 @@
 """Methods for extracting features (list of strings) from a text string."""
 from inspect import isfunction
+import nltk, math, operator
+
 from ..utils.hashtag import Segmenter
 from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE, wordDotsRE
-import nltk, math
-from nltk.stem import WordNetLemmatizer
+from pydexter import DexterClient
+from ..config import DEXTER_URL
+
 
 ANNOTATION_PREFIX = 'NMIS__aNn__'
 URL_FEATURE = 'NMIS__UrL__'
 HASHTAG_FEATURE = 'NMIS__Hashtag__'
 MENTION_FEATURE = 'NMIS__Mention__'
+ANNOTATION_EXPANSION_PREFIX = 'NMIS__aNnEXP__'
 STEM_PREFIX = 'NMIS__Stem__'
 
 class FeatureExtractor:
@@ -29,6 +33,7 @@ filterSet = stopwords #| punctuations
 
 punctuations2 = set(('\'', '"', '`')) | punctuations
 
+#FIXME optimize singleton generators, redundant code
 segmenter = None
 def getSegmenter(dictionary):
     global segmenter
@@ -49,6 +54,37 @@ def getLemmatizer():
     if not lemmatizer:
         lemmatizer = nltk.stem.WordNetLemmatizer()
     return lemmatizer
+
+dxtr = None
+def getDexter():
+    global dxtr
+    if not dxtr:
+        dxtr = DexterClient(DEXTER_URL)
+    return dxtr
+
+def entityExpansion(text):
+    dxtr = getDexter()
+    dxtr.default_params={"lp":0.5}
+    spots = dxtr.spot(text)
+    mentions = []
+    for spot in spots:
+        for entity in spot["candidates"]:
+            ent_id = entity["entity"]
+            ent_comm = entity["commonness"]
+            dxtr.default_params={"lp":0.0}
+            curr_mentions = []
+            for mention in dxtr.get_spots(ent_id):
+                mention_name = mention["mention"]
+                curr_mentions.append((mention_name, mention["linkProbability"] * ent_comm * mention["linkFrequency"]))
+            curr_mentions = [m for m in curr_mentions if m[1] > 1.]
+            curr_mentions.sort(key=operator.itemgetter(1), reverse=True)
+            mentions.extend(curr_mentions[:3])
+    if not mentions:
+        return mentions
+    mentions.sort(key=operator.itemgetter(1), reverse=True)
+    print text, mentions[:30]
+    return [ANNOTATION_EXPANSION_PREFIX + m for m in zip(*mentions)[0]]
+
 
 def terms(text):
     """Returns the unique, filtered, terms of a text"""

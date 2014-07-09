@@ -1,6 +1,9 @@
 import sys
+
 from CipCipPy import corpus
+
 from CipCipPy.corpus.filters import LinkTitles
+
 
 newCorpus = sys.argv[1]
 oldCorpus = sys.argv[2]

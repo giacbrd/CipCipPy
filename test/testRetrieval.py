@@ -1,13 +1,16 @@
 """Retrieve results"""
 
+import sys
+import os
+
 from CipCipPy.retrieval import Searcher
 import whoosh.index
 from whoosh import scoring
-import sys
 from CipCipPy.utils.fileManager import readQueries, writeResults
 from CipCipPy.indexing import getIndexPath
+
 from CipCipPy.config import RESOURCE_PATH
-import os
+
 
 # how many tweets retrieve and filter, scores are biased on this value
 numOfResults = 10000

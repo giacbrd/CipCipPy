@@ -1,10 +1,10 @@
 """Functions for several IO uses"""
 from collections import namedtuple
-
 import datetime
-from . import replyRE, hashtagRE, months
 import gzip
 import os.path
+
+from . import replyRE, hashtagRE, months
 from ..retrieval import getStoredValue
 
 

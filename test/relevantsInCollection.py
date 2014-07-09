@@ -1,7 +1,10 @@
 __author__ = 'giacomo'
 
-import sys, os
+import sys
+import os
+
 from CipCipPy.utils.fileManager import readQueries, readQrels, iterTweets
+
 
 queries = readQueries(sys.argv[1])
 qrels = readQrels(sys.argv[2], set(q[0] for q in queries))

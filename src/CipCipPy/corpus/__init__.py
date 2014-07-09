@@ -26,14 +26,15 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
                "Andrea Esuli <andrea.esuli@isti.cnr.it>",
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
-import os, shutil
-from filters import BaseFilter
-import httplib2
-from ..utils.fileManager import tweetParser, iterTweets
+import os
 import re
 from HTMLParser import HTMLParser
 import codecs
 from multiprocessing import Pool
+
+from filters import BaseFilter
+import httplib2
+
 
 def build(filters, inPath, outPath):
     """filters is an iterator over objects for filtering, for each line they are applied in the iterator order."""

@@ -26,14 +26,15 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
 import sys
+import traceback
+
 import whoosh.index as index
 from whoosh.qparser import QueryParser
-from ..utils import hashtag, stopwords
 import numpy
-from whoosh.qparser import GtLtPlugin, BoostPlugin
+from whoosh.qparser import BoostPlugin
+
+from ..utils import hashtag, stopwords
 from ..indexing import getIndexPath
-import hashlib
-import traceback
 from ..utils.cache import *
 from ..classification import feature
 

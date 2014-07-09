@@ -130,6 +130,19 @@ class SVMClassifier(Classifier):
         self.cl = svm.SVC()
 
 
+class OneClassClassifier(Classifier):
+
+    def __init__(self, nu=0.5):
+        self.cl = svm.OneClassSVM(nu=nu)
+
+    def retrain(self, vectorFeature, vectorTarget):
+        assert(vectorFeature.shape[0] == len(vectorTarget))
+        trueRows = [i for i, t in enumerate(vectorTarget) if t]
+        # get the rows with target==1 (positive samples)
+        vectors = vectorFeature[trueRows, :]
+        self.cl.fit(vectors)
+
+
 class KNNClassifier(Classifier, ProbClassifier):
 
     def __init__(self, neighbors=2):
@@ -191,7 +204,6 @@ class RocchioClassifier(Classifier):
 
     def retrain(self, vectorFeature, vectorTarget):
         assert(vectorFeature.shape[0] == len(vectorTarget))
-        #FIXME operations on sparse matrices
         trueRows = [i for i, t in enumerate(vectorTarget) if t]
         # get the rows with target==1 (positive samples)
         vectors = vectorFeature[trueRows, :]

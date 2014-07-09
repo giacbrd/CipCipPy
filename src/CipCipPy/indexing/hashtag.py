@@ -1,22 +1,27 @@
-"""Function for creating link titles index"""
+"""Function for creating hashtags index"""
 
 import os
 import shutil
-from ..config import MEM_SIZE, PROC_NUM
-from ..utils.fileManager import iterTweets, dateFromFileName
+
 from whoosh.fields import Schema, TEXT, ID, DATETIME
 import whoosh.index
+
+from ..config import MEM_SIZE, PROC_NUM
+from ..utils.fileManager import iterTweets
+from ..utils.hashtag import Segmenter
 from . import getIndexPath
 
 
-def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
-    """Indexing of titles of the linked pages."""
+def index(corpusPath, name, dictionary, tweetTime = None, stored = False, overwrite = True):
+    """Indexing of segmented hashtags."""
     
     dirList = os.listdir(corpusPath)
+
+    segmenter = Segmenter(dictionary)
     
     schema = Schema(id = ID(stored = True, unique = True),
                     date = DATETIME,
-                    title = TEXT(stored = stored)
+                    hashtags = TEXT(stored = stored)
                     )
 
     indexPath = getIndexPath(name, tweetTime)
@@ -29,7 +34,7 @@ def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
         os.makedirs(indexPath)
     ix = whoosh.index.create_in(indexPath, schema)
     writer = ix.writer(procs = PROC_NUM, limitmb = MEM_SIZE)
-       
+        
     for fName in dirList:
         #if tweetTime and dateFromFileName(fName) > tweetTime:
         #    continue
@@ -40,7 +45,7 @@ def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
             if tweet[2] != '302': #and not 'RT @' in tweet[4]: # FIXME retweet filtering
                 writer.add_document(id = tweet[0],
                                     date = tweet[3],
-                                    title = tweet[4]
+                                    hashtags = u' '.join(u' '.join(t for t in segmenter.get(ht)[0] if len(t) > 1) for ht in tweet[5] if ht != '')
                                     )
     
     writer.commit()

@@ -10,12 +10,15 @@ arguments:
 
 #FIXME use argparse
 
-from CipCipPy.utils.fileManager import readQueries, topicsFileName
-from CipCipPy.indexing import hashtag, linkTitle, status, annotation, namedEntity
 import sys
 from Queue import Empty
-from CipCipPy.config import RESOURCE_PATH
 import os
+
+from CipCipPy.utils.fileManager import readQueries, topicsFileName
+from CipCipPy.indexing import hashtag, linkTitle, status, annotation
+
+from CipCipPy.config import RESOURCE_PATH
+
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])

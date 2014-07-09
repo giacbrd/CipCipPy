@@ -10,15 +10,15 @@ Arguments:
 
 import sys
 import os
-from CipCipPy.utils.fileManager import readQueries, topicsFileName
-from CipCipPy.retrieval import Searcher, getStoredValue
-from CipCipPy.indexing import getIndexPath, getIndex
-from whoosh import scoring, index
 import cPickle
 from operator import itemgetter
-from CipCipPy.realtimeFiltering import Filterer
+
+from CipCipPy.utils.fileManager import readQueries, topicsFileName
+from CipCipPy.retrieval import Searcher, getStoredValue
+from CipCipPy.indexing import getIndex
+from whoosh import scoring
+
 from CipCipPy.config import RESOURCE_PATH
-import codecs
 
 
 neg = int(sys.argv[1])

@@ -13,17 +13,20 @@ arguments:
     [query numbers divided by :]
 """
 
-import sys, collections, re
-from CipCipPy.classification.scikitClassifiers import ADAClassifier
+import sys
+import collections
+import re
+import itertools
+
 from CipCipPy.utils.fileManager import readQueries, readQrels
-from CipCipPy.evaluation import T11SU, F1
-from CipCipPy.classification.feature import terms
 from CipCipPy.realtimeFiltering import SupervisedFilterer
+from CipCipPy.classification.scikitClassifiers import *
+from CipCipPy.classification.feature import *
+
+from CipCipPy.evaluation import T11SU
 from mb12filteval import *
 import EvalJig as ej
-import itertools
-from CipCipPy.classification.scikitClassifiers import NCClassifier, RClassifier, LClassifier, DTClassifier, KNNClassifier, RFClassifier, RocchioClassifier, NegativeRocchioClassifier
-from CipCipPy.classification.feature import *
+
 
 queries = readQueries(sys.argv[1])
 queriesAnnotated = readQueries(sys.argv[2])
@@ -92,6 +95,8 @@ for param in list(itertools.product(*parameters)):
         classifier = RocchioClassifier(threshold=float(classifierParam))
     elif classifier == 'NRO':
         classifier = NegativeRocchioClassifier(threshold=float(classifierParam))
+    elif classifier == 'OC':
+        classifier = OneClassClassifier(nu=float(classifierParam))
 
     f = SupervisedFilterer(classifier)
     f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],

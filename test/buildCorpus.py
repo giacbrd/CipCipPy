@@ -1,6 +1,9 @@
-from CipCipPy import corpus
 import sys
-from CipCipPy.corpus.filters import EnglishLangid, HtmlUnescape
+
+from CipCipPy import corpus
+
+from CipCipPy.corpus.filters import HtmlUnescape
+
 
 inPath = sys.argv[1]
 outPath = sys.argv[2]

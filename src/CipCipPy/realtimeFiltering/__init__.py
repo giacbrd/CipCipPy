@@ -26,13 +26,13 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
                "Andrea Esuli <andrea.esuli@isti.cnr.it>",
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
+import cPickle
+import os
+import time
 
 from ..classification.feature import *
-import cPickle
 from ..classification.scikitClassifiers import TrainingSet
-import os, time
-from ..utils import viaUserRE, retweetRE, textHash
-from scipy.sparse import csr_matrix
+from ..utils import retweetRE, textHash
 
 
 class Filterer:

@@ -4,6 +4,7 @@ usage: <dumps dir> <topicsFile> <qrelsFile>"""
 import sys
 import os
 import cPickle
+
 from CipCipPy.evaluation.trecTools import printEval
 
 

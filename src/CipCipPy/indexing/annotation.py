@@ -1,26 +1,24 @@
-"""Function for creating hashtags index"""
+"""Function for creating annoated entities index"""
 
 import os
 import shutil
-from ..config import MEM_SIZE, PROC_NUM
-from ..utils.fileManager import iterTweets
-from ..utils.hashtag import Segmenter
+
 from whoosh.fields import Schema, TEXT, ID, DATETIME
 import whoosh.index
+
+from ..config import MEM_SIZE, PROC_NUM
+from ..utils.fileManager import iterTweets
 from . import getIndexPath
 
 
-
-def index(corpusPath, name, dictionary, tweetTime = None, stored = False, overwrite = True):
-    """Indexing of segmented hashtags."""
+def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
+    """Indexing of the annotated entities in the tweets."""
     
     dirList = os.listdir(corpusPath)
-
-    segmenter = Segmenter(dictionary)
     
     schema = Schema(id = ID(stored = True, unique = True),
                     date = DATETIME,
-                    hashtags = TEXT(stored = stored)
+                    annotations = TEXT(stored = stored)
                     )
 
     indexPath = getIndexPath(name, tweetTime)
@@ -33,7 +31,7 @@ def index(corpusPath, name, dictionary, tweetTime = None, stored = False, overwr
         os.makedirs(indexPath)
     ix = whoosh.index.create_in(indexPath, schema)
     writer = ix.writer(procs = PROC_NUM, limitmb = MEM_SIZE)
-        
+       
     for fName in dirList:
         #if tweetTime and dateFromFileName(fName) > tweetTime:
         #    continue
@@ -44,7 +42,7 @@ def index(corpusPath, name, dictionary, tweetTime = None, stored = False, overwr
             if tweet[2] != '302': #and not 'RT @' in tweet[4]: # FIXME retweet filtering
                 writer.add_document(id = tweet[0],
                                     date = tweet[3],
-                                    hashtags = u' '.join(u' '.join(t for t in segmenter.get(ht)[0] if len(t) > 1) for ht in tweet[5] if ht != '')
+                                    annotations = tweet[4]
                                     )
     
     writer.commit()

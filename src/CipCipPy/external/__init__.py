@@ -27,11 +27,9 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
 
 import urllib2
 import re
-import time
-import sys
 import inspect
-from ..utils.cache import *
 
+from ..utils.cache import *
 
 
 htmlClean = re.compile("<.*?>")

@@ -2,10 +2,12 @@
 
 import os
 import shutil
-from ..config import MEM_SIZE, PROC_NUM
-from ..utils.fileManager import iterTweets, dateFromFileName
+
 from whoosh.fields import Schema, TEXT, ID, DATETIME
 import whoosh.index
+
+from ..config import MEM_SIZE, PROC_NUM
+from ..utils.fileManager import iterTweets
 from . import getIndexPath
 
 

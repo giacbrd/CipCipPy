@@ -1,9 +1,10 @@
 """Filter classes to use in this package builder method."""
-
-from ..utils import language, punctuations, urlRE
 import re
 import urllib2
 import signal
+
+from ..utils import language
+from ..utils import punctuations, urlRE
 
 
 class BaseFilter:

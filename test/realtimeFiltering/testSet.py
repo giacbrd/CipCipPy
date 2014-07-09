@@ -4,10 +4,13 @@ usage: <topics file> <corpus directory> <output directory> [query numbers divide
 
 import os
 import sys
-from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
-from CipCipPy.indexing import getIndexPath, getIndex
-from CipCipPy.retrieval import getStoredValue
 import codecs
+
+from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
+from CipCipPy.retrieval import getStoredValue
+
+from CipCipPy.indexing import getIndex
+
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])

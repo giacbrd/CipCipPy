@@ -4,9 +4,12 @@ usage: <dumps dir> <out path> <run name> [printTweets]"""
 import sys
 import os
 import cPickle
+
 from CipCipPy.utils.fileManager import writeResults
 import whoosh.index
+
 from CipCipPy.indexing import getIndexPath
+
 
 inPath = sys.argv[1]
 outPath = sys.argv[2]

@@ -9,6 +9,8 @@ import os
 # DEFINE THE DATA PATH!
 DATA_PATH = '/pathTo/CipCipPy/data'
 
+# Dexter REST API server url
+DEXTER_URL = "http://ilona.isti.cnr.it:8080/dexter-webapp/dev/"
 
 CACHE_PATH = os.path.join(DATA_PATH, 'cache')
 INDEX_PATH = os.path.join(DATA_PATH, 'indexes')

@@ -1,16 +1,17 @@
 """Explore optimal parameters for retrieval"""
 
+import sys
+from itertools import product, permutations
+import os
+import collections
+
 from CipCipPy.retrieval import Searcher
 from whoosh import scoring
-import sys
-from CipCipPy.utils.fileManager import readQueries, writeResults, readQrels, topicsFileName
-from CipCipPy.indexing import getIndexPath
-from CipCipPy.evaluation import AUC, ROC
-from itertools import product, permutations
+from CipCipPy.utils.fileManager import readQueries, topicsFileName
+
 import EvalJig as ej
 from mb12eval import *
 from CipCipPy.config import RESOURCE_PATH
-import os, collections
 
 
 numOfResults = 10000 # how many tweets retrieve and filter, scores are biased on this value

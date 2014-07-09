@@ -4,7 +4,9 @@ import hashlib
 import os
 import shutil
 import cPickle
+
 from ..config import CACHE_PATH
+
 
 class CacheException(Exception):
 

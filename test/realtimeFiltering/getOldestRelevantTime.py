@@ -1,6 +1,7 @@
+import sys
 
 from CipCipPy.utils.fileManager import readQueries, readQrels
-import sys
+
 
 queries = readQueries(sys.argv[1])
 qrels = readQrels(sys.argv[2], set(q[0] for q in queries))

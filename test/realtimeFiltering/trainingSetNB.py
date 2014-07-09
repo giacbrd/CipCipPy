@@ -11,13 +11,15 @@ Arguments:
 
 import sys
 import os
-from CipCipPy.utils.fileManager import readQueries, topicsFileName
-from CipCipPy.retrieval import Searcher, getStoredValue
-from CipCipPy.indexing import getIndexPath, getIndex
-from whoosh import scoring, index
 import cPickle
 from operator import itemgetter
+
+from CipCipPy.utils.fileManager import readQueries, topicsFileName
+from CipCipPy.retrieval import Searcher, getStoredValue
+from CipCipPy.indexing import getIndex
+from whoosh import scoring
 from CipCipPy.realtimeFiltering.feature import featureExtractText, queryFeatureExtractor
+
 from CipCipPy.config import RESOURCE_PATH
 
 
