@@ -37,10 +37,12 @@ from ..utils import retweetRE, textHash
 
 class Filterer:
 
-    def setFeatureExtractor(self, statusFeatEx, genericFeatEx, binaryFeatEx):
+    def setFeatureExtractor(self, statusFeatEx, genericFeatEx, binaryFeatEx, minLinkProb, expansion_count = 0):
         self.statusFeatEx = FeatureExtractor(statusFeatEx)
         self.genericFeatEx = FeatureExtractor(genericFeatEx)
         self.binaryFeatEx = FeatureExtractor(binaryFeatEx)
+        self.expansion_count = expansion_count
+        self.minLinkProb = minLinkProb
 
     def featureExtract(self, text, external=True):
         """Extracts all the features from a sample"""
@@ -50,10 +52,12 @@ class Filterer:
             features.extend(self.statusFeatEx.get(text[0]))
         if text[1]:  # segmented hashtag
             features.extend(self.genericFeatEx.get(text[1]))
+            features.extend(entityExpansion(text[1], self.minLinkProb, self.expansion_count))
         if external and text[2]:  # link title
             features.extend(self.genericFeatEx.get(text[2]))
-        if external and text[3]:  # annotations
-            features.extend(annotations(text[3]))
+            features.extend(entityExpansion(text[2], self.minLinkProb, self.expansion_count))
+        #if external and text[3]:  # annotations
+        #    features.extend(annotations(text[3]))
         return features
 
     def featureExtractBinary(self, text, external=True):
@@ -62,16 +66,8 @@ class Filterer:
         text = text.split('\t\t')
         if text[0]:  # status
             binary_features.extend(self.binaryFeatEx.get(text[0]))
-        if external and text[3]:  # annotations
-            binary_features.extend(annotations(text[3]))
-        return binary_features
-
-    def featureExtractQueryBinary(self, text, external=True):
-        """Extracts all the binary features from the query"""
-        binary_features = []
-        text = text.split('\t\t')
-        if external and text[1]:  # annotations
-            binary_features.extend(annotations(text[1]))
+        #if external and text[3]:  # annotations
+        #    binary_features.extend(annotations(text[3]))
         return binary_features
 
     def featureExtractQuery(self, text, external=True):
@@ -80,9 +76,18 @@ class Filterer:
         text = text.split('\t\t')
         if text[0]:  # topic
             features.extend(self.genericFeatEx.get(text[0]))
-        if external and text[1]:  # annotations
-            features.extend(annotations(text[1]))
+            features.extend(entityExpansion(text[0], self.minLinkProb, self.expansion_count))
+        #if external and text[1]:  # annotations
+        #    features.extend(annotations(text[1]))
         return features
+
+    def featureExtractQueryBinary(self, text, external=True):
+        """Extracts all the binary features from the query"""
+        binary_features = []
+        text = text.split('\t\t')
+        #if external and text[1]:  # annotations
+        #    binary_features.extend(annotations(text[1]))
+        return binary_features
 
     def intersect(self, query, text):
         """How many terms query amd text have in common."""
@@ -119,7 +124,7 @@ class SupervisedFilterer(Filterer):
         return result
 
     def get(self, queries, queriesAnnotated, neg, trainingSetPath, filteringIdsPath,
-            qrels, external, minLinkProb, annotationFilter = False, bootstrap = 0, dumpsPath = None):
+            qrels, external, annotationFilter = False, bootstrap = 0, dumpsPath = None):
         """ Return filtered tweets for query topics and the relative time ranges.
         queries - queries from a topic file
         queriesAnnotated - queries from a topic file with annotated topics
@@ -138,6 +143,7 @@ class SupervisedFilterer(Filterer):
         #print self.classifier, neg, external, minLinkProb, annotationFilter, bootstrap
         results = {}
         printOut = {}
+        assert len(queries) == len(queriesAnnotated)
         for i, q in enumerate(queries):
             #alreadySeen = set()
             if int(q[0][2:]) not in qrels:
@@ -152,14 +158,15 @@ class SupervisedFilterer(Filterer):
             testFile = open(os.path.join(filteringIdsPath, q[0]))
             posAnnotations = set()
             # add the query as positive example
-            features = self.featureExtractQuery(q[1] + '\t\t' + queriesAnnotated[i][1], external)
-            features = self.cutOnLinkProb(features, minLinkProb)
+            features = self.featureExtractQuery(q[1], external)# + '\t\t' + queriesAnnotated[i][1], external)
+            #features = self.cutOnLinkProb(features, self.minLinkProb)
             features_binary = self.featureExtractQueryBinary(q[1]+'\t\t' + queriesAnnotated[i][1], external)
-            features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+            #features_binary = self.cutOnLinkProb(features_binary, self.minLinkProb)
             positives = [q[1]]
             #print '[Debug]', 'QUERY', features, features_binary
             # the set of features that any positive sample must contain
             initialFeatures = set(features + features_binary)
+            #FIXME get annotations online
             if annotationFilter:
                 posAnnotations.update(self.get_annotations(features))
             rawTweets.append((q[0], True, features, features_binary))
@@ -170,11 +177,12 @@ class SupervisedFilterer(Filterer):
                 #alreadySeen.add(self.tweetHash(text))
                 results[q[0]].append((tweetId, '1.0\tyes'))
                 features = self.featureExtract(text, external)
-                features = self.cutOnLinkProb(features, minLinkProb)
+                #features = self.cutOnLinkProb(features, self.minLinkProb)
                 features_binary = self.featureExtractBinary(text, external)
-                features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+                #features_binary = self.cutOnLinkProb(features_binary, self.minLinkProb)
                 #print '[Debug]', 'FIRST', features, features_binary
                 positives.append((tweetId, text))
+                #FIXME get annotations online
                 if annotationFilter:
                     posAnnotations.update(self.get_annotations(features))
                 rawTweets.append((tweetId, True, features, features_binary))
@@ -185,9 +193,9 @@ class SupervisedFilterer(Filterer):
                 tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
                 text = text.strip('\n')
                 features = self.featureExtract(text, external)
-                features = self.cutOnLinkProb(features, minLinkProb)
+                #features = self.cutOnLinkProb(features, self.minLinkProb)
                 features_binary = self.featureExtractBinary(text, external)
-                features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+                #features_binary = self.cutOnLinkProb(features_binary, self.minLinkProb)
                 rawTweets.append((tweetId, False, features, features_binary))
                 negCount -= 1
             # add a negative sample at the axis origin
@@ -213,12 +221,13 @@ class SupervisedFilterer(Filterer):
                     continue
                 #alreadySeen.add(currTweetHash)
                 features = self.featureExtract(text, external)
-                features = self.cutOnLinkProb(features, minLinkProb)
+                #features = self.cutOnLinkProb(features, self.minLinkProb)
                 features_binary = self.featureExtractBinary(text, external)
-                features_binary = self.cutOnLinkProb(features_binary, minLinkProb)
+                #features_binary = self.cutOnLinkProb(features_binary, self.minLinkProb)
                 if not features or not (len(initialFeatures & set(features + features_binary))) \
                         or not hasUrl(text.split('\t\t')[0]):
                     continue
+                #FIXME get annotations online
                 testAnnotation = set(self.get_annotations(features))
                 if annotationFilter and not posAnnotations.intersection(testAnnotation):
                     continue
