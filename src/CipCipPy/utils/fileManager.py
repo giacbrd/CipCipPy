@@ -14,6 +14,10 @@ Tweet = namedtuple("Tweet", "id user http date status hashtags replies")
 Query = namedtuple("Query", "number topic date tweettime newesttime")
 Qrels = namedtuple("Qrels", "rel notrel")
 
+def dataset_iter(path, start_time, end_time, reverse=False):
+    pass
+
+
 def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResults = float("inf")):
     """Write results text in TREC format
     queryIds - list of query numbers relative to results list

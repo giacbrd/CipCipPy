@@ -14,14 +14,15 @@ from CipCipPy.retrieval import getStoredValue
 from CipCipPy.indexing import getIndex
 from pydexter import DexterClient
 
-
+corpusPath = sys.argv[1]
 outPath = sys.argv[2]
+
+#FIXME avoid whoosh indexes!
 
 #_storedStatusAll = getIndex('storedStatusAll')
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')
 _storedLinkTitle = getIndex('storedLinkTitle')
-_storedAnnotation = getIndex('storedAnnotations20130805')
 #_storedNamedEntity = getIndex('storedNamedEntity')
 
 #def getFirstStatus(indexId):
@@ -61,12 +62,11 @@ def entities(text):
     return spots, mentions
 
 
-dirList = os.listdir(sys.argv[1])
+dirList = os.listdir(corpusPath)
 for fName in dirList:
     outName = os.path.join(outPath, fName)
-    tempOutName = os.path.join(outPath, "TEMP_" + fName)
-    outFile = codecs.open(tempOutName, 'w', encoding='utf8')
-    for tweet in iterTweets(os.sep.join([sys.argv[1], fName])):
+    outFile = codecs.open(outName, 'w', encoding='utf8')
+    for tweet in iterTweets(os.sep.join([corpusPath, fName])):
         timeInt = int(tweet[0])
         if tweet[2] != '302':
             time = str(timeInt)
@@ -76,5 +76,3 @@ for fName in dirList:
                 outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \
                                title + '\t\t' + json.dumps(entities(status)) + '\t\t' + json.dumps(entities(title)) + '\n')
     outFile.close()
-    os.system("tac " + tempOutName + " > " + outName)
-    os.remove(tempOutName)
