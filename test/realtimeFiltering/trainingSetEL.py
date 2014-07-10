@@ -1,6 +1,6 @@
 """Training set generation for real-time filtering.
 For each query serialize tweet ids and corpus content previous to query time. Last content is external, e.g. link titles.
-usage: <topics file> <corpus directory> <output directory> <Dexter API url> [query numbers divided by :]"""
+usage: <corpus directory> <output directory> <Dexter API url>"""
 
 import json
 import os
@@ -15,10 +15,7 @@ from CipCipPy.indexing import getIndex
 from pydexter import DexterClient
 
 
-queries = readQueries(sys.argv[1])
-nameSuffix = "." + topicsFileName(sys.argv[1])
-
-outPath = sys.argv[3]
+outPath = sys.argv[2]
 
 #_storedStatusAll = getIndex('storedStatusAll')
 _storedStatus = getIndex('storedStatus')
@@ -37,9 +34,6 @@ def getHashtag(indexId):
     return getStoredValue(_storedHashtag, indexId, 'hashtags')
 
 
-if len(sys.argv) > 5:
-    queries = [q for q in queries if q[0] in set(sys.argv[5].split(':'))]
-
 def clean(text):
     return text if text is not None else u''
 
@@ -54,7 +48,7 @@ if not os.path.exists(outPath):
         else:
             raise
 
-dxtr = DexterClient(sys.argv[4], default_params={"lp":0})
+dxtr = DexterClient(sys.argv[3], default_params={"lp":0.1})
 
 def entities(text):
     spots = dxtr.spot(text)
@@ -67,21 +61,20 @@ def entities(text):
     return spots, mentions
 
 
-for q in queries:
-    dirList = os.listdir(sys.argv[2])
-    outName = os.path.join(outPath, q[0])
-    tempOutName = os.path.join(outPath, "TEMP_" + q[0])
-    outFile = codecs.open(tempOutName, 'w', encoding='utf8')
-    for fName in dirList:
-        for tweet in iterTweets(os.sep.join([sys.argv[2], fName])):
-            timeInt = int(tweet[0])
-            if timeInt < q[3] and tweet[2] != '302':
-                time = str(timeInt)
-                status = getStatus(time)
-                title = clean(getTitle(time)).strip().replace('\t', ' ')
-                if status or title:
-                    outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \
-                                   title + '\t\t' + json.dumps(entities(status)) + '\t\t' + json.dumps(entities(title)) + '\n')
-    outFile.close()
-    os.system("tac " + tempOutName + " > " + outName)
-    os.remove(tempOutName)
+dirList = os.listdir(sys.argv[1])
+outName = os.path.join(outPath, "training")
+tempOutName = os.path.join(outPath, "TEMP")
+outFile = codecs.open(tempOutName, 'w', encoding='utf8')
+for fName in dirList:
+    for tweet in iterTweets(os.sep.join([sys.argv[1], fName])):
+        timeInt = int(tweet[0])
+        if tweet[2] != '302':
+            time = str(timeInt)
+            status = getStatus(time)
+            title = clean(getTitle(time)).strip().replace('\t', ' ')
+            if status or title:
+                outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \
+                               title + '\t\t' + json.dumps(entities(status)) + '\t\t' + json.dumps(entities(title)) + '\n')
+outFile.close()
+os.system("tac " + tempOutName + " > " + outName)
+os.remove(tempOutName)
