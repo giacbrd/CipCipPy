@@ -1,5 +1,6 @@
 """Methods for extracting features (list of strings) from a text string."""
 from inspect import isfunction
+import json
 import nltk, math, operator
 
 from ..utils.hashtag import Segmenter
@@ -62,28 +63,27 @@ def getDexter():
         dxtr = DexterClient(DEXTER_URL)
     return dxtr
 
-def entityExpansion(text, min_linkprob, count):
-    dxtr = getDexter()
-    dxtr.default_params={"lp":min_linkprob}
-    spots = dxtr.spot(text)
-    mentions = []
-    for spot in spots:
+def entityExpansion(data, min_linkprob, count):
+    data = json.loads(data)
+    spots = data[0]
+    mentions = data[1]
+    result = []
+    for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
         for entity in spot["candidates"]:
             ent_id = entity["entity"]
             ent_comm = entity["commonness"]
-            dxtr.default_params={"lp":min_linkprob}
             curr_mentions = []
-            for mention in dxtr.get_spots(ent_id):
+            for mention in (m for m in mentions[ent_id] if m["linkProbability"] >= min_linkprob):
                 mention_name = mention["mention"]
                 curr_mentions.append((mention_name, mention["linkProbability"] * ent_comm * mention["linkFrequency"]))
             curr_mentions = [m for m in curr_mentions if m[1] > 1.]
             curr_mentions.sort(key=operator.itemgetter(1), reverse=True)
-            mentions.extend(curr_mentions[:count])
-    if not mentions:
-        return mentions
-    mentions.sort(key=operator.itemgetter(1), reverse=True)
+            result.extend(curr_mentions[:count])
+    if not result:
+        return result
+    result.sort(key=operator.itemgetter(1), reverse=True)
     #print text, mentions[:30]
-    return [ANNOTATION_EXPANSION_PREFIX + m.replace(" ", "_") for m in zip(*mentions)[0]]
+    return [ANNOTATION_EXPANSION_PREFIX + m.replace(" ", "_") for m in zip(*result)[0]]
 
 
 def terms(text):

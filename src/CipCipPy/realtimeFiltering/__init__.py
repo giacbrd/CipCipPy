@@ -52,12 +52,12 @@ class Filterer:
             features.extend(self.statusFeatEx.get(text[0]))
         if text[1]:  # segmented hashtag
             features.extend(self.genericFeatEx.get(text[1]))
-            features.extend(entityExpansion(text[1], self.minLinkProb, self.expansion_count))
         if external and text[2]:  # link title
             features.extend(self.genericFeatEx.get(text[2]))
-            features.extend(entityExpansion(text[2], self.minLinkProb, self.expansion_count))
-        #if external and text[3]:  # annotations
-        #    features.extend(annotations(text[3]))
+        if external and text[3]:  # status annotaions
+            features.extend(entityExpansion(text[3], self.minLinkProb, self.expansion_count))
+        if external and text[4]:  # link title annotation
+            features.extend(entityExpansion(text[4], self.minLinkProb, self.expansion_count))
         return features
 
     def featureExtractBinary(self, text, external=True):
@@ -76,9 +76,8 @@ class Filterer:
         text = text.split('\t\t')
         if text[0]:  # topic
             features.extend(self.genericFeatEx.get(text[0]))
-            features.extend(entityExpansion(text[0], self.minLinkProb, self.expansion_count))
-        #if external and text[1]:  # annotations
-        #    features.extend(annotations(text[1]))
+        if external and text[1]:  # annotations
+            features.extend(entityExpansion(text[1], self.minLinkProb, self.expansion_count))
         return features
 
     def featureExtractQueryBinary(self, text, external=True):
