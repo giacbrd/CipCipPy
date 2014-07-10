@@ -62,10 +62,10 @@ def entities(text):
 
 
 dirList = os.listdir(sys.argv[1])
-outName = os.path.join(outPath, "training")
-tempOutName = os.path.join(outPath, "TEMP")
-outFile = codecs.open(tempOutName, 'w', encoding='utf8')
 for fName in dirList:
+    outName = os.path.join(outPath, fName)
+    tempOutName = os.path.join(outPath, "TEMP_" + fName)
+    outFile = codecs.open(tempOutName, 'w', encoding='utf8')
     for tweet in iterTweets(os.sep.join([sys.argv[1], fName])):
         timeInt = int(tweet[0])
         if tweet[2] != '302':
@@ -75,6 +75,6 @@ for fName in dirList:
             if status or title:
                 outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \
                                title + '\t\t' + json.dumps(entities(status)) + '\t\t' + json.dumps(entities(title)) + '\n')
-outFile.close()
-os.system("tac " + tempOutName + " > " + outName)
-os.remove(tempOutName)
+    outFile.close()
+    os.system("tac " + tempOutName + " > " + outName)
+    os.remove(tempOutName)
