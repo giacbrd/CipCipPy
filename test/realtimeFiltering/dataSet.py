@@ -66,6 +66,7 @@ dirList = os.listdir(corpusPath)
 for fName in dirList:
     outName = os.path.join(outPath, fName)
     outFile = codecs.open(outName, 'w', encoding='utf8')
+    outData = []
     for tweet in iterTweets(os.sep.join([corpusPath, fName])):
         timeInt = int(tweet[0])
         if tweet[2] != '302':
@@ -73,6 +74,7 @@ for fName in dirList:
             status = getStatus(time)
             title = clean(getTitle(time)).strip().replace('\t', ' ')
             if status or title:
-                outFile.write(time + '\t\t' + clean(status) + '\t\t' + clean(getHashtag(time)) + '\t\t' + \
-                               title + '\t\t' + json.dumps(entities(status)) + '\t\t' + json.dumps(entities(title)) + '\n')
+                outData.append((timeInt, clean(status), clean(getHashtag(time)), title, entities(status), entities(title)))
+    json.dump(outData, outFile)
     outFile.close()
+
