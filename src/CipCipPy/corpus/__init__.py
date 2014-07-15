@@ -112,7 +112,7 @@ def enrich(corpusPath1, corpusPath2, filters, outPath, processes = 1, overwrite 
     dirList1 = os.listdir(corpusPath1)
     dirList2 = os.listdir(corpusPath2)
     #FIXME files that are only in corpus2 are not copied
-    fileForChunk = int(len(dirList2) / processes)
+    fileForChunk = int(len(dirList2) / processes) + 1
     chunks =[dirList2[i:i+fileForChunk] for i in range(0,len(dirList2),fileForChunk)]
     for chunk in chunks:
         pool.apply_async(_enrich, [corpusPath1, corpusPath2, chunk, filters, outPath, overwrite])
