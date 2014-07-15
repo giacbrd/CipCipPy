@@ -1,6 +1,7 @@
 """Training set generation for real-time filtering.
 For each query serialize tweet ids and corpus content previous to query time. Last content is external, e.g. link titles.
 usage: <corpus directory> <output directory> <Dexter API url>"""
+import gzip
 
 import json
 import os
@@ -64,9 +65,8 @@ def entities(text):
 
 dirList = os.listdir(corpusPath)
 for fName in dirList:
-    outName = os.path.join(outPath, fName)
-    outFile = codecs.open(outName, 'w', encoding='utf8')
     outData = []
+    minTime, maxTime = float("inf"), -float("inf")
     for tweet in iterTweets(os.sep.join([corpusPath, fName])):
         timeInt = int(tweet[0])
         if tweet[2] != '302':
@@ -74,7 +74,14 @@ for fName in dirList:
             status = getStatus(time)
             title = clean(getTitle(time)).strip().replace('\t', ' ')
             if status or title:
+                if timeInt < minTime:
+                    minTime = timeInt
+                if timeInt > maxTime:
+                    maxTime = timeInt
                 outData.append((timeInt, clean(status), clean(getHashtag(time)), title, entities(status), entities(title)))
-    json.dump(outData, outFile)
-    outFile.close()
+    outName = os.path.join(outPath, str(minTime)+"-"+str(maxTime))
+    with codecs.open(outName, 'w', encoding='utf8') as outFile:
+        with gzip.GzipFile(fileobj=outFile, mode='w') as outGzip:
+            json.dump(outData, outGzip)
+
 
