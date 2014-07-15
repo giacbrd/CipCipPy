@@ -41,20 +41,28 @@ def getHashtag(indexId):
 def clean(text):
     return text if text is not None else u''
 
-def entities(text):
-    spots = dxtr.spot(text)
-    mentions = {}
-    for spot in spots:
-        for entity in spot["candidates"]:
-            ent_id = entity["entity"]
-            if ent_id not in mentions:
-                # Don not keep entity candidates of mentions
-                mentions[ent_id] = [{key: value for key, value in m.iteritems() if key != "candidates"}
-                                    for m in dxtr.get_spots(ent_id) if m["linkProbability"] > 0.1]
-    return spots, mentions
 
-
-def generate(corpusPath, dirList, outPath):
+def generate(corpusPath, dirList, outPath, dxtr):
+    _storedStatus = getIndex('storedStatus')
+    _storedHashtag = getIndex('storedHashtag')
+    _storedLinkTitle = getIndex('storedLinkTitle')
+    def getStatus(indexId):
+        return getStoredValue(_storedStatus, indexId, 'status')
+    def getTitle(indexId):
+        return getStoredValue(_storedLinkTitle, indexId, 'title')
+    def getHashtag(indexId):
+        return getStoredValue(_storedHashtag, indexId, 'hashtags')
+    def entities(text):
+        spots = dxtr.spot(text)
+        mentions = {}
+        for spot in spots:
+            for entity in spot["candidates"]:
+                ent_id = entity["entity"]
+                if ent_id not in mentions:
+                    # Don not keep entity candidates of mentions
+                    mentions[ent_id] = [{key: value for key, value in m.iteritems() if key != "candidates"}
+                                        for m in dxtr.get_spots(ent_id) if m["linkProbability"] > 0.1]
+        return spots, mentions
     for fName in dirList:
         outData = ''
         minTime, maxTime = float("inf"), -float("inf")
@@ -90,6 +98,6 @@ pool = Pool(processes)
 filePerChunk = int(len(dirList) / processes) + 1
 chunks =[dirList[i:i+filePerChunk] for i in range(0,len(dirList),filePerChunk)]
 for chunk in chunks:
-    pool.apply_async(generate, [corpusPath, chunk, outPath])
+    pool.apply_async(generate, [corpusPath, chunk, outPath, dxtr])
 pool.close()
 pool.join()
