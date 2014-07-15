@@ -65,7 +65,7 @@ def entities(text):
 
 dirList = os.listdir(corpusPath)
 for fName in dirList:
-    outData = []
+    outData = ''
     minTime, maxTime = float("inf"), -float("inf")
     for tweet in iterTweets(os.sep.join([corpusPath, fName])):
         timeInt = int(tweet[0])
@@ -78,10 +78,10 @@ for fName in dirList:
                     minTime = timeInt
                 if timeInt > maxTime:
                     maxTime = timeInt
-                outData.append((timeInt, clean(status), clean(getHashtag(time)), title, entities(status), entities(title)))
+                outData += json.dumps((timeInt, clean(status), clean(getHashtag(time)),
+                                       title, entities(status), entities(title))) + '\n'
     outName = os.path.join(outPath, str(minTime)+"-"+str(maxTime))
-    with codecs.open(outName, 'w', encoding='utf8') as outFile:
-        with gzip.GzipFile(fileobj=outFile, mode='w') as outGzip:
-            json.dump(outData, outGzip)
+    with gzip.open(filename=outName, mode='w') as outGzip:
+        outGzip.write(outData)
 
 
