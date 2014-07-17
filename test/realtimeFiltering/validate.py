@@ -3,8 +3,7 @@ arguments:
     validation topics file
     validation annotated topics
     relevance judgements
-    path of ids and content per query (test set) for realtime filtering
-    training set dir
+    dataset path
     "external" for using external information, otherwise internal"
     parameters: classifier (R, NC), classifier parameter, number of negative samples,
         minimum link probability, annotation pre-filtering, feature extraction function names (divided by .) for twitter status,
@@ -29,16 +28,16 @@ import EvalJig as ej
 
 
 queries = readQueries(sys.argv[1])
-queriesAnnotated = readQueries(sys.argv[2])
-assert len(queries) == len(queriesAnnotated)
+with open(sys.argv[2]) as ann_qfile
+    queriesAnnotated = json.load(ann_qfile)
+#assert len(queries) == len(queriesAnnotated)
 
 qrels2 = readQrels(sys.argv[3], set(q[0] for q in queries))
-filteringIdsPath = sys.argv[4]
-trainingSetPath = sys.argv[5]
+dataset_path = sys.argv[4]
 external = False
-if sys.argv[6] == 'external':
+if sys.argv[5] == 'external':
     external = True
-parameters = tuple(tuple(c.split(':')) for c in sys.argv[7].split('-'))
+parameters = tuple(tuple(c.split(':')) for c in sys.argv[6].split('-'))
 
 
 jig = FilterJig()
@@ -105,7 +104,7 @@ for param in list(itertools.product(*parameters)):
                           float(minLinkProb),
                           expansion_count=int(expansion_count))
 
-    results, printOut = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
+    results, printOut = f.get(queries, queriesAnnotated, int(neg), dataset_path,
                 qrels2, external, annotationFilter=True if annotationRule == 'True' else False)
 
     ##########################################################

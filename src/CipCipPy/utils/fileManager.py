@@ -1,8 +1,6 @@
 """Functions for several IO uses"""
 from collections import namedtuple
-import datetime
-import gzip
-import os.path
+import datetime, gzip, json, os
 
 from . import replyRE, hashtagRE, months
 from ..retrieval import getStoredValue
@@ -15,7 +13,21 @@ Query = namedtuple("Query", "number topic date tweettime newesttime")
 Qrels = namedtuple("Qrels", "rel notrel")
 
 def dataset_iter(path, start_time, end_time, reverse=False):
-    pass
+    dir_list = os.listdir(path)
+    if reverse:
+        dir_list.reverse()
+    for fname in dir_list:
+        curr_start, curr_end = [int(t) for t in fname.split("-")]
+        if curr_start <= start_time <= curr_end or curr_start <= end_time <= curr_end:
+            with gzip.open(filename=os.path.join(path, fname), mode='r') as gzip_file:
+                lines = gzip_file
+                if reverse:
+                    lines = gzip_file.readlines()
+                    lines.reverse()
+                for line in lines:
+                    tweet = json.loads(line.strip())
+                    if start_time <= tweet[0] <= end_time:
+                        yield tweet
 
 
 def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResults = float("inf")):

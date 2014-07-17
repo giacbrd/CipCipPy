@@ -1,5 +1,4 @@
-"""Training set generation for real-time filtering.
-For each query serialize tweet ids and corpus content previous to query time. Last content is external, e.g. link titles.
+"""Data set generation for real-time filtering.
 usage: <corpus directory> <output directory> <Dexter API url> <number of processes>"""
 import gzip
 
@@ -12,6 +11,7 @@ from multiprocessing import Pool
 
 from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
 from CipCipPy.retrieval import getStoredValue
+from CipCipPy.utils.entityLink import entities
 
 from CipCipPy.indexing import getIndex
 from pydexter import DexterClient
@@ -23,14 +23,9 @@ processes = int(sys.argv[4])
 
 #FIXME avoid whoosh indexes!
 
-#_storedStatusAll = getIndex('storedStatusAll')
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')
 _storedLinkTitle = getIndex('storedLinkTitle')
-#_storedNamedEntity = getIndex('storedNamedEntity')
-
-#def getFirstStatus(indexId):
-#    return getStoredValue(_storedStatusAll, indexId, 'status')
 def getStatus(indexId):
     return getStoredValue(_storedStatus, indexId, 'status')
 def getTitle(indexId):
@@ -41,28 +36,7 @@ def getHashtag(indexId):
 def clean(text):
     return text if text is not None else u''
 
-
 def generate(corpusPath, dirList, outPath, dxtr):
-    _storedStatus = getIndex('storedStatus')
-    _storedHashtag = getIndex('storedHashtag')
-    _storedLinkTitle = getIndex('storedLinkTitle')
-    def getStatus(indexId):
-        return getStoredValue(_storedStatus, indexId, 'status')
-    def getTitle(indexId):
-        return getStoredValue(_storedLinkTitle, indexId, 'title')
-    def getHashtag(indexId):
-        return getStoredValue(_storedHashtag, indexId, 'hashtags')
-    def entities(text):
-        spots = dxtr.spot(text)
-        mentions = {}
-        for spot in spots:
-            for entity in spot["candidates"]:
-                ent_id = entity["entity"]
-                if ent_id not in mentions:
-                    # Don not keep entity candidates of mentions
-                    mentions[ent_id] = [{key: value for key, value in m.iteritems() if key != "candidates"}
-                                        for m in dxtr.get_spots(ent_id) if m["linkProbability"] > 0.1]
-        return spots, mentions
     for fName in dirList:
         outData = ''
         minTime, maxTime = float("inf"), -float("inf")
@@ -78,7 +52,7 @@ def generate(corpusPath, dirList, outPath, dxtr):
                     if timeInt > maxTime:
                         maxTime = timeInt
                     outData += json.dumps((timeInt, clean(status), clean(getHashtag(time)),
-                                           title, entities(status), entities(title))) + '\n'
+                                           title, entities(status, dxtr, 0.1), entities(title, dxtr, 0.1))) + '\n'
         outName = os.path.join(outPath, str(minTime)+"-"+str(maxTime))
         with gzip.open(filename=outName, mode='w') as outGzip:
             outGzip.write(outData)

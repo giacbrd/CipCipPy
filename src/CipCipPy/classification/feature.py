@@ -64,7 +64,6 @@ def getDexter():
     return dxtr
 
 def entityExpansion(data, min_linkprob, count):
-    data = json.loads(data)
     spots = data[0]
     mentions = data[1]
     result = []

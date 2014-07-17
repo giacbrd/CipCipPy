@@ -23,21 +23,21 @@ class TrainingSet():
         self.tweetId = []
         self.tweetTarget = []
         self.features = []
-        self.featuresBinary = []
+        #self.featuresBinary = []
         self.tweetsToPop = tweetsToPop
-        for triple in rawTweets:
-            self.tweetId.append(triple[0])
-            self.tweetTarget.append(1 if triple[1] else 0)
-            self.features.append(' '.join(triple[2]))
-            self.featuresBinary.append(' '.join(triple[3]))
+        for tweet in rawTweets:
+            self.tweetId.append(tweet[0])
+            self.tweetTarget.append(1 if tweet[1] else 0)
+            self.features.append(' '.join(tweet[2]))
+            #self.featuresBinary.append(' '.join(triple[3]))
         self.tfidfMatrix = None
-        self.binaryMatrix = None
-        self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
+        #self.binaryMatrix = None
+        #self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
         # self.count_vect = CountVectorizer(lowercase=False)
         # self.idf_transf = TfidfTransformer()
         self.tfidf_vect = TfidfVectorizer(lowercase=False, min_df=1, binary=False)
         self.mergedMatrix = None
-        self.has_binary = True
+        #self.has_binary = True
 
 
     def countVectorizeTfIdf(self):
@@ -45,9 +45,9 @@ class TrainingSet():
         self.tfidfMatrix = self.tfidf_vect.fit_transform(self.features)
 
 
-    def countVectorizeBinary(self):
-        """Compute vectors of binary features"""
-        self.binaryMatrix = self.binary_count_vect.fit_transform(self.featuresBinary)
+    # def countVectorizeBinary(self):
+    #     """Compute vectors of binary features"""
+    #     self.binaryMatrix = self.binary_count_vect.fit_transform(self.featuresBinary)
 
 
     def vectorizeTestTfIdf(self, testTweet):
@@ -55,31 +55,34 @@ class TrainingSet():
         return self.tfidf_vect.transform([' '.join(testTweet[2])])
 
 
-    def vectorizeTestBinary(self, testTweet):
-        """Vectorize a tweet with binary features"""
-        return self.binary_count_vect.transform([' '.join(testTweet[3])])
+    # def vectorizeTestBinary(self, testTweet):
+    #     """Vectorize a tweet with binary features"""
+    #     return self.binary_count_vect.transform([' '.join(testTweet[3])])
 
 
     def mergedIndex(self):
         """Creates and merge the idf matrix and the binary matrix """
-        self.countVectorizeTfIdf()
-        if not [item for sublist in self.featuresBinary for item in sublist]:
-            self.has_binary = False
-            self.mergedMatrix = self.tfidfMatrix
-        else:
-            self.countVectorizeBinary()
-            self.mergedMatrix = np.concatenate((self.tfidfMatrix.todense(), self.binaryMatrix.todense()), axis=1)
+        # self.countVectorizeTfIdf()
+        # if not [item for sublist in self.featuresBinary for item in sublist]:
+        #     self.has_binary = False
+        #     self.mergedMatrix = self.tfidfMatrix
+        # else:
+        #     self.countVectorizeBinary()
+        #     self.mergedMatrix = np.concatenate((self.tfidfMatrix.todense(), self.binaryMatrix.todense()), axis=1)
             # self.tfidfMatrix = np.csc_matrix(self.tfidfMatrix)
+        self.countVectorizeTfIdf()
+        self.mergedMatrix = self.tfidfMatrix
 
 
     def mergedIndexTest(self, testTweet):
         """Creates and merge the idf vector and the binary vector """
-        idfTestVector = self.vectorizeTestTfIdf(testTweet)
-        if not self.has_binary:
-            return idfTestVector
-        else:
-            binaryTestVector = self.vectorizeTestBinary(testTweet)
-            return np.concatenate((idfTestVector.todense(), binaryTestVector.todense()), axis=1)
+        # idfTestVector = self.vectorizeTestTfIdf(testTweet)
+        # if not self.has_binary:
+        #     return idfTestVector
+        # else:
+        #     binaryTestVector = self.vectorizeTestBinary(testTweet)
+        #     return np.concatenate((idfTestVector.todense(), binaryTestVector.todense()), axis=1)
+        return self.vectorizeTestTfIdf(testTweet)
 
 
     def addExample(self, rawTweet):
@@ -87,8 +90,8 @@ class TrainingSet():
         self.tweetId.append(rawTweet[0])
         self.tweetTarget.append(1 if rawTweet[1] else 0)
         self.features.append(' '.join(rawTweet[2]))
-        if self.has_binary:
-            self.featuresBinary.append(' '.join(rawTweet[3]))
+        # if self.has_binary:
+        #     self.featuresBinary.append(' '.join(rawTweet[3]))
 
     def popOldExample(self):
         """Pop out the first example inserted"""
