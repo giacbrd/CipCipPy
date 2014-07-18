@@ -60,7 +60,7 @@ def entityExpansion(data, min_linkprob, count):
     result = []
     for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
         for entity in spot["candidates"]:
-            ent_id = entity["entity"]
+            ent_id = str(entity["entity"])
             ent_comm = entity["commonness"]
             curr_mentions = []
             for mention in (m for m in mentions[ent_id] if m["linkProbability"] >= min_linkprob):

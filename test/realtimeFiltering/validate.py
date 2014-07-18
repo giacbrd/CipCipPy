@@ -28,7 +28,7 @@ import EvalJig as ej
 
 
 queries = readQueries(sys.argv[1])
-with open(sys.argv[2]) as ann_qfile
+with open(sys.argv[2]) as ann_qfile:
     queriesAnnotated = json.load(ann_qfile)
 #assert len(queries) == len(queriesAnnotated)
 

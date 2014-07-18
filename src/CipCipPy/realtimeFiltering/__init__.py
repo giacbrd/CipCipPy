@@ -32,7 +32,8 @@ import time
 
 from ..classification.feature import *
 from ..classification.scikitClassifiers import TrainingSet
-from ..utils import retweetRE, textHash, dataset_iter
+from ..utils import retweetRE, textHash
+from ..utils.fileManager import dataset_iter
 
 
 class Filterer:
@@ -47,7 +48,6 @@ class Filterer:
     def featureExtract(self, tweet, external=True):
         """Extracts all the features from a sample"""
         features = []
-        tweet = tweet.split('\t\t')
         if tweet[1]:  # status
             features.extend(self.statusFeatEx.get(tweet[1]))
         if tweet[2]:  # segmented hashtag
@@ -143,7 +143,6 @@ class SupervisedFilterer(Filterer):
         #print self.classifier, neg, external, minLinkProb, annotationFilter, bootstrap
         results = {}
         printOut = {}
-        assert len(queries) == len(queriesAnnotated)
         for i, q in enumerate(queries):
             #alreadySeen = set()
             if int(q[0][2:]) not in qrels:
@@ -227,7 +226,8 @@ class SupervisedFilterer(Filterer):
                 #features_binary = self.cutOnLinkProb(features_binary, self.minLinkProb)
                 if not features or not (len(initialFeatures & set(features))) or not hasUrl(tweet[1]): # + features_binary))) \
                     continue
-                testAnnotation = set(self.get_annotations(tweet[4:]))
+                #FIXME define testAnnotation!
+                #testAnnotation = set(self.get_annotations(tweet[4:]))
                 if annotationFilter and not posAnnotations.intersection(testAnnotation):
                     continue
                 if bootstrapCount > 0:
