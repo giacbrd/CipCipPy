@@ -5,8 +5,6 @@ import nltk, math, operator
 
 from ..utils.hashtag import Segmenter
 from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE, wordDotsRE
-from pydexter import DexterClient
-from ..config import DEXTER_URL
 
 
 ANNOTATION_PREFIX = 'NMIS__aNn__'
@@ -55,13 +53,6 @@ def getLemmatizer():
     if not lemmatizer:
         lemmatizer = nltk.stem.WordNetLemmatizer()
     return lemmatizer
-
-dxtr = None
-def getDexter():
-    global dxtr
-    if not dxtr:
-        dxtr = DexterClient(DEXTER_URL)
-    return dxtr
 
 def entityExpansion(data, min_linkprob, count):
     spots = data[0]
