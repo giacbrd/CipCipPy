@@ -186,7 +186,7 @@ class SupervisedFilterer(Filterer):
                     posAnnotations.update(self.get_annotations(tweet[4:]))
                 rawTweets.append((tweet[0], True, features))#, features_binary))
                 break
-            for tweet in dataset_iter(datasetPath, q.tweettime-1, -float("inf"), reverse=True):
+            for tweet in dataset_iter(datasetPath, -float("inf"), q.tweettime-1, reverse=True):
                 if negCount < 1:
                     break
                 #tweetId, null, text = unicode(line, encoding='utf8').partition('\t\t')
