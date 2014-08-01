@@ -9,13 +9,10 @@ arguments:
         minimum link probability, annotation pre-filtering, feature extraction function names (divided by .) for twitter status,
         for generic feature extraction, for binary features.
         e.g. R-0.1:0.2-10:100-....-terms.bigrams-terms-hasUrl.hasMention
-    [query numbers divided by :]
+    path for output file
 """
 
-import sys
-import collections
-import re
-import itertools
+import sys, collections, re, itertools, os
 
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.realtimeFiltering import SupervisedFilterer
@@ -39,6 +36,8 @@ if sys.argv[5] == 'external':
     external = True
 parameters = tuple(tuple(c.split(':')) for c in sys.argv[6].split('-'))
 
+out_path = sys.argv[7]
+sys.stdout = open(os.path.join(out_path, sys.argv[6]+".out"), 'w')
 
 jig = FilterJig()
 jig.add_op(ej.NumRetr())

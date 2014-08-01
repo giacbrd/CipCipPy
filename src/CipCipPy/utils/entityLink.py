@@ -10,6 +10,7 @@ def entities(text, dxtr, link_prob):
             ent_id = entity["entity"]
             if ent_id not in mentions:
                 # Don not keep entity candidates of mentions
-                mentions[ent_id] = [{key: value for key, value in m.iteritems() if key != "candidates"}
-                                    for m in dxtr.get_spots(ent_id) if m["linkProbability"] > link_prob]
+                # mentions[ent_id] = [{key: value for key, value in m.iteritems() if key != "candidates"}
+                #                     for m in dxtr.get_spots(ent_id) if m["linkProbability"] > link_prob]
+                mentions[ent_id] = [m for m in dxtr.get_spots(ent_id) if m["linkProbability"] > link_prob]
     return spots, mentions

@@ -54,26 +54,60 @@ def getLemmatizer():
         lemmatizer = nltk.stem.WordNetLemmatizer()
     return lemmatizer
 
-def entityExpansion(data, min_linkprob, count):
+def entityExpansion(data, min_linkprob, min_score):
     spots = data[0]
     mentions = data[1]
     result = []
+    # Add the spots in the text to the final result
+    partial_result = []
+    # Explore other mentions
     for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
+        base_linkprob = spot["linkProbability"]
+        partial_result.append(spot["mention"])
         for entity in spot["candidates"]:
             ent_id = str(entity["entity"])
             ent_comm = entity["commonness"]
             curr_mentions = []
-            for mention in (m for m in mentions[ent_id] if m["linkProbability"] >= min_linkprob):
-                mention_name = mention["mention"]
-                curr_mentions.append((mention_name, mention["linkProbability"] * ent_comm * mention["linkFrequency"]))
-            curr_mentions = [m for m in curr_mentions if m[1] > 1.]
-            curr_mentions.sort(key=operator.itemgetter(1), reverse=True)
-            result.extend(curr_mentions[:count])
+            for mention in (m for m in mentions[ent_id] if m["linkProbability"] >= min_linkprob
+                            and m["linkFrequency"] > 2 and m["mention"] != spot["mention"]):
+                ment_ent_comm = 0
+                for ment_ent in mention["candidates"]:
+                    if ment_ent["entity"] == ent_id:
+                        ment_ent_comm = ment_ent["commonness"]
+                curr_mentions.append((mention["mention"], mention["linkProbability"] * ment_ent_comm
+                                      * ent_comm * base_linkprob))
     if not result:
         return result
-    result.sort(key=operator.itemgetter(1), reverse=True)
+    result = [r for r in result if r[1] >= min_score]
+    result = zip(*result)[0]
     #print text, mentions[:30]
-    return [ANNOTATION_EXPANSION_PREFIX + m.replace(" ", "_") for m in zip(*result)[0]]
+    # Add mentions composed of more thano one term
+    ngrams_feat = [r for r in result if " " in r]
+    result_string = " ".join(result)
+    term_feat = terms(result_string)
+    stem_feat = stems(result_string)
+    return ngrams_feat + term_feat + stem_feat + partial_result
+
+# def entityExpansion(data, min_linkprob, count):
+#     spots = data[0]
+#     mentions = data[1]
+#     result = []
+#     for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
+#         for entity in spot["candidates"]:
+#             ent_id = str(entity["entity"])
+#             ent_comm = entity["commonness"]
+#             curr_mentions = []
+#             for mention in (m for m in mentions[ent_id] if m["linkProbability"] >= min_linkprob):
+#                 mention_name = mention["mention"]
+#                 curr_mentions.append((mention_name, mention["linkProbability"] * ent_comm * mention["linkFrequency"]))
+#             curr_mentions = [m for m in curr_mentions if m[1] > 1.]
+#             curr_mentions.sort(key=operator.itemgetter(1), reverse=True)
+#             result.extend(curr_mentions[:count])
+#     if not result:
+#         return result
+#     result.sort(key=operator.itemgetter(1), reverse=True)
+#     #print text, mentions[:30]
+#     return [ANNOTATION_EXPANSION_PREFIX + m.replace(" ", "_") for m in zip(*result)[0]]
 
 
 def terms(text):
