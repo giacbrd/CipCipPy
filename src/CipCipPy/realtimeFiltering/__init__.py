@@ -38,11 +38,11 @@ from ..utils.fileManager import dataset_iter
 
 class Filterer:
 
-    def setFeatureExtractor(self, statusFeatEx, genericFeatEx, binaryFeatEx, minLinkProb, expansion_count = 0):
+    def setFeatureExtractor(self, statusFeatEx, genericFeatEx, binaryFeatEx, minLinkProb, expansion_limit = 0):
         self.statusFeatEx = FeatureExtractor(statusFeatEx)
         self.genericFeatEx = FeatureExtractor(genericFeatEx)
         self.binaryFeatEx = FeatureExtractor(binaryFeatEx)
-        self.expansion_count = expansion_count
+        self.expansion_limit = expansion_limit
         self.minLinkProb = minLinkProb
 
     def featureExtract(self, tweet, external=True):
@@ -55,9 +55,9 @@ class Filterer:
         if external and tweet[3]:  # link title
             features.extend(self.genericFeatEx.get(tweet[3]))
         if external and tweet[4]:  # status annotaions
-            features.extend(entityExpansion(tweet[4], self.minLinkProb, self.expansion_count))
+            features.extend(entityExpansion(tweet[4], self.minLinkProb, self.expansion_limit))
         if external and tweet[5]:  # link title annotation
-            features.extend(entityExpansion(tweet[5], self.minLinkProb, self.expansion_count))
+            features.extend(entityExpansion(tweet[5], self.minLinkProb, self.expansion_limit))
         return features
 
     # def featureExtractBinary(self, text, external=True):
@@ -76,7 +76,7 @@ class Filterer:
         if text:  # topic
             features.extend(self.genericFeatEx.get(text))
         if external and annotations:  # annotations
-            features.extend(entityExpansion(annotations, self.minLinkProb, self.expansion_count))
+            features.extend(entityExpansion(annotations, self.minLinkProb, self.expansion_limit))
         return features
 
     # def featureExtractQueryBinary(self, text, external=True):
@@ -176,6 +176,7 @@ class SupervisedFilterer(Filterer):
                 #text = text.strip('\n')
                 #alreadySeen.add(self.tweetHash(text))
                 results[q[0]].append((str(tweet[0]), '1.0\tyes'))
+                assert(tweet[0]==q.tweettime)
                 features = self.featureExtract(tweet, external)
                 #features = self.cutOnLinkProb(features, self.minLinkProb)
                 #features_binary = self.featureExtractBinary(text, external)

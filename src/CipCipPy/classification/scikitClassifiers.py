@@ -28,14 +28,14 @@ class TrainingSet():
         for tweet in rawTweets:
             self.tweetId.append(tweet[0])
             self.tweetTarget.append(1 if tweet[1] else 0)
-            self.features.append(' '.join(tweet[2]))
+            self.features.append(tweet[2])
             #self.featuresBinary.append(' '.join(triple[3]))
         self.tfidfMatrix = None
         #self.binaryMatrix = None
         #self.binary_count_vect = CountVectorizer(lowercase=False, binary=True, min_df=1)
         # self.count_vect = CountVectorizer(lowercase=False)
         # self.idf_transf = TfidfTransformer()
-        self.tfidf_vect = TfidfVectorizer(lowercase=False, min_df=1, binary=False)
+        self.tfidf_vect = TfidfVectorizer(lowercase=False, min_df=1, binary=False, analyzer=lambda x: x)
         self.mergedMatrix = None
         #self.has_binary = True
 
@@ -43,6 +43,8 @@ class TrainingSet():
     def countVectorizeTfIdf(self):
         """Compute vectors of features presence (binary count), and inverse document frequency"""
         self.tfidfMatrix = self.tfidf_vect.fit_transform(self.features)
+        print self.tfidf_vect.get_feature_names()
+
 
 
     # def countVectorizeBinary(self):
@@ -52,7 +54,7 @@ class TrainingSet():
 
     def vectorizeTestTfIdf(self, testTweet):
         """Vectorize a tweet with idf"""
-        return self.tfidf_vect.transform([' '.join(testTweet[2])])
+        return self.tfidf_vect.transform([testTweet[2]])
 
 
     # def vectorizeTestBinary(self, testTweet):
@@ -89,7 +91,7 @@ class TrainingSet():
         """Add a new example for retraining"""
         self.tweetId.append(rawTweet[0])
         self.tweetTarget.append(1 if rawTweet[1] else 0)
-        self.features.append(' '.join(rawTweet[2]))
+        self.features.append(rawTweet[2])
         # if self.has_binary:
         #     self.featuresBinary.append(' '.join(rawTweet[3]))
 

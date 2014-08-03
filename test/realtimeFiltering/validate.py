@@ -74,7 +74,7 @@ for param in list(itertools.product(*parameters)):
 
     #######  EDIT  ###########################################
 
-    classifier, classifierParam, neg, minLinkProb, expansion_count, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
+    classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
     if classifier == 'NC':
         classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
     elif classifier == 'R':
@@ -101,7 +101,7 @@ for param in list(itertools.product(*parameters)):
                           [eval(feat) for feat in genericFeatures.split('.')],
                           [eval(feat) for feat in binaryFeatures.split('.')],
                           float(minLinkProb),
-                          expansion_count=int(expansion_count))
+                          expansion_limit=float(expansion_limit))
 
     results, printOut = f.get(queries, queriesAnnotated, int(neg), dataset_path,
                 qrels2, external, annotationFilter=True if annotationRule == 'True' else False)

@@ -55,6 +55,8 @@ def getLemmatizer():
     return lemmatizer
 
 def entityExpansion(data, min_linkprob, min_score):
+    if min_linkprob > 1. or min_score > 1.:
+        return []
     spots = data[0]
     mentions = data[1]
     result = []
@@ -63,30 +65,32 @@ def entityExpansion(data, min_linkprob, min_score):
     # Explore other mentions
     for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
         base_linkprob = spot["linkProbability"]
-        partial_result.append(spot["mention"])
+        partial_result.append(spot["mention"].replace(" ", "_"))
         for entity in spot["candidates"]:
-            ent_id = str(entity["entity"])
+            ent_id = entity["entity"]
             ent_comm = entity["commonness"]
             curr_mentions = []
-            for mention in (m for m in mentions[ent_id] if m["linkProbability"] >= min_linkprob
+            for mention in (m for m in mentions[str(ent_id)] if m["linkProbability"] >= min_linkprob
                             and m["linkFrequency"] > 2 and m["mention"] != spot["mention"]):
                 ment_ent_comm = 0
                 for ment_ent in mention["candidates"]:
                     if ment_ent["entity"] == ent_id:
                         ment_ent_comm = ment_ent["commonness"]
+                        break
                 curr_mentions.append((mention["mention"], mention["linkProbability"] * ment_ent_comm
                                       * ent_comm * base_linkprob))
+            result.extend(curr_mentions)
+    result = [r for r in result if r[1] >= min_score]
     if not result:
         return result
-    result = [r for r in result if r[1] >= min_score]
     result = zip(*result)[0]
     #print text, mentions[:30]
     # Add mentions composed of more thano one term
-    ngrams_feat = [r for r in result if " " in r]
+    ngrams_feat = [r.replace(" ", "_") for r in result if " " in r]
     result_string = " ".join(result)
     term_feat = terms(result_string)
     stem_feat = stems(result_string)
-    return ngrams_feat + term_feat + stem_feat + partial_result
+    return list(set(ngrams_feat + term_feat + stem_feat + partial_result))
 
 # def entityExpansion(data, min_linkprob, count):
 #     spots = data[0]
@@ -132,14 +136,16 @@ def stems(text):
 
 def bigrams(text):
     """Returns term pairs of a text"""
-    bigrams = []
+    bigrams_list = []
     text = hashReplRE.sub(";", text)
     text = urlRE.sub(";", text)
+    text = wordDotsRE.sub(".", text)
     for sent in nltk.sent_tokenize(text):
         for subSent in sent.split(';'):
-            bigrams.extend(nltk.bigrams(nltk.word_tokenize(subSent)))
-    bigrams = [' '.join(b) for b in bigrams if u'\ufffd' not in b]
-    return [b.lower().replace(' ', '_') for b in bigrams if not len(set(b) & punctuations2)]
+            bigrams_list.extend(nltk.bigrams(nltk.word_tokenize(subSent)))
+    # Differently from terms, we accept stopwords in bigrams
+    return ['_'.join(b).lower() for b in bigrams_list if u'\ufffd' not in b #and len(b[0]) > 1 and len(b[1]) > 1
+                    and not set(b[0]).issubset(punctuations2) and not set(b[1]).issubset(punctuations2)]
 
 def hashtags(text):
     """Returns hashtags of a text"""
