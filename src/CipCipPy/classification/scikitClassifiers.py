@@ -43,9 +43,6 @@ class TrainingSet():
     def countVectorizeTfIdf(self):
         """Compute vectors of features presence (binary count), and inverse document frequency"""
         self.tfidfMatrix = self.tfidf_vect.fit_transform(self.features)
-        print self.tfidf_vect.get_feature_names()
-
-
 
     # def countVectorizeBinary(self):
     #     """Compute vectors of binary features"""
