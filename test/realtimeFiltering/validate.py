@@ -34,10 +34,11 @@ dataset_path = sys.argv[4]
 external = False
 if sys.argv[5] == 'external':
     external = True
-parameters = tuple(tuple(c.split(':')) for c in sys.argv[6].split('-'))
 
-out_path = sys.argv[7]
-sys.stdout = open(os.path.join(out_path, sys.argv[6]+".out"), 'w')
+out_path = sys.argv[6]
+sys.stdout = open(os.path.join(out_path, sys.argv[7]+".out"), 'w')
+
+parameters = tuple(tuple(c.split(':')) for c in sys.argv[7].split('-'))
 
 jig = FilterJig()
 jig.add_op(ej.NumRetr())
@@ -130,7 +131,7 @@ for param in list(itertools.product(*parameters)):
         else:
             jig.compute(topic, [], qrels[topic])
 
-    print printOut
+    #print printOut
 
     print param
     jig.print_scores()
