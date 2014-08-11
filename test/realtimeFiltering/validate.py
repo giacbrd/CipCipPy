@@ -75,6 +75,9 @@ for param in list(itertools.product(*parameters)):
 
     #######  EDIT  ###########################################
 
+    print param
+    sys.stdout.flush()
+
     classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
     if classifier == 'NC':
         classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
@@ -133,7 +136,6 @@ for param in list(itertools.product(*parameters)):
 
     #print printOut
 
-    print param
     jig.print_scores()
     jig.comp_means()
     jig.print_means()
