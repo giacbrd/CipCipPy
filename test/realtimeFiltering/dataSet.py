@@ -18,7 +18,7 @@ from pydexter import DexterClient
 
 corpusPath = sys.argv[1]
 outPath = sys.argv[2]
-dxtr = DexterClient(sys.argv[3], default_params={"lp":0.1})
+dxtr = DexterClient(sys.argv[3], default_params={"lp":0.2})
 processes = int(sys.argv[4])
 
 #FIXME avoid whoosh indexes!
@@ -52,7 +52,7 @@ def generate(corpusPath, dirList, outPath, dxtr):
                     if timeInt > maxTime:
                         maxTime = timeInt
                     outData += json.dumps((timeInt, clean(status), clean(getHashtag(time)),
-                                           title, entities(status, dxtr, 0.1), entities(title, dxtr, 0.1))) + '\n'
+                                           title, entities(status, dxtr, 0.2), entities(title, dxtr, 0.2))) + '\n'
         outName = os.path.join(outPath, str(minTime)+"-"+str(maxTime))
         with gzip.open(filename=outName, mode='w') as outGzip:
             outGzip.write(outData)
