@@ -68,9 +68,12 @@ def entityExpansion(data, min_linkprob, min_score):
         partial_result.append(spot["mention"].replace(" ", "_"))
         for entity in spot["candidates"]:
             ent_id = entity["entity"]
+            ent_id_str = str(ent_id)
+            if ent_id_str not in mentions:
+                continue
             ent_comm = entity["commonness"]
             curr_mentions = []
-            for mention in (m for m in mentions[str(ent_id)] if m["linkProbability"] >= min_linkprob
+            for mention in (m for m in mentions[ent_id_str] if m["linkProbability"] >= min_linkprob
                             and m["linkFrequency"] > 2 and m["mention"] != spot["mention"]):
                 ment_ent_comm = 0
                 for ment_ent in mention["candidates"]:
