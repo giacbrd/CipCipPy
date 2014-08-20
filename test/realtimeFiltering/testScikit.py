@@ -15,12 +15,13 @@ arguments:
     [query numbers divided by :]
 """
 
-import os, sys, errno, json
+
+import sys, errno, json, os
 
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.realtimeFiltering import SupervisedFilterer
-from CipCipPy.classification.scikitClassifiers import ADAClassifier, NCClassifier, RClassifier, LClassifier, \
-    DTClassifier, KNNClassifier, RFClassifier, RocchioClassifier
+from CipCipPy.classification.scikitClassifiers import *
+from CipCipPy.classification.feature import *
 
 
 #FIXME use argparse
