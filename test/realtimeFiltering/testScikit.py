@@ -1,7 +1,6 @@
 """
 Test filtering.
 arguments:
-    number of negative samples
     topics file
     annotated topics file
     relevance judgements
@@ -16,9 +15,7 @@ arguments:
     [query numbers divided by :]
 """
 
-import os
-import sys
-import errno
+import os, sys, errno, json
 
 from CipCipPy.utils.fileManager import readQueries, readQrels
 from CipCipPy.realtimeFiltering import SupervisedFilterer
@@ -29,24 +26,25 @@ from CipCipPy.classification.scikitClassifiers import ADAClassifier, NCClassifie
 #FIXME use argparse
 
 queries = readQueries(sys.argv[1])
-queriesAnnotated = readQueries(sys.argv[2])
-if len(sys.argv) > 9:
-    queries = [q for q in queries if q[0] in set(sys.argv[9].split(':'))]
-    queriesAnnotated = [q for q in queriesAnnotated if q[0] in set(sys.argv[9].split(':'))]
-assert len(queries) == len(queriesAnnotated)
+
+with open(sys.argv[2]) as ann_qfile:
+    queriesAnnotated = json.load(ann_qfile)
+
+if len(sys.argv) > 8:
+    queries = [q for q in queries if q[0] in set(sys.argv[8].split(':'))]
 
 qrels = readQrels(sys.argv[3], set(q[0] for q in queries))
-filteringIdsPath = sys.argv[4]
-trainingSetPath = sys.argv[5]
-resultsPath = sys.argv[6]
+dataset_path = sys.argv[4]
+resultsPath = sys.argv[5]
 
 external = False
-if sys.argv[7] == 'external':
+if sys.argv[6] == 'external':
     external = True
 
-param = sys.argv[8].split('-')
+param = sys.argv[7].split('-')
 
-classifier, classifierParam, neg, minLinkProb, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
+classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
+
 if classifier == 'NC':
     classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
 elif classifier == 'R':
@@ -65,9 +63,12 @@ elif classifier == 'RO':
     classifier = RocchioClassifier(threshold=float(classifierParam))
 
 f = SupervisedFilterer(classifier)
+
 f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],
                       [eval(feat) for feat in genericFeatures.split('.')],
-                      [eval(feat) for feat in binaryFeatures.split('.')])
+                      [eval(feat) for feat in binaryFeatures.split('.')],
+                      float(minLinkProb),
+                      expansion_limit=float(expansion_limit))
 
 runName = 'run' + '-'.join(param) + ('_external' if external else '_internal')
 
@@ -82,11 +83,10 @@ if not os.path.exists(dumpsPath):
         else:
             raise
 
-results, printOut = f.get(queries, queriesAnnotated, int(neg), trainingSetPath, filteringIdsPath,
-                qrels, external, float(minLinkProb), annotationFilter = True if annotationRule=='True' else False,
-                dumpsPath=dumpsPath)
+results, printOut = f.get(queries, queriesAnnotated, int(neg), dataset_path,
+            qrels, external, annotationFilter=True if annotationRule == 'True' else False, dumpsPath=dumpsPath)
 
-print printOut
+#print printOut
 #printEval(sys.argv[1], sys.argv[3], results)
 
 
