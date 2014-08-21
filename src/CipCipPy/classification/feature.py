@@ -55,7 +55,7 @@ def getLemmatizer():
     return lemmatizer
 
 def entityExpansion(data, min_linkprob, min_score):
-    if min_linkprob > 1. or min_score > 1.:
+    if min_linkprob > 1. or min_score > 1. or not data:
         return []
     spots = data[0]
     mentions = data[1]

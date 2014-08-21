@@ -160,13 +160,13 @@ class SupervisedFilterer(Filterer):
             # add the query as positive example
             query_annotations = queriesAnnotated[q[0]]
             features = self.featureExtractQuery(q[1], query_annotations, external)
+            initialFeatures = set(self.featureExtractQuery(q[1], [], external))
             #features = self.cutOnLinkProb(features, self.minLinkProb)
             #features_binary = self.featureExtractQueryBinary(q[1]+'\t\t' + queriesAnnotated[i][1], external)
             #features_binary = self.cutOnLinkProb(features_binary, self.minLinkProb)
             ###positives = [q[1]]
             #print '[Debug]', 'QUERY', features, features_binary
             # the set of features that any positive sample must contain
-            initialFeatures = set(features)# + features_binary)
             if annotationFilter:
                 posAnnotations.update(self.get_annotations(query_annotations))
             rawTweets.append((q[0], True, features))#, features_binary))
