@@ -11,6 +11,7 @@ ANNOTATION_PREFIX = 'NMIS__aNn__'
 URL_FEATURE = 'NMIS__UrL__'
 HASHTAG_FEATURE = 'NMIS__Hashtag__'
 MENTION_FEATURE = 'NMIS__Mention__'
+ENTITY_FEATURE = 'NMIS__Entity__'
 ANNOTATION_EXPANSION_PREFIX = 'NMIS__aNnEXP__'
 STEM_PREFIX = 'NMIS__Stem__'
 
@@ -20,11 +21,14 @@ class FeatureExtractor:
     def __init__(self, functions):
         self.functions = functions
 
-    def get(self, text):
+    def get(self, data):
         result = []
         for f in self.functions:
             if isfunction(f):
-                result.extend(f(text))
+                if isinstance(data, basestring):
+                    result.extend(f(data))
+                else:
+                    result.extend(f(*data))
         return result
 
 
@@ -85,7 +89,7 @@ def entityExpansion(data, min_linkprob, min_score):
             result.extend(curr_mentions)
     result = [r for r in result if r[1] >= min_score]
     if not result:
-        return result
+        return partial_result
     result = zip(*result)[0]
     #print text, mentions[:30]
     # Add mentions composed of more thano one term
@@ -116,6 +120,29 @@ def entityExpansion(data, min_linkprob, min_score):
 #     #print text, mentions[:30]
 #     return [ANNOTATION_EXPANSION_PREFIX + m.replace(" ", "_") for m in zip(*result)[0]]
 
+def mentionsInText(data, min_linkprob, min_score):
+    if min_linkprob > 1. or not data:
+        return []
+    spots = data[0]
+    result = []
+    # Explore mentions
+    for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
+        result.append(MENTION_FEATURE + spot["mention"].replace(" ", "_"))
+    return result
+
+def candidateEntities(data, min_linkprob, min_score):
+    if min_linkprob > 1. or min_score > 1. or not data:
+        return []
+    spots = data[0]
+    mentions = data[1]
+    result = []
+    # Explore mentions
+    for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
+        base_linkprob = spot["linkProbability"]
+        for entity in spot["candidates"]:
+            if (entity["commonness"] * base_linkprob) >= min_score:
+                result.append(ENTITY_FEATURE + str(entity["entity"]))
+    return result
 
 def terms(text):
     """Returns the unique, filtered, terms of a text"""

@@ -78,7 +78,8 @@ for param in list(itertools.product(*parameters)):
     print param
     sys.stdout.flush()
 
-    classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
+    classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, \
+        genericFeatures, entityFeatures, binaryFeatures = param
     if classifier == 'NC':
         classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
     elif classifier == 'R':
@@ -104,6 +105,7 @@ for param in list(itertools.product(*parameters)):
     f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],
                           [eval(feat) for feat in genericFeatures.split('.')],
                           [eval(feat) for feat in binaryFeatures.split('.')],
+                          [eval(feat) for feat in entityFeatures.split('.')],
                           float(minLinkProb),
                           expansion_limit=float(expansion_limit))
 

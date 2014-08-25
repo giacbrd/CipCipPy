@@ -38,9 +38,10 @@ from ..utils.fileManager import dataset_iter
 
 class Filterer:
 
-    def setFeatureExtractor(self, statusFeatEx, genericFeatEx, binaryFeatEx, minLinkProb, expansion_limit = 0):
+    def setFeatureExtractor(self, statusFeatEx, genericFeatEx, binaryFeatEx, entityFeatEx, minLinkProb, expansion_limit = 0):
         self.statusFeatEx = FeatureExtractor(statusFeatEx)
         self.genericFeatEx = FeatureExtractor(genericFeatEx)
+        self.entityFeatEx = FeatureExtractor(entityFeatEx)
         self.binaryFeatEx = FeatureExtractor(binaryFeatEx)
         self.expansion_limit = expansion_limit
         self.minLinkProb = minLinkProb
@@ -55,9 +56,9 @@ class Filterer:
         if external and tweet[3]:  # link title
             features.extend(self.genericFeatEx.get(tweet[3]))
         if external and tweet[4]:  # status annotaions
-            features.extend(entityExpansion(tweet[4], self.minLinkProb, self.expansion_limit))
+            features.extend(self.entityFeatEx.get((tweet[4], self.minLinkProb, self.expansion_limit)))
         if external and tweet[5]:  # link title annotation
-            features.extend(entityExpansion(tweet[5], self.minLinkProb, self.expansion_limit))
+            features.extend(self.entityFeatEx.get((tweet[5], self.minLinkProb, self.expansion_limit)))
         return features
 
     # def featureExtractBinary(self, text, external=True):
@@ -76,7 +77,7 @@ class Filterer:
         if text:  # topic
             features.extend(self.genericFeatEx.get(text))
         if external and annotations:  # annotations
-            features.extend(entityExpansion(annotations, self.minLinkProb, self.expansion_limit))
+            features.extend(self.entityFeatEx.get((annotations, self.minLinkProb, self.expansion_limit)))
         return features
 
     # def featureExtractQueryBinary(self, text, external=True):
