@@ -44,7 +44,8 @@ if sys.argv[6] == 'external':
 
 param = sys.argv[7].split('-')
 
-classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, genericFeatures, binaryFeatures = param
+classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, genericFeatures, \
+    entityFeatures, binaryFeatures = param
 
 if classifier == 'NC':
     classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
@@ -68,6 +69,7 @@ f = SupervisedFilterer(classifier)
 f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],
                       [eval(feat) for feat in genericFeatures.split('.')],
                       [eval(feat) for feat in binaryFeatures.split('.')],
+                      [eval(feat) for feat in entityFeatures.split('.')],
                       float(minLinkProb),
                       expansion_limit=float(expansion_limit))
 
