@@ -12,6 +12,7 @@ URL_FEATURE = 'NMIS__UrL__'
 HASHTAG_FEATURE = 'NMIS__Hashtag__'
 MENTION_FEATURE = 'NMIS__Mention__'
 ENTITY_FEATURE = 'NMIS__Entity__'
+ALIAS_FEATURE = 'NMIS__Alias__'
 ANNOTATION_EXPANSION_PREFIX = 'NMIS__aNnEXP__'
 STEM_PREFIX = 'NMIS__Stem__'
 
@@ -65,11 +66,11 @@ def entityExpansion(data, min_linkprob, min_score):
     mentions = data[1]
     result = []
     # Add the spots in the text to the final result
-    partial_result = []
+    partial_result = set()
     # Explore other mentions
     for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
         base_linkprob = spot["linkProbability"]
-        partial_result.append(spot["mention"].replace(" ", "_"))
+        partial_result.add(spot["mention"].replace(" ", "_"))
         for entity in spot["candidates"]:
             ent_id = entity["entity"]
             ent_id_str = str(ent_id)
@@ -89,15 +90,16 @@ def entityExpansion(data, min_linkprob, min_score):
             result.extend(curr_mentions)
     result = [r for r in result if r[1] >= min_score]
     if not result:
-        return partial_result
+        return [ALIAS_FEATURE + feat for feat in partial_result]
     result = zip(*result)[0]
     #print text, mentions[:30]
     # Add mentions composed of more thano one term
-    ngrams_feat = [r.replace(" ", "_") for r in result if " " in r]
-    result_string = " ".join(result)
-    term_feat = terms(result_string)
-    stem_feat = stems(result_string)
-    return list(set(ngrams_feat + term_feat + stem_feat + partial_result))
+    #ngrams_feat = [r.replace(" ", "_") for r in result if " " in r]
+    #result_string = " ".join(result)
+    #term_feat = terms(result_string)
+    #stem_feat = stems(result_string)
+    result = set(r.replace(" ", "_") for r in result if " " in r)
+    return [ALIAS_FEATURE + feat for feat in result.union(partial_result)]
 
 # def entityExpansion(data, min_linkprob, count):
 #     spots = data[0]
