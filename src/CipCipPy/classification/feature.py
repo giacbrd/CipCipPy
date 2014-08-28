@@ -49,7 +49,7 @@ stemmer = None
 def getStemmer():
     global stemmer
     if not stemmer:
-        stemmer = nltk.stem.PorterStemmer()
+        stemmer = nltk.stem.LancasterStemmer()
     return stemmer
 
 lemmatizer = None

@@ -81,7 +81,7 @@ if not os.path.exists(dumpsPath):
         os.makedirs(dumpsPath)
     except OSError as e:
         if e.errno == errno.EEXIST:
-            print 'Error: ', e
+            print 'Warning: ', e
             print 'continuing...'
         else:
             raise
