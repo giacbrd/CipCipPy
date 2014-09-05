@@ -98,7 +98,7 @@ def entityExpansion(data, min_linkprob, min_score):
     #result_string = " ".join(result)
     #term_feat = terms(result_string)
     #stem_feat = stems(result_string)
-    result = set(r.replace(" ", "_") for r in result if " " in r)
+    result = set(r.replace(" ", "_") for r in result)
     return [ALIAS_FEATURE + feat for feat in result.union(partial_result)]
 
 # def entityExpansion(data, min_linkprob, count):
