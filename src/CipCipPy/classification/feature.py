@@ -129,6 +129,8 @@ def firstEntity(data, min_linkprob, min_score):
     result = []
     # Explore mentions
     for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
+        if not spot["candidates"]:
+            continue
         candidate = max((entity["commonness"], entity["entity"]) for entity in spot["candidates"])[1]
         result.append(ENTITY_FEATURE + str(candidate))
     return result
