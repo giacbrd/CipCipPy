@@ -219,6 +219,7 @@ class SupervisedFilterer(Filterer):
                 #currTweetHash = self.tweetHash(text)
                 # exclude retweets
                 tweetId = str(tweet[0])
+                #TODO move this in dataset generation
                 if retweetRE.findall(tweet[1]):# or currTweetHash in alreadySeen or viaUserRE.findall(text.split('\t\t')[0]):
                     continue
                 #alreadySeen.add(currTweetHash)

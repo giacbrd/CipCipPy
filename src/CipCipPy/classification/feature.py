@@ -59,7 +59,7 @@ def getLemmatizer():
         lemmatizer = nltk.stem.WordNetLemmatizer()
     return lemmatizer
 
-def entityExpansion(data, min_linkprob, min_score):
+def surfaceForms(data, min_linkprob, min_score):
     if min_linkprob > 1. or min_score > 1. or not data:
         return []
     spots = data[0]
@@ -121,6 +121,17 @@ def entityExpansion(data, min_linkprob, min_score):
 #     result.sort(key=operator.itemgetter(1), reverse=True)
 #     #print text, mentions[:30]
 #     return [ANNOTATION_EXPANSION_PREFIX + m.replace(" ", "_") for m in zip(*result)[0]]
+
+def firstEntity(data, min_linkprob, min_score):
+    if min_linkprob > 1. or not data:
+        return []
+    spots = data[0]
+    result = []
+    # Explore mentions
+    for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
+        candidate = max((entity["commonness"], entity["entity"]) for entity in spot["candidates"])[1]
+        result.append(ENTITY_FEATURE + str(candidate))
+    return result
 
 def mentionsInText(data, min_linkprob, min_score):
     if min_linkprob > 1. or not data:

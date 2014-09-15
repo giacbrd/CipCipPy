@@ -16,14 +16,14 @@ pos_tweets = set()
 for i, q in enumerate(queries):
     if int(q[0][2:]) not in qrels:
         continue
-    pos_tweets += qrels[int(q[0][2:])][0]
+    pos_tweets.update(qrels[int(q[0][2:])][0])
 
 
 total = 0
 with_urls = 0
 
 for tweet in dataset_iter(datasetPath, -float("inf"), float("inf")):
-    if int(tweet[0]) in pos_tweets:
+    if str(tweet[0]) in pos_tweets:
         if hasUrl(tweet[1]):
             with_urls += 1
         total += 1
