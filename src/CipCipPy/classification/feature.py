@@ -159,6 +159,9 @@ def candidateEntities(data, min_linkprob, min_score):
                 result.append(ENTITY_FEATURE + str(entity["entity"]))
     return result
 
+def allEntityFeatures(data, min_linkprob, min_score):
+    return candidateEntities(data, min_linkprob, min_score) + surfaceForms(data, min_linkprob, min_score)
+
 def terms(text):
     """Returns the unique, filtered, terms of a text"""
     terms = []

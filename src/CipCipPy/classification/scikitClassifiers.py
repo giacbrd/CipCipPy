@@ -205,6 +205,7 @@ class RocchioClassifier(Classifier):
         self.distance_func = distance_func
 
     def retrain(self, vectorFeature, vectorTarget):
+        #FIXME optimize! (e.g. don't compute centrois if trueRows are the same) need to optimize also the training set computations
         assert(vectorFeature.shape[0] == len(vectorTarget))
         trueRows = [i for i, t in enumerate(vectorTarget) if t]
         # get the rows with target==1 (positive samples)
