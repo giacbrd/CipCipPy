@@ -19,7 +19,7 @@ arguments:
 import sys, errno, json, os
 
 from CipCipPy.utils.fileManager import readQueries, readQrels
-from CipCipPy.realtimeFiltering import SupervisedFilterer
+from CipCipPy.filtering import SupervisedFilterer
 from CipCipPy.classification.scikitClassifiers import *
 from CipCipPy.classification.feature import *
 

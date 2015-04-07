@@ -18,7 +18,7 @@ from CipCipPy.utils.fileManager import readQueries, topicsFileName
 from CipCipPy.retrieval import Searcher, getStoredValue
 from CipCipPy.indexing import getIndex
 from whoosh import scoring
-from CipCipPy.realtimeFiltering.feature import featureExtractText, queryFeatureExtractor
+from CipCipPy.filtering.feature import featureExtractText, queryFeatureExtractor
 
 from CipCipPy.config import RESOURCE_PATH
 

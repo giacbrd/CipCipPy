@@ -1,5 +1,5 @@
 #    CipCipPy - Twitter IR system for the TREC Microblog track.
-#    Copyright (C) <2011-2013>  Giacomo Berardi, Andrea Esuli, Diego Marcheggiani
+#    Copyright (C) <2011-2015>  Giacomo Berardi, Andrea Esuli, Diego Marcheggiani
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -22,20 +22,19 @@ Indexing package.
 
 #FIXME clean all the duplicate code in the index functions
 
-__version__ = "0.1"
+__version__ = "0.2"
 __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>", 
                "Andrea Esuli <andrea.esuli@isti.cnr.it>", 
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
 import os
-
 import whoosh.index
 
 from ..config import INDEX_PATH
 
 
 def getIndexPath(name, tweetTime = None):
-    return os.path.join(INDEX_PATH, name, str(tweetTime) if tweetTime else '')#date.strftime('%Y%m%d%H%M%S') if date else '')
+    return os.path.join(INDEX_PATH, name, str(tweetTime) if tweetTime else '')
 
 def getIndex(indexName):
     """Returns a whoosh index"""

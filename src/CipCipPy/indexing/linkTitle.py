@@ -11,7 +11,7 @@ from ..utils.fileManager import iterTweets
 from . import getIndexPath
 
 
-def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
+def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True, procs = PROC_NUM, limitmb = MEM_SIZE):
     """Indexing of titles of the linked pages."""
     
     dirList = os.listdir(corpusPath)

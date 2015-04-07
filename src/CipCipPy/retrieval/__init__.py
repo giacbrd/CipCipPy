@@ -1,5 +1,5 @@
 #    CipCipPy - Twitter IR system for the TREC Microblog track.
-#    Copyright (C) <2011-2013>  Giacomo Berardi, Andrea Esuli, Diego Marcheggiani
+#    Copyright (C) <2011-2015>  Giacomo Berardi, Andrea Esuli, Diego Marcheggiani
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -20,17 +20,14 @@ CipCipPy
 Retrieval package.
 """
 
-__version__ = "0.1"
+__version__ = "0.2"
 __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
                "Andrea Esuli <andrea.esuli@isti.cnr.it>",
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
-import sys
-import traceback
-
+import sys, traceback, numpy
 import whoosh.index as index
 from whoosh.qparser import QueryParser
-import numpy
 from whoosh.qparser import BoostPlugin
 
 from ..utils import hashtag, stopwords

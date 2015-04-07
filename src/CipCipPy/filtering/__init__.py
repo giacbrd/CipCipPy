@@ -203,8 +203,8 @@ class SupervisedFilterer(Filterer):
             #rawTweets.append((0, False, [], []))
             training = TrainingSet(rawTweets, 0)
             if rawTweets:
-                training.mergedIndex()
-                self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
+                training.vectorize()
+                self.classifier.retrain(training.matrix, training.tweetTarget)
             #for e, v in enumerate(training.tfidfMatrix[:2]):
             #    fe = training.features[e].split(' ')
             #    col = v.nonzero()[1]
@@ -245,12 +245,12 @@ class SupervisedFilterer(Filterer):
                             training.addExample((tweet[0], False, features))#, features_binary))
                     bootstrapCount -= 1
                     if bootstrapCount == 0:
-                        training.mergedIndex()
-                        self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
+                        training.vectorize()
+                        self.classifier.retrain(training.matrix, training.tweetTarget)
                         bootstrapCount = -1
                     continue
                 #nb.test(tweetId, features)
-                test = training.mergedIndexTest((tweet[0], False, features))#, features_binary))
+                test = training.vectorizeTest((tweet[0], False, features))#, features_binary))
                 classification = self.classifier.classify(test)
                 ###if classification == 1 and tweetId not in qrels[int(q[0][2:])][0]:
                     ###fp.append(tweet)
@@ -270,13 +270,13 @@ class SupervisedFilterer(Filterer):
                         if annotationFilter:
                             posAnnotations.update(self.get_annotations(tweet[4:]))
                         # TODO pop a old positive sample? only if rules are not used?
-                        training.mergedIndex()
-                        self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
+                        training.vectorize()
+                        self.classifier.retrain(training.matrix, training.tweetTarget)
                     #elif tweetId in qrels[int(q[0][2:])][1]:
                     else:
                         training.addExample((tweet[0], False, features))#, features_binary))
-                        training.mergedIndex()
-                        self.classifier.retrain(training.mergedMatrix, training.tweetTarget)
+                        training.vectorize()
+                        self.classifier.retrain(training.matrix, training.tweetTarget)
             #print '[Debug] Query processed in ', time.time() - start_time, 'seconds.'
             ###printOut[q[0]] = (positives, tp, fp, fn)
             if dumpsPath:

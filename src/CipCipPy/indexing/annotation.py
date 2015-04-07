@@ -1,7 +1,6 @@
-"""Function for creating annoated entities index"""
+"""Function for creating annotated entities index"""
 
-import os
-import shutil
+import os, shutil
 
 from whoosh.fields import Schema, TEXT, ID, DATETIME
 import whoosh.index
@@ -11,7 +10,7 @@ from ..utils.fileManager import iterTweets
 from . import getIndexPath
 
 
-def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):
+def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True, procs = PROC_NUM, limitmb = MEM_SIZE):
     """Indexing of the annotated entities in the tweets."""
     
     dirList = os.listdir(corpusPath)

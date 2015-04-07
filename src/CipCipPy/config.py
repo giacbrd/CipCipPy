@@ -13,6 +13,5 @@ CACHE_PATH = os.path.join(DATA_PATH, 'cache')
 INDEX_PATH = os.path.join(DATA_PATH, 'indexes')
 RESOURCE_PATH = os.path.join(DATA_PATH, 'resources')
 
-#TODO these constants should be parameters
-PROC_NUM = 1  # number of processors for indexing computing
-MEM_SIZE = 1024  # memory size for each processor in indexing computing, in MB
+PROC_NUM = 1  # default number of processors for indexing computing
+MEM_SIZE = 1024  # default memory size for each processor in index computing, in MB

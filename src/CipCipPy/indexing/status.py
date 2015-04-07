@@ -11,7 +11,7 @@ from ..utils.fileManager import iterTweets
 from . import getIndexPath
 
 
-def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True):#, featureExtractor):
+def index(corpusPath, name, tweetTime = None, stored = False, overwrite = True, procs = PROC_NUM, limitmb = MEM_SIZE):#, featureExtractor):
     """Indexing of the status of tweets."""
     
     dirList = os.listdir(corpusPath)

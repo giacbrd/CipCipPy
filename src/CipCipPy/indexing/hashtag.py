@@ -12,7 +12,7 @@ from ..utils.hashtag import Segmenter
 from . import getIndexPath
 
 
-def index(corpusPath, name, dictionary, tweetTime = None, stored = False, overwrite = True):
+def index(corpusPath, name, dictionary, tweetTime = None, stored = False, overwrite = True, procs = PROC_NUM, limitmb = MEM_SIZE):
     """Indexing of segmented hashtags."""
     
     dirList = os.listdir(corpusPath)

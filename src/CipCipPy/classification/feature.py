@@ -1,7 +1,7 @@
 """Methods for extracting features (list of strings) from a text string."""
+
 from inspect import isfunction
-import json
-import nltk, math, operator
+import nltk, math
 
 from ..utils.hashtag import Segmenter
 from ..utils import hashReplRE, urlRE, stopwords, punctuations, hashtagRE, replyRE, wordDotsRE
@@ -31,7 +31,6 @@ class FeatureExtractor:
                 else:
                     result.extend(f(*data))
         return result
-
 
 filterSet = stopwords #| punctuations
 
@@ -92,35 +91,8 @@ def surfaceForms(data, min_linkprob, min_score):
     if not result:
         return [ALIAS_FEATURE + feat for feat in partial_result]
     result = zip(*result)[0]
-    #print text, mentions[:30]
-    # Add mentions composed of more thano one term
-    #ngrams_feat = [r.replace(" ", "_") for r in result if " " in r]
-    #result_string = " ".join(result)
-    #term_feat = terms(result_string)
-    #stem_feat = stems(result_string)
     result = set(r.replace(" ", "_") for r in result)
     return [ALIAS_FEATURE + feat for feat in result.union(partial_result)]
-
-# def entityExpansion(data, min_linkprob, count):
-#     spots = data[0]
-#     mentions = data[1]
-#     result = []
-#     for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
-#         for entity in spot["candidates"]:
-#             ent_id = str(entity["entity"])
-#             ent_comm = entity["commonness"]
-#             curr_mentions = []
-#             for mention in (m for m in mentions[ent_id] if m["linkProbability"] >= min_linkprob):
-#                 mention_name = mention["mention"]
-#                 curr_mentions.append((mention_name, mention["linkProbability"] * ent_comm * mention["linkFrequency"]))
-#             curr_mentions = [m for m in curr_mentions if m[1] > 1.]
-#             curr_mentions.sort(key=operator.itemgetter(1), reverse=True)
-#             result.extend(curr_mentions[:count])
-#     if not result:
-#         return result
-#     result.sort(key=operator.itemgetter(1), reverse=True)
-#     #print text, mentions[:30]
-#     return [ANNOTATION_EXPANSION_PREFIX + m.replace(" ", "_") for m in zip(*result)[0]]
 
 def firstEntity(data, min_linkprob, min_score):
     if min_linkprob > 1. or not data:

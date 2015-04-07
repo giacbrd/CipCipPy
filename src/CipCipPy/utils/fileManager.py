@@ -1,12 +1,9 @@
-"""Functions for several IO uses"""
+"""Functions for I/O"""
+
 from collections import namedtuple
 import datetime, gzip, json, os
-
 from . import replyRE, hashtagRE, months
 from ..retrieval import getStoredValue
-
-
-
 
 Tweet = namedtuple("Tweet", "id user http date status hashtags replies")
 Query = namedtuple("Query", "number topic date tweettime newesttime")
@@ -36,9 +33,6 @@ def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResul
     """Write results text in TREC format
     queryIds - list of query numbers relative to results list
     indexForPrint - index object to retrieve tweets to print in the results, if false no tweets are printed"""
-#    for r in results:
- #       if len(r) < 30:
-  #          return
     f = open(os.path.join(resultsPath, runName), 'w')
     searcher = None
     try:
@@ -46,13 +40,10 @@ def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResul
             searcher = indexForPrint.searcher()
         for q, r in results.iteritems():
             if r:
-                #r = r.items()
-                #r.sort(key = operator.itemgetter(1), reverse = True)
                 num = min(numOfResults, len(r))
                 for n in xrange(num):
                     tweet = '\n'
                     if indexForPrint:
-                        #print r[n][0], searcher.document(id = unicode(r[n][0]))
                         tweet = '\t' + getStoredValue(searcher, r[n][0], 'status') + '\n'
                     f.write((q + '\t' + r[n][0] + '\t' + str(r[n][1]) + '\t' + runName + tweet).encode('ascii', 'replace'))
     finally:
@@ -60,7 +51,7 @@ def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResul
             searcher.close()
 
 def readQueries(filePath):
-    """Returns tuples of query string and date from a topics file:
+    """Returns tuples of query string and dated from a topics file:
     (number, query topic, query date, query date as tweet id [, query date as tweet id of the most recent tweet])"""
     queries = []
     f = open(filePath)

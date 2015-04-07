@@ -63,7 +63,6 @@ class Lang:
         currLang = None
         for lang in self.languages.iterkeys():
             guessed = self.calcDistance(text, lang)
-            #print lang, '\t', guessed
             if guessed < currMin:
                 currMin = guessed
                 currLang = lang

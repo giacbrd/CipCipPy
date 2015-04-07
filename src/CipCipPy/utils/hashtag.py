@@ -15,7 +15,6 @@ class Segmenter:
     def __init__(self, dictionary):
         """dictionary is a map of terms and frequency values (a dict file, serialized with pickle).
         It can be generated from a generic text, and it is used for segmentation."""
-        #dictionary=open(os.path.join(RESOURCE_PATH, '1gramsGoogle'),'r')
         self.dictionary = pickle.load(open(dictionary))
         self.maxWordLength = max(map(len, self.dictionary))
         self.total = float(sum(self.dictionary.values()))
