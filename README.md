@@ -12,30 +12,31 @@ For license information see LICENSE
 
 Installation
 ------------
-In *config.py* set the constant DATA_PATH to the directory where CipCipPy will store data (indexes, cache, ...).
-Install the package executing: python setup.py install.
-Some language training files are included in data/resources/languageTraining.
-For hashtag segmentation it is necessary to build a dictionary {term: frequency}, we have used Google 1-grams http://storage.googleapis.com/books/ngrams/books/datasetsv2.html.
+In *config.py* set the constant `DATA_PATH` with the directory where CipCipPy will store data (indexes, cache, ...).
+
+Install the package executing: `python setup.py install`.
+
+Some hints:<br/>
+Language training files included in data/resources/languageTraining are made for CipCipPy.utils.language.Lang class.<br/>
+For hashtag segmentation it is necessary to build a dictionary {term: frequency}; 
+e.g., we have used Google 1-grams http://storage.googleapis.com/books/ngrams/books/datasetsv2.html.
 
 Dependencies
 ------------
-* numpy
 * whoosh
 * sklearn
 * nltk
 * langid (for language detection)
-* httplib2 (only for corpus downloading)
-* TREC tools for evaluation (only in test scripts): mb12eval, mb12filteval, EvalJig
+* TREC tools for evaluation: mb12-filteval.py and EvalJig.py 
+(download them from http://trec.nist.gov/data/microblog2012.html and rename mb12-filteval.py in mb12filteval.py) 
 
 Packages and files
 ------------------
 * *config.py*
-    Global constants to configure the environment
+    Global constants for configuring the environment
 * *corpus*
-    New corpus can be generated with the function *corpus.builder*, passing a list of instances of the classes in
+    New corpus can be generated with the function *corpus.build*, passing a list of instances of the classes in
     *corpus.filters*.
-* *external*
-    Interfaces for accessing to external resources.
 * *indexing*
     Each module in this package contains a function *index* to generate an index from a plain text corpus, filtering out documents after a specific time.
     An index takes a name that is used in the retrieval phase.
@@ -44,11 +45,11 @@ Packages and files
 * *classification*
     Supervised learning utilities.
 * *realtimeFilering*
-    Classes for real-time filtering (a TREC microblog task), they uses *classification*.
+    Classes for real-time filtering (a TREC microblog task), which mainly use *classification*.
 * *utils*
     Generic classes and functions used in the library.
-* *test* (not a package)
-    Scripts to execute applications using the library (building indexes, searching from TREC topics, ...).
+* *scripts* (not a package)
+    Scripts to execute applications using the library (building indexes, validating models, ...).
 * *data* (not a package)
     Data path contains all the data used by the library (cached data, indexes, ...).
 

@@ -11,5 +11,5 @@ setup(name='CipCipPy',
     package_dir={'': 'src'},
     py_modules=['CipCipPy.config'],
     #packages=['CipCipPy.'+name for name in os.listdir('src') if os.path.isdir(os.path.join('src', name))],
-    requires=['numpy', 'whoosh', 'sklearn', 'nltk']
+    requires=['whoosh', 'sklearn', 'nltk']
 )

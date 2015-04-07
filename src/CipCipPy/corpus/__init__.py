@@ -26,7 +26,7 @@ __authors__ = ["Giacomo Berardi <giacomo.berardi@isti.cnr.it>",
                "Andrea Esuli <andrea.esuli@isti.cnr.it>",
                "Diego Marcheggiani <diego.marcheggiani@isti.cnr.it>"]
 
-import os, re, codecs
+import os, codecs #, re
 from multiprocessing import Pool
 from filters import BaseFilter
 # import httplib2
