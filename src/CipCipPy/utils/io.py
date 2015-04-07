@@ -30,8 +30,7 @@ def dataset_iter(path, start_time, end_time, reverse=False):
 
 
 def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResults = float("inf")):
-    """Write results text in TREC format
-    queryIds - list of query numbers relative to results list
+    """Write result dumps in TREC textual format
     indexForPrint - index object to retrieve tweets to print in the results, if false no tweets are printed"""
     f = open(os.path.join(resultsPath, runName), 'w')
     searcher = None
@@ -45,13 +44,15 @@ def writeResults(results, runName, resultsPath, indexForPrint = None, numOfResul
                     tweet = '\n'
                     if indexForPrint:
                         tweet = '\t' + getStoredValue(searcher, r[n][0], 'status') + '\n'
-                    f.write((q + '\t' + r[n][0] + '\t' + str(r[n][1]) + '\t' + runName + tweet).encode('ascii', 'replace'))
+                    f.write((q + '\t' + r[n][0] + '\t' + str(r[n][1]) +
+                             '\t' + runName + tweet).encode('ascii', 'replace'))
     finally:
+        f.close()
         if indexForPrint:
             searcher.close()
 
 def readQueries(filePath):
-    """Returns tuples of query string and dated from a topics file:
+    """Return tuples of query string and dates from a topics file:
     (number, query topic, query date, query date as tweet id [, query date as tweet id of the most recent tweet])"""
     queries = []
     f = open(filePath)

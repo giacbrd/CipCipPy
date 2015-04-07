@@ -54,5 +54,6 @@ Packages and files
 
 Publications
 ------------
-* Berardi, G., Esuli, A., Marcheggiani, D., & Sebastiani, F. ISTI@ TREC Microblog track 2011: exploring the use of hashtag segmentation and text quality ranking.
-* Berardi, G., Esuli, A., & Marcheggiani, D. ISTI@ TREC Microblog track 2012: real-time filtering through supervised learning.
+* *On the Impact of Entity Linking in Microblog Real-Time Filtering*. Berardi G., Ceccarelli D., Esuli A., & Marcheggiani D.
+* *ISTI@ TREC Microblog track 2012: real-time filtering through supervised learning*. Berardi G., Esuli A., & Marcheggiani D.
+* *ISTI@ TREC Microblog track 2011: exploring the use of hashtag segmentation and text quality ranking*. Berardi G., Esuli A., Marcheggiani D., & Sebastiani F.

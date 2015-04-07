@@ -7,7 +7,7 @@ from whoosh.fields import Schema, TEXT, ID, DATETIME
 import whoosh.index
 
 from ..config import MEM_SIZE, PROC_NUM
-from ..utils.fileManager import iterTweets
+from ..utils.io import iterTweets
 from ..utils.hashtag import Segmenter
 from . import getIndexPath
 

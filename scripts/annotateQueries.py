@@ -3,8 +3,8 @@ usage: <topic file> <output file> <Dexter API url>"""
 
 import json
 import sys
-from CipCipPy.utils.fileManager import readQueries
-from CipCipPy.utils.entityLink import entities
+from CipCipPy.utils.io import readQueries
+from CipCipPy.utils.annotation import entities
 from pydexter import DexterClient
 
 queries = readQueries(sys.argv[1])

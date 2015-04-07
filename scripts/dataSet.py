@@ -1,19 +1,14 @@
-"""Data set generation for real-time filtering.
+"""Dataset generation for real-time filtering.
 usage: <corpus directory> <output directory> <Dexter API url> <number of processes>"""
-import gzip
 
-import json
-import os
-import sys
-import codecs
-import errno
+import gzip, json, os, sys, errno
 from multiprocessing import Pool
 
-from CipCipPy.utils.fileManager import readQueries, iterTweets, topicsFileName
+from CipCipPy.utils.io import iterTweets
 from CipCipPy.retrieval import getStoredValue
-from CipCipPy.utils.entityLink import entities
-
+from CipCipPy.utils.annotation import entities
 from CipCipPy.indexing import getIndex
+
 from pydexter import DexterClient
 
 corpusPath = sys.argv[1]
@@ -21,7 +16,7 @@ outPath = sys.argv[2]
 dxtr = DexterClient(sys.argv[3], default_params={"lp":0.2})
 processes = int(sys.argv[4])
 
-#FIXME avoid whoosh indexes!
+#FIXME avoid whoosh indexes! (consequently whoosh dependency)
 
 _storedStatus = getIndex('storedStatus')
 _storedHashtag = getIndex('storedHashtag')

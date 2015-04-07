@@ -10,15 +10,11 @@ arguments:
 
 #FIXME use argparse
 
-import sys
+import sys, os
 from Queue import Empty
-import os
-
-from CipCipPy.utils.fileManager import readQueries, topicsFileName
-from CipCipPy.indexing import hashtag, linkTitle, status, annotation
-
+from CipCipPy.utils.io import readQueries, topicsFileName
+from CipCipPy.indexing import hashtag, linktitle, status, annotation
 from CipCipPy.config import RESOURCE_PATH
-
 
 queries = readQueries(sys.argv[1])
 nameSuffix = "." + topicsFileName(sys.argv[1])
@@ -27,7 +23,7 @@ def index(q):
     print q
     print "link titles indexing"
     try:
-        linkTitle.index(sys.argv[4], 'linkTitle' + nameSuffix, tweetTime = q[3])
+        linktitle.index(sys.argv[4], 'linkTitle' + nameSuffix, tweetTime = q[3])
     except Empty:
         print "empty index, skipping!"
     print "status indexing"
@@ -44,9 +40,8 @@ def index(q):
 print "collection data indexing"
 status.index(sys.argv[2], 'storedStatus', stored = True)
 hashtag.index(sys.argv[3], 'storedHashtag' , stored = True, dictionary=os.path.join(RESOURCE_PATH, '1gramsGoogle'))
-linkTitle.index(sys.argv[4], 'storedLinkTitle', stored = True)
+linktitle.index(sys.argv[4], 'storedLinkTitle', stored = True)
 annotation.index(sys.argv[5], 'storedAnnotations20130805', stored = True)
-#namedEntity.index(sys.argv[5], 'storedNamedEntity', stored = True, overwrite = False)
 
 try:
     for q in queries:

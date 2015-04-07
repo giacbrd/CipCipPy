@@ -3,7 +3,7 @@ usage: <print out of a filtering run> <output file> <Dexter API url>"""
 
 import json
 import sys
-from CipCipPy.utils.entityLink import entities
+from CipCipPy.utils.annotation import entities
 from pydexter import DexterClient
 
 tweets = eval(open(sys.argv[1]).readline().strip())

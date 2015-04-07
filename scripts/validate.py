@@ -1,4 +1,5 @@
 """
+Validation script (print results on validation topics)
 arguments:
     validation topics file
     validation annotated topics
@@ -6,20 +7,20 @@ arguments:
     dataset path
     "external" for using external information, otherwise internal"
     parameters: classifier (R, NC), classifier parameter, number of negative samples,
-        minimum link probability, annotation pre-filtering, feature extraction function names (divided by .) for twitter status,
-        for generic feature extraction, for binary features.
+        minimum link probability, annotation pre-filtering, feature extraction function names (divided by .)
+        for twitter status, for generic feature extraction.
         e.g. R-0.1:0.2-10:100-....-terms.bigrams-terms-hasUrl.hasMention
     path for output file
 """
 
 import sys, collections, re, itertools, os
 
-from CipCipPy.utils.fileManager import readQueries, readQrels
+from CipCipPy.utils.io import readQueries, readQrels
 from CipCipPy.filtering import SupervisedFilterer
-from CipCipPy.classification.scikitClassifiers import *
+from CipCipPy.classification import *
 from CipCipPy.classification.feature import *
-
 from CipCipPy.evaluation import T11SU
+
 from mb12filteval import *
 import EvalJig as ej
 
@@ -78,8 +79,9 @@ for param in list(itertools.product(*parameters)):
     print param
     sys.stdout.flush()
 
-    classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, \
-        genericFeatures, entityFeatures, binaryFeatures = param
+    classifier, classifierParam, neg, minLinkProb, expansion_limit, statusFeatures, \
+        genericFeatures, entityFeatures = param
+
     if classifier == 'NC':
         classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
     elif classifier == 'R':
@@ -104,13 +106,11 @@ for param in list(itertools.product(*parameters)):
     f = SupervisedFilterer(classifier)
     f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],
                           [eval(feat) for feat in genericFeatures.split('.')],
-                          [eval(feat) for feat in binaryFeatures.split('.')],
                           [eval(feat) for feat in entityFeatures.split('.')],
                           float(minLinkProb),
                           expansion_limit=float(expansion_limit))
 
-    results, printOut = f.get(queries, queriesAnnotated, int(neg), dataset_path,
-                qrels2, external, annotationFilter=True if annotationRule == 'True' else False)
+    results, printOut = f.get(queries, queriesAnnotated, int(neg), dataset_path, qrels2, external)
 
     ##########################################################
 
@@ -141,7 +141,6 @@ for param in list(itertools.product(*parameters)):
     jig.print_scores()
     jig.comp_means()
     jig.print_means()
-
 
     # Using CipCipPy evaluation tools
     # T11SUs = T11SU(results, qrels)

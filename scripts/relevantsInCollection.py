@@ -1,10 +1,7 @@
-__author__ = 'giacomo'
+"""Debugging script: print some info about relevant tweets in a collection"""
 
-import sys
-import os
-
-from CipCipPy.utils.fileManager import readQueries, readQrels, iterTweets
-
+import sys, os
+from CipCipPy.utils.io import readQueries, readQrels, iterTweets
 
 queries = readQueries(sys.argv[1])
 qrels = readQrels(sys.argv[2], set(q[0] for q in queries))
@@ -26,7 +23,7 @@ for fName in dirList:
                 continue
             if tweetId in qrels[qKey][0]:
                 if int(q[3]) == int(tweetId):
-                    print q, 'FIRST', tweet
+                    print q, 'FIRST TWEET', tweet
                 print q[0], q[1], '>>>>>>' , clean(tweet[4])
                 pos[qKey] += 1
 

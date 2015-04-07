@@ -1,17 +1,13 @@
 """Evaluate results with TREC tools
 usage: <dumps dir> <topicsFile> <qrelsFile>"""
 
-import sys
-import os
-import cPickle
+import sys, os, cPickle
 
-from CipCipPy.evaluation.trecTools import printEval
-
+from CipCipPy.evaluation.trec import printEval
 
 inPath = sys.argv[1]
 topicsPath = sys.argv[2]
 qrelsPath = sys.argv[3]
-
 
 results = {}
 

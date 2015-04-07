@@ -9,20 +9,19 @@ arguments:
     results dir
     "external" for using external information, otherwise "internal"
     parameters: classifier (R, NC), classifier parameter, number of negative samples,
-        minimum link probability, annotation pre-filtering, feature extraction function names (divided by .) for twitter status,
-        for generic feature extraction, for binary features.
+        minimum link probability, annotation pre-filtering, feature extraction function names (divided by .)
+        for twitter status, for generic feature extraction.
         e.g. R-0.2-100-....-terms.bigrams-terms-hasUrl.hasMention
     [query numbers divided by :]
 """
 
 
-import sys, errno, json, os
+import sys, errno, os
 
-from CipCipPy.utils.fileManager import readQueries, readQrels
+from CipCipPy.utils.io import readQueries, readQrels
 from CipCipPy.filtering import SupervisedFilterer
-from CipCipPy.classification.scikitClassifiers import *
+from CipCipPy.classification import *
 from CipCipPy.classification.feature import *
-
 
 #FIXME use argparse
 
@@ -44,8 +43,8 @@ if sys.argv[6] == 'external':
 
 param = sys.argv[7].split('-')
 
-classifier, classifierParam, neg, minLinkProb, expansion_limit, annotationRule, statusFeatures, genericFeatures, \
-    entityFeatures, binaryFeatures = param
+classifier, classifierParam, neg, minLinkProb, expansion_limit, statusFeatures, genericFeatures, \
+    entityFeatures = param
 
 if classifier == 'NC':
     classifier = NCClassifier(shrink=float(classifierParam) if classifierParam != 'None' else None)
@@ -68,7 +67,6 @@ f = SupervisedFilterer(classifier)
 
 f.setFeatureExtractor([eval(feat) for feat in statusFeatures.split('.')],
                       [eval(feat) for feat in genericFeatures.split('.')],
-                      [eval(feat) for feat in binaryFeatures.split('.')],
                       [eval(feat) for feat in entityFeatures.split('.')],
                       float(minLinkProb),
                       expansion_limit=float(expansion_limit))
@@ -87,13 +85,8 @@ if not os.path.exists(dumpsPath):
             raise
 
 results, printOut = f.get(queries, queriesAnnotated, int(neg), dataset_path,
-            qrels, external, annotationFilter=True if annotationRule == 'True' else False, dumpsPath=dumpsPath)
+            qrels, external, dumpsPath=dumpsPath)
 
 #print printOut
 #printEval(sys.argv[1], sys.argv[3], results)
-
-
-#indexForPrint = whoosh.index.open_dir(getIndexPath('storedStatus'))
-
-#writeResults(results, runName, resultsPath, indexForPrint = indexForPrint)
 

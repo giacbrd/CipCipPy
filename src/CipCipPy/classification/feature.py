@@ -200,44 +200,6 @@ def segmHashtagsBigrams(text, dictionary):
         hashBigr.extend(bigrams(' '.join(segmenter.get(ht)[0])))
     return hashBigr
 
-def countAggregateAllEntities(nerTweet):
-    """Returns a feature representing the count of the named entities"""
-    result=[]
-    count=nerTweet.count('/B-')
-    for i in range(count):
-        result.append('_ner_')
-    return result
-
-def countAggregateMostCommonEntities(nerTweet):
-    """Returns a feature representing the count of the most common named entities"""
-    entitiesName=['person','geo-loc','company']
-    result=[]
-    for ent in entitiesName:
-        count=nerTweet.count('/B-'+ent)
-        for i in range(count):
-            result.append('_ner_')
-    return result
-
-def countSpecificAllEntities(nerTweet):
-    """Returns a feature representing the count of each type of named entity"""
-    entitiesName=['person','geo-loc','company','facility','product','band','sportsteam','movie','tv-show','other','NONE']
-    result=[]
-    for ent in entitiesName:
-        count=nerTweet.count('/B-'+ent)
-        for i in range(count):
-            result.append('_'+ent+'_')
-    return result
-
-def countSpecificMostCommonEntities(nerTweet):
-    """Returns a feature representing the count of each type of the most common named entities"""
-    entitiesName=['person','geo-loc','company']
-    result=[]
-    for ent in entitiesName:
-        count=nerTweet.count('/B-'+ent)
-        for i in range(count):
-            result.append('_'+ent+'_')
-    return result
-
 def countIntersectingTerms(text, query):
     """Returns a feature representing the number of terms in common between two texts"""
     result=[]

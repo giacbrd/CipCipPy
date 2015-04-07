@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
-import os
 
 setup(name='CipCipPy',
     description='Twitter IR system for the TREC Microblog track',

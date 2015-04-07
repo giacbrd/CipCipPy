@@ -1,15 +1,12 @@
 """Write results from result dumps
 usage: <dumps dir> <out path> <run name> [printTweets]"""
 
-import sys
-import os
-import cPickle
+import sys, os, cPickle
 
-from CipCipPy.utils.fileManager import writeResults
-import whoosh.index
-
+from CipCipPy.utils.io import writeResults
 from CipCipPy.indexing import getIndexPath
 
+import whoosh.index
 
 inPath = sys.argv[1]
 outPath = sys.argv[2]
