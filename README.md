@@ -28,20 +28,21 @@ Dependencies
 * nltk
 * langid (for language detection)
 * TREC tools for evaluation: mb12-filteval.py and EvalJig.py 
-(download them from http://trec.nist.gov/data/microblog2012.html and rename mb12-filteval.py in mb12filteval.py) 
+(download them from http://trec.nist.gov/data/microblog2012.html and rename mb12-filteval.py to mb12filteval.py) 
 
 Packages and files
 ------------------
 * *config.py*
-    Global constants for configuring the environment
+    Global parameters for configuring the environment.
 * *corpus*
-    New corpus can be generated with the function *corpus.build*, passing a list of instances of the classes in
+    A new corpus can be generated with the function *corpus.build*, passing a list of instances of the classes from
     *corpus.filters*.
 * *indexing*
-    Each module in this package contains a function *index* to generate an index from a plain text corpus, filtering out documents after a specific time.
+    Each module in this package contains a function *index* to generate an index from a plain text corpus, 
+    filtering out documents after a specific time.
     An index takes a name that is used in the retrieval phase.
 * *retrieval*
-    Classes for searching, use the indexes by index names.
+    Tools for accessing (e.g., searching) the indexes.
 * *classification*
     Supervised learning utilities.
 * *realtimeFilering*
@@ -49,9 +50,9 @@ Packages and files
 * *utils*
     Generic classes and functions used in the library.
 * *scripts* (not a package)
-    Scripts to execute applications using the library (building indexes, validating models, ...).
+    Scripts for executing applications which exploit the library (building indexes, validating models, ...).
 * *data* (not a package)
-    Data path contains all the data used by the library (cached data, indexes, ...).
+    The data path contains all the data files used by the library (cached data, indexes, ...).
 
 Publications
 ------------
