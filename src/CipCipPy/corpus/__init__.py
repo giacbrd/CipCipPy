@@ -101,7 +101,7 @@ def _enrich(corpusPath1, corpusPath2, dirList2, filters, outPath, overwrite):
 
 def enrich(corpusPath1, corpusPath2, filters, outPath, processes = 1, overwrite = False):
     """Create a corpus that contains the tweets of corpus1,
-    and the tweets of corpus2 those are not in corpus1
+    and the tweets of corpus2 that are not in corpus1 (it is an union operation).
     Filters are applied to corpus2"""
     pool = Pool(processes)
     if not os.path.exists(outPath):

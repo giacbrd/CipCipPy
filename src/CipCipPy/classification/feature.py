@@ -59,6 +59,7 @@ def getLemmatizer():
     return lemmatizer
 
 def surfaceForms(data, min_linkprob, min_score):
+    """Returns the surface forms of all the entities of each mention in the text (Exp3 in the SAC 2015 paper)"""
     if min_linkprob > 1. or min_score > 1. or not data:
         return []
     spots = data[0]
@@ -95,11 +96,11 @@ def surfaceForms(data, min_linkprob, min_score):
     return [ALIAS_FEATURE + feat for feat in result.union(partial_result)]
 
 def firstEntity(data, min_linkprob, min_score):
+    """Returns only the first candidate entity for each mention"""
     if min_linkprob > 1. or not data:
         return []
     spots = data[0]
     result = []
-    # Explore mentions
     for spot in (s for s in spots if s["linkProbability"] >= min_linkprob):
         if not spot["candidates"]:
             continue
@@ -108,6 +109,7 @@ def firstEntity(data, min_linkprob, min_score):
     return result
 
 def mentionsInText(data, min_linkprob, min_score):
+    """Returns the mentions spotted in the text (Exp1 in the SAC 2015 paper)"""
     if min_linkprob > 1. or not data:
         return []
     spots = data[0]
@@ -118,6 +120,7 @@ def mentionsInText(data, min_linkprob, min_score):
     return result
 
 def candidateEntities(data, min_linkprob, min_score):
+    """Returns all the candidate entities for each mention (Exp2 in the SAC 2015 paper)"""
     if min_linkprob > 1. or min_score > 1. or not data:
         return []
     spots = data[0]
@@ -177,7 +180,7 @@ def mentions(text):
 
 def hasHashtags(text):
     """Returns hashtags of a text"""
-    return [HASHTAG_FEATURE]if hashtagRE.findall(text) else []
+    return [HASHTAG_FEATURE] if hashtagRE.findall(text) else []
 
 def hasMentions(text):
     """Returns mentioned users of a text"""

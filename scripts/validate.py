@@ -5,12 +5,12 @@ arguments:
     validation annotated topics
     relevance judgements
     dataset path
-    "external" for using external information, otherwise internal"
+    "external" for using external information, otherwise "internal"
     parameters: classifier (R, NC), classifier parameter, number of negative samples,
-        minimum link probability, annotation pre-filtering, feature extraction function names (divided by .)
-        for twitter status, for generic feature extraction.
-        e.g. R-0.1:0.2-10:100-....-terms.bigrams-terms-hasUrl.hasMention
-    path for output file
+        minimum link probability, feature extraction function names (divided by .)
+        for twitter status, for generic feature extraction (used on queries), for entity linking expansion.
+        e.g. R-0.1:0.2-10:100-....-terms.bigrams-terms-surfaceForms
+    path for the output file with the evaluation
 """
 
 import sys, collections, re, itertools, os

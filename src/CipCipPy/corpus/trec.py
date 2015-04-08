@@ -3,12 +3,12 @@
 import os
 import subprocess
 
-def _getCommand(toolDir):
-    return "java -Xmx4g -cp '" + toolDir + "/lib/*:" + toolDir + "/dist/twitter-corpus-tools-0.0.1.jar' "
+def _getCommand(toolsDir, toolsJar):
+    return "java -Xmx4g -cp '" + toolsDir + "/lib/*:" + toolsDir + "/dist/twitter-corpus-tools-0.0.1.jar' "
 
 
-def download(toolPath, datPath, outPath):
-    command = _getCommand(toolPath)
+def download(toolsPath, toolsJar, datPath, outPath):
+    command = _getCommand(toolsPath)
     for names in os.walk(datPath):
         for fName in names[2]:
             if fName[-3:] == 'dat':
@@ -17,8 +17,8 @@ def download(toolPath, datPath, outPath):
                         fName) + " -output " + os.path.join(outPath, fName[:-4] + ".html.seq")), shell=True)
 
 
-def dump(toolPath, corpusPath, outPath):
-    command = _getCommand(toolPath)
+def dump(toolsPath, toolsJar, corpusPath, outPath):
+    command = _getCommand(toolsPath)
     for names in os.walk(corpusPath):
         for fName in names[2]:
             if fName[-3:] == 'seq':
@@ -27,8 +27,8 @@ def dump(toolPath, corpusPath, outPath):
                         fName) + " -dump -html > " + os.path.join(outPath, fName[:-4] + ".txt")), shell = True)
 
 
-def repair(toolPath, datPath, corpusPath, outPath):
-    command = _getCommand(toolPath)
+def repair(toolsPath, toolsJar, datPath, corpusPath, outPath, logsPath):
+    command = _getCommand(toolsPath)
     for names in os.walk(datPath):
         for fName in names[2]:
             if fName[-3:] == 'dat':

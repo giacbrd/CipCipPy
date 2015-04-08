@@ -9,9 +9,9 @@ arguments:
     results dir
     "external" for using external information, otherwise "internal"
     parameters: classifier (R, NC), classifier parameter, number of negative samples,
-        minimum link probability, annotation pre-filtering, feature extraction function names (divided by .)
-        for twitter status, for generic feature extraction.
-        e.g. R-0.2-100-....-terms.bigrams-terms-hasUrl.hasMention
+        minimum link probability, feature extraction function names (divided by .)
+        for twitter status, for generic feature extraction (used on queries), for entity linking expansion.
+        e.g. R-0.2-100-....-terms.bigrams-terms-surfaceForms
     [query numbers divided by :]
 """
 

@@ -1,4 +1,5 @@
 """Filter classes to use in this package builder method."""
+
 import re
 import urllib2
 import signal
@@ -8,7 +9,7 @@ from ..utils import punctuations, urlRE
 
 
 class BaseFilter:
-    """Filter out bad tweets"""
+    """Filter out ``bad'' tweets"""
     
     def filter(self, line):
         l = line.split('\t')
@@ -17,8 +18,9 @@ class BaseFilter:
         else:
             return None
 
+
 class TimeRange:
-    """Filter out tweets external to a time range"""
+    """Filter out tweets not in a time range"""
 
     def __init__(self, tweetTime, tweetNewestTime):
         self.tweetTime = tweetTime
@@ -36,7 +38,6 @@ class TimeRange:
 class EnglishTri:
     """Filter out non english tweets with trigrams similarity method."""
 
-    # TODO pass a english corpus to verify if a tweet is already processed e.g. add only new tweets and copy the old ones
     def __init__(self, languageTraining):
         self.lingGuesser = language.Lang(languageTraining)
     
@@ -46,6 +47,7 @@ class EnglishTri:
             return line
         else:
             return None
+
 
 class EnglishLangid:
     """Filter out non english tweets using https://github.com/saffsd/langid.py"""
@@ -61,6 +63,7 @@ class EnglishLangid:
             else:
                 return None
 
+
 class HtmlUnescape:
     """Unescape html code"""
 
@@ -73,7 +76,9 @@ class HtmlUnescape:
         l[4] = self.hp.unescape(' '.join(l[4].splitlines()))
         return '\t'.join(l)
 
+
 titleRE = re.compile('<title>(.*?)</title>', re.I | re.S)
+
 
 class LinkTitles:
     """Substitute the twitter status with the titles of links it contains."""
